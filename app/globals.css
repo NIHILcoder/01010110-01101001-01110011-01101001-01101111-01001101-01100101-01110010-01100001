@@ -114,3 +114,17 @@
   z-index: 0;
 }
 
+/* Add these styles to your global.css file */
+
+@keyframes gradient {
+  0% { background-position: 0% center; }
+  100% { background-position: 300% center; }
+}
+
+.animate-gradient {
+  animation: gradient 8s linear infinite;
+}
+
+.bg-gradient-size {
+  background-size: 300% auto;
+}

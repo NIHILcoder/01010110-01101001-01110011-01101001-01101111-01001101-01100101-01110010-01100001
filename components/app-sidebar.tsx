@@ -36,6 +36,12 @@ export function AppSidebar() {
       notification: false,
     },
     {
+      title: "Prompt Library",
+      href: "/prompts",
+      icon: BookOpen,
+      notification: false,
+    },
+    {
       title: "Community",
       href: "/community",
       icon: Users,
