@@ -54,27 +54,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
-import { EnhancedParticlesBackground } from "@/components/enhanced-particles-background";
 
-// Определение типов для тегов
-interface TagItem {
-    text: string;
-    category: string;
-}
-
-// Определение типов для моделей
-interface ModelOption {
-    name: string;
-    id: string;
-    image: string;
-}
-
-// Интерфейс для сгруппированных тегов
-interface GroupedTags {
-    [category: string]: TagItem[];
-}
-
-// Основной компонент
 export function EnhancedGenerationForm() {
     // State variables
     const [generating, setGenerating] = useState<boolean>(false);
@@ -95,61 +75,10 @@ export function EnhancedGenerationForm() {
     const promptInputRef = useRef<HTMLTextAreaElement>(null);
     const generationContainerRef = useRef<HTMLDivElement>(null);
 
-    // Mock tag suggestions
-    const tagSuggestions: TagItem[] = [
-        { text: "detailed", category: "quality" },
-        { text: "high quality", category: "quality" },
-        { text: "photorealistic", category: "style" },
-        { text: "8k", category: "resolution" },
-        { text: "cinematic lighting", category: "lighting" },
-        { text: "sharp focus", category: "focus" },
-        { text: "studio quality", category: "quality" },
-    ];
-
-    // Model options
-    const modelOptions: ModelOption[] = [
-        { name: "Flux Realistic", id: "flux", image: "/placeholder.svg?height=80&width=80&text=Flux" },
-        { name: "Anime Diffusion", id: "anime", image: "/placeholder.svg?height=80&width=80&text=Anime" },
-        { name: "Dreamshaper", id: "dreamshaper", image: "/placeholder.svg?height=80&width=80&text=Dream" },
-        { name: "Realistic Vision", id: "realistic", image: "/placeholder.svg?height=80&width=80&text=Real" },
-    ];
-
-    // Group tags by category
-    const groupedTags: GroupedTags = tagSuggestions.reduce((acc: GroupedTags, tag) => {
-        if (!acc[tag.category]) {
-            acc[tag.category] = [];
-        }
-        acc[tag.category].push(tag);
-        return acc;
-    }, {});
-
     // Handle prompt change
     const handlePromptChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
         setPrompt(e.target.value);
         setShowTagSuggestions(e.target.value.length > 0);
-    };
-
-    // Handle negative prompt change
-    const handleNegativePromptChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-        setNegativePrompt(e.target.value);
-    };
-
-    // Add tag to prompt
-    const addTagToPrompt = (tagText: string) => {
-        const newPrompt = prompt ? `${prompt}, ${tagText}` : tagText;
-        setPrompt(newPrompt);
-
-        // Focus back on the prompt input after adding a tag
-        if (promptInputRef.current) {
-            promptInputRef.current.focus();
-        }
-    };
-
-    // Handle file upload
-    const handleFileUpload = () => {
-        if (fileInputRef.current) {
-            fileInputRef.current.click();
-        }
     };
 
     // Generate image
@@ -175,33 +104,12 @@ export function EnhancedGenerationForm() {
         }, 100);
     };
 
-    // Toggle fullscreen
-    const toggleFullscreen = () => {
-        setFullscreen(!fullscreen);
-    };
-
-    // Zoom in/out
-    const handleZoomIn = () => {
-        setZoomLevel((prev) => Math.min(prev + 10, 200));
-    };
-
-    const handleZoomOut = () => {
-        setZoomLevel((prev) => Math.max(prev - 10, 50));
-    };
-
-    // Reset zoom
-    const resetZoom = () => {
-        setZoomLevel(100);
-    };
-
     return (
-        <div className="container relative mx-auto py-8">
-            <EnhancedParticlesBackground variant="sparkles" density={60} />
-
-            {/* Main Content - Centered structure with larger preview */}
-            <div className="max-w-7xl mx-auto flex flex-col lg:flex-row gap-6">
+        <div className="w-full h-full">
+            {/* Main Content - Expanded layout to fill available space */}
+            <div className="w-full grid grid-cols-1 lg:grid-cols-3 gap-6">
                 {/* Left side: Generation Settings */}
-                <div className="w-full lg:w-1/3 space-y-4">
+                <div className="w-full lg:col-span-1 space-y-4">
                     <Card>
                         <CardHeader className="pb-3">
                             <div className="flex items-center justify-between">
@@ -268,44 +176,6 @@ export function EnhancedGenerationForm() {
                                                 onChange={handlePromptChange}
                                                 ref={promptInputRef}
                                             />
-
-                                            {/* Tag suggestions */}
-                                            {showTagSuggestions && (
-                                                <Card className="absolute bottom-2 left-2 right-2 z-10 max-h-64 overflow-auto p-2 shadow-md">
-                                                    <div className="mb-2 flex items-center justify-between px-2">
-                                                        <div className="text-xs font-medium">Suggested tags:</div>
-                                                        <Button
-                                                            variant="ghost"
-                                                            size="icon"
-                                                            className="h-6 w-6"
-                                                            onClick={() => setShowTagSuggestions(false)}
-                                                        >
-                                                            <X className="h-3 w-3" />
-                                                        </Button>
-                                                    </div>
-                                                    <ScrollArea className="h-48 pr-4">
-                                                        {Object.entries(groupedTags).map(([category, tags]) => (
-                                                            <div key={category} className="mb-3">
-                                                                <div className="mb-1 px-2 text-xs font-semibold capitalize text-muted-foreground">
-                                                                    {category}:
-                                                                </div>
-                                                                <div className="flex flex-wrap gap-1 px-2">
-                                                                    {tags.map((tag) => (
-                                                                        <Badge
-                                                                            key={tag.text}
-                                                                            variant="outline"
-                                                                            className="cursor-pointer bg-secondary hover:bg-primary hover:text-primary-foreground"
-                                                                            onClick={() => addTagToPrompt(tag.text)}
-                                                                        >
-                                                                            {tag.text}
-                                                                        </Badge>
-                                                                    ))}
-                                                                </div>
-                                                            </div>
-                                                        ))}
-                                                    </ScrollArea>
-                                                </Card>
-                                            )}
                                         </div>
 
                                         <div className="flex items-center justify-between">
@@ -329,30 +199,25 @@ export function EnhancedGenerationForm() {
                                     <div className="space-y-2">
                                         <Label htmlFor="negative-prompt" className="flex items-center gap-2">
                                             Negative Prompt
-                                            <Tooltip>
-                                                <TooltipTrigger asChild>
-                                                    <Button variant="ghost" size="icon" className="h-5 w-5">
-                                                        <Lightbulb className="h-3 w-3" />
-                                                    </Button>
-                                                </TooltipTrigger>
-                                                <TooltipContent>
-                                                    <p>Elements to exclude from the generated image</p>
-                                                </TooltipContent>
-                                            </Tooltip>
                                         </Label>
                                         <Textarea
                                             id="negative-prompt"
                                             placeholder="Elements to avoid in the image... (e.g., blurry, bad anatomy, distorted, watermark, signature)"
                                             className="min-h-[80px] resize-none"
                                             value={negativePrompt}
-                                            onChange={handleNegativePromptChange}
+                                            onChange={(e) => setNegativePrompt(e.target.value)}
                                         />
                                     </div>
 
                                     <div className="space-y-3">
                                         <Label className="text-base font-medium">Model Selection</Label>
                                         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                                            {modelOptions.map((model) => (
+                                            {[
+                                                { id: "flux", name: "Flux Realistic", image: "/placeholder.svg?height=80&width=80&text=Flux" },
+                                                { id: "anime", name: "Anime Diffusion", image: "/placeholder.svg?height=80&width=80&text=Anime" },
+                                                { id: "dreamshaper", name: "Dreamshaper", image: "/placeholder.svg?height=80&width=80&text=Dream" },
+                                                { id: "realistic", name: "Realistic Vision", image: "/placeholder.svg?height=80&width=80&text=Real" }
+                                            ].map((model) => (
                                                 <div
                                                     key={model.id}
                                                     className={cn(
@@ -362,7 +227,7 @@ export function EnhancedGenerationForm() {
                                                     onClick={() => setSelectedModel(model.id)}
                                                 >
                                                     <img
-                                                        src={model.image || "/placeholder.svg"}
+                                                        src={model.image}
                                                         alt={model.name}
                                                         className="h-14 w-14 rounded-md object-cover"
                                                     />
@@ -423,7 +288,7 @@ export function EnhancedGenerationForm() {
                                         <Label>Image to Image</Label>
                                         <div
                                             className="flex h-32 cursor-pointer flex-col items-center justify-center rounded-md border border-dashed transition-colors hover:border-primary hover:bg-secondary/50"
-                                            onClick={handleFileUpload}
+                                            onClick={() => fileInputRef.current?.click()}
                                         >
                                             <Upload className="mb-2 h-6 w-6 text-muted-foreground" />
                                             <p className="text-sm text-muted-foreground">Click to upload an image</p>
@@ -452,43 +317,41 @@ export function EnhancedGenerationForm() {
                     </Card>
                 </div>
 
-                {/* Right side: Preview - Larger size */}
-                <div className="w-full lg:w-2/3 space-y-4">
-                    <Card className="flex flex-col">
+                {/* Right side: Preview - Expanded to take more space */}
+                <div className="w-full lg:col-span-2 space-y-4">
+                    <Card className="flex flex-col h-full">
                         <CardHeader className="flex flex-row items-center justify-between pb-3">
                             <CardTitle>Preview</CardTitle>
                             <div className="flex items-center gap-2">
                                 {generatedImage && (
                                     <div className="flex items-center gap-2">
-                                        <Button variant="outline" size="icon" onClick={handleZoomOut} disabled={zoomLevel <= 50}>
+                                        <Button variant="outline" size="icon" onClick={() => setZoomLevel(Math.max(50, zoomLevel - 10))}>
                                             <ZoomOut className="h-4 w-4" />
                                         </Button>
-                                        <Button variant="outline" size="sm" onClick={resetZoom}>
+                                        <Button variant="outline" size="sm" onClick={() => setZoomLevel(100)}>
                                             {zoomLevel}%
                                         </Button>
-                                        <Button variant="outline" size="icon" onClick={handleZoomIn} disabled={zoomLevel >= 200}>
+                                        <Button variant="outline" size="icon" onClick={() => setZoomLevel(Math.min(200, zoomLevel + 10))}>
                                             <ZoomIn className="h-4 w-4" />
                                         </Button>
                                     </div>
                                 )}
-                                <Button variant="outline" size="icon" onClick={toggleFullscreen}>
+                                <Button variant="outline" size="icon" onClick={() => setFullscreen(!fullscreen)}>
                                     <Maximize2 className="h-4 w-4" />
                                 </Button>
                             </div>
                         </CardHeader>
-                        <CardContent>
+                        <CardContent className="flex-1">
                             <div
                                 ref={generationContainerRef}
                                 className={cn(
-                                    "generation-preview relative",
+                                    "generation-preview relative h-full w-full",
                                     aspectRatio === "1:1" ? "aspect-square" :
                                         aspectRatio === "4:3" ? "aspect-4/3" :
                                             aspectRatio === "16:9" ? "aspect-16/9" :
                                                 aspectRatio === "9:16" ? "aspect-9/16" :
                                                     aspectRatio === "2:3" ? "aspect-2/3" :
-                                                        "aspect-3/2",
-                                    // INCREASED SIZE - Make the preview larger
-                                    "h-auto lg:h-[700px] mx-auto"
+                                                        "aspect-3/2"
                                 )}
                             >
                                 {generating ? (
@@ -512,7 +375,7 @@ export function EnhancedGenerationForm() {
                                             }}
                                         >
                                             <img
-                                                src={generatedImage || "/placeholder.svg"}
+                                                src={generatedImage}
                                                 alt="Generated image"
                                                 className="h-full w-full object-contain"
                                             />
@@ -565,69 +428,12 @@ export function EnhancedGenerationForm() {
                         )}
                     </Card>
 
-                    {/* Visual workflow editor for advanced mode */}
-                    <Dialog>
-                        <DialogTrigger asChild>
-                            <Button variant="outline" className="w-full">
-                                <Layers className="mr-2 h-4 w-4" />
-                                Open Visual Workflow Editor
-                            </Button>
-                        </DialogTrigger>
-                        <DialogContent className="max-w-4xl">
-                            <DialogHeader>
-                                <DialogTitle>Visual Workflow Editor</DialogTitle>
-                                <DialogDescription>Create and customize advanced generation workflows</DialogDescription>
-                            </DialogHeader>
-                            <div className="h-[500px] rounded-md border bg-muted/20 p-4">
-                                <div className="flex h-full items-center justify-center">
-                                    <p className="text-muted-foreground">Visual workflow editor would be displayed here</p>
-                                </div>
-                            </div>
-                        </DialogContent>
-                    </Dialog>
+                    {/* Visual workflow editor button */}
+                    <Button variant="outline" className="w-full">
+                        <Layers className="mr-2 h-4 w-4" />
+                        Open Visual Workflow Editor
+                    </Button>
                 </div>
-            </div>
-
-            {/* Quick Access Tools (Fixed position) */}
-            <div className="fixed bottom-4 right-4 z-10 flex flex-col gap-2">
-                <TooltipProvider>
-                    <Tooltip>
-                        <TooltipTrigger asChild>
-                            <Button variant="secondary" size="icon" className="h-10 w-10 rounded-full shadow-lg">
-                                <History className="h-5 w-5" />
-                            </Button>
-                        </TooltipTrigger>
-                        <TooltipContent side="left">
-                            <p>Generation History</p>
-                        </TooltipContent>
-                    </Tooltip>
-                </TooltipProvider>
-
-                <TooltipProvider>
-                    <Tooltip>
-                        <TooltipTrigger asChild>
-                            <Button variant="secondary" size="icon" className="h-10 w-10 rounded-full shadow-lg">
-                                <BookOpen className="h-5 w-5" />
-                            </Button>
-                        </TooltipTrigger>
-                        <TooltipContent side="left">
-                            <p>Prompt Library</p>
-                        </TooltipContent>
-                    </Tooltip>
-                </TooltipProvider>
-
-                <TooltipProvider>
-                    <Tooltip>
-                        <TooltipTrigger asChild>
-                            <Button variant="secondary" size="icon" className="h-10 w-10 rounded-full shadow-lg">
-                                <Settings className="h-5 w-5" />
-                            </Button>
-                        </TooltipTrigger>
-                        <TooltipContent side="left">
-                            <p>Quick Settings</p>
-                        </TooltipContent>
-                    </Tooltip>
-                </TooltipProvider>
             </div>
         </div>
     );
