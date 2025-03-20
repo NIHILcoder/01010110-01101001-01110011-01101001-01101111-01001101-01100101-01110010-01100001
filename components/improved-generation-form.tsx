@@ -198,34 +198,7 @@ export function EnhancedGenerationForm() {
         <div className="container relative mx-auto py-8">
             <EnhancedParticlesBackground variant="sparkles" density={60} />
 
-            {/* Header */}
-            <div className="mb-8 flex flex-col items-center justify-center text-center space-y-4">
-                <div className="flex items-center justify-center mb-2">
-                    <div className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-primary via-primary/80 to-primary flex items-center">
-                        <Sparkles className="h-8 w-8 mr-2 text-primary animate-pulse" />
-                        VisioMera Studio
-                    </div>
-                </div>
-
-                <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-                    Transform your imagination into stunning visuals with our AI-powered creative platform
-                </p>
-
-                <Tabs defaultValue="standard" className="w-full max-w-md">
-                    <TabsList className="grid w-full grid-cols-2">
-                        <TabsTrigger value="standard" className="flex items-center gap-2">
-                            <Sparkles className="h-4 w-4" />
-                            Standard
-                        </TabsTrigger>
-                        <TabsTrigger value="advanced" className="flex items-center gap-2">
-                            <Star className="h-4 w-4" />
-                            Advanced
-                        </TabsTrigger>
-                    </TabsList>
-                </Tabs>
-            </div>
-
-            {/* Main Content - Centered structure */}
+            {/* Main Content - Centered structure with larger preview */}
             <div className="max-w-7xl mx-auto flex flex-col lg:flex-row gap-6">
                 {/* Left side: Generation Settings */}
                 <div className="w-full lg:w-1/3 space-y-4">
@@ -514,8 +487,8 @@ export function EnhancedGenerationForm() {
                                                 aspectRatio === "9:16" ? "aspect-9/16" :
                                                     aspectRatio === "2:3" ? "aspect-2/3" :
                                                         "aspect-3/2",
-                                    // Make the preview larger
-                                    "h-auto lg:h-[600px] mx-auto"
+                                    // INCREASED SIZE - Make the preview larger
+                                    "h-auto lg:h-[700px] mx-auto"
                                 )}
                             >
                                 {generating ? (

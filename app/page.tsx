@@ -5,7 +5,7 @@ import { EnhancedParticlesBackground } from "@/components/enhanced-particles-bac
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Card } from "@/components/ui/card"
-import { Sparkles, Stars, Zap, Lightbulb, Info } from "lucide-react"
+import { Sparkles, Zap, Lightbulb, Info } from "lucide-react"
 import type { MouseEvent as ReactMouseEvent } from 'react';
 
 export default function EnhancedHomePage() {
@@ -13,7 +13,7 @@ export default function EnhancedHomePage() {
         <div className="container relative mx-auto px-4 py-6 md:py-8">
             <EnhancedParticlesBackground variant="sparkles" density={60} />
 
-            {/* Header section with improved responsiveness */}
+            {/* Header section with improved responsiveness - KEEPING ONLY ONE TOGGLE */}
             <div className="mb-6 md:mb-8 flex flex-col items-center justify-center text-center space-y-4">
                 <div className="flex items-center justify-center mb-2">
                     <div className="text-2xl sm:text-3xl md:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-primary via-primary/80 to-primary flex items-center">
@@ -26,6 +26,7 @@ export default function EnhancedHomePage() {
                     Transform your imagination into stunning visuals with our AI-powered creative platform
                 </p>
 
+                {/* Keeping only this toggle, removed the duplicate one */}
                 <Tabs defaultValue="standard" className="w-full max-w-md">
                     <TabsList className="grid w-full grid-cols-2">
                         <TabsTrigger value="standard" className="flex items-center gap-2">
@@ -33,7 +34,7 @@ export default function EnhancedHomePage() {
                             Standard
                         </TabsTrigger>
                         <TabsTrigger value="advanced" className="flex items-center gap-2">
-                            <Stars className="h-4 w-4" />
+                            <Zap className="h-4 w-4" />
                             Advanced
                         </TabsTrigger>
                     </TabsList>
