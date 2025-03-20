@@ -1,6 +1,6 @@
 "use client";
 
-import { EnhancedGenerationForm } from "@/components/enhanced-generation-form"
+import ImprovedGenerationForm from "@/components/improved-generation-form"
 import { EnhancedParticlesBackground } from "@/components/enhanced-particles-background"
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -10,18 +10,19 @@ import type { MouseEvent as ReactMouseEvent } from 'react';
 
 export default function EnhancedHomePage() {
     return (
-        <div className="container relative mx-auto py-8">
+        <div className="container relative mx-auto px-4 py-6 md:py-8">
             <EnhancedParticlesBackground variant="sparkles" density={60} />
 
-            <div className="mb-8 flex flex-col items-center justify-center text-center space-y-4">
+            {/* Header section with improved responsiveness */}
+            <div className="mb-6 md:mb-8 flex flex-col items-center justify-center text-center space-y-4">
                 <div className="flex items-center justify-center mb-2">
-                    <div className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-primary via-primary/80 to-primary flex items-center">
-                        <Sparkles className="h-8 w-8 mr-2 text-primary animate-pulse" />
+                    <div className="text-2xl sm:text-3xl md:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-primary via-primary/80 to-primary flex items-center">
+                        <Sparkles className="h-6 w-6 md:h-8 md:w-8 mr-2 text-primary animate-pulse" />
                         VisioMera Studio
                     </div>
                 </div>
 
-                <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+                <p className="text-sm sm:text-base md:text-lg text-muted-foreground max-w-2xl mx-auto px-2">
                     Transform your imagination into stunning visuals with our AI-powered creative platform
                 </p>
 
@@ -39,34 +40,37 @@ export default function EnhancedHomePage() {
                 </Tabs>
             </div>
 
-            <div className="features-section mb-8 grid grid-cols-1 md:grid-cols-3 gap-4 max-w-6xl mx-auto">
-                <Card className="bg-secondary/30 p-4 rounded-lg border border-border/50 flex flex-col items-center text-center hover:shadow-md hover:border-primary/30 transition-all duration-300">
-                    <div className="p-3 rounded-full bg-primary/10 mb-3">
-                        <Zap className="h-6 w-6 text-primary" />
+            {/* Features section with improved responsive grid */}
+            <div className="features-section mb-6 md:mb-8 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 md:gap-4 max-w-6xl mx-auto">
+                <Card className="bg-secondary/30 p-3 md:p-4 rounded-lg border border-border/50 flex flex-col items-center text-center hover:shadow-md hover:border-primary/30 transition-all duration-300">
+                    <div className="p-2 md:p-3 rounded-full bg-primary/10 mb-2 md:mb-3">
+                        <Zap className="h-5 w-5 md:h-6 md:w-6 text-primary" />
                     </div>
-                    <h3 className="font-medium">Rapid Generation</h3>
-                    <p className="text-sm text-muted-foreground">Create images in seconds with our optimized models</p>
+                    <h3 className="font-medium text-sm md:text-base">Rapid Generation</h3>
+                    <p className="text-xs md:text-sm text-muted-foreground">Create images in seconds with our optimized models</p>
                 </Card>
 
-                <Card className="bg-secondary/30 p-4 rounded-lg border border-border/50 flex flex-col items-center text-center hover:shadow-md hover:border-primary/30 transition-all duration-300">
-                    <div className="p-3 rounded-full bg-primary/10 mb-3">
-                        <Lightbulb className="h-6 w-6 text-primary" />
+                <Card className="bg-secondary/30 p-3 md:p-4 rounded-lg border border-border/50 flex flex-col items-center text-center hover:shadow-md hover:border-primary/30 transition-all duration-300">
+                    <div className="p-2 md:p-3 rounded-full bg-primary/10 mb-2 md:mb-3">
+                        <Lightbulb className="h-5 w-5 md:h-6 md:w-6 text-primary" />
                     </div>
-                    <h3 className="font-medium">AI-Enhanced Prompts</h3>
-                    <p className="text-sm text-muted-foreground">Get better results with our intelligent prompt enhancement</p>
+                    <h3 className="font-medium text-sm md:text-base">AI-Enhanced Prompts</h3>
+                    <p className="text-xs md:text-sm text-muted-foreground">Get better results with our intelligent prompt enhancement</p>
                 </Card>
 
-                <Card className="bg-secondary/30 p-4 rounded-lg border border-border/50 flex flex-col items-center text-center hover:shadow-md hover:border-primary/30 transition-all duration-300">
-                    <div className="p-3 rounded-full bg-primary/10 mb-3">
-                        <Info className="h-6 w-6 text-primary" />
+                <Card className="bg-secondary/30 p-3 md:p-4 rounded-lg border border-border/50 flex flex-col items-center text-center hover:shadow-md hover:border-primary/30 transition-all duration-300 sm:col-span-2 md:col-span-1">
+                    <div className="p-2 md:p-3 rounded-full bg-primary/10 mb-2 md:mb-3">
+                        <Info className="h-5 w-5 md:h-6 md:w-6 text-primary" />
                     </div>
-                    <h3 className="font-medium">Advanced Options</h3>
-                    <p className="text-sm text-muted-foreground">Fine-tune your generation with powerful controls</p>
+                    <h3 className="font-medium text-sm md:text-base">Advanced Options</h3>
+                    <p className="text-xs md:text-sm text-muted-foreground">Fine-tune your generation with powerful controls</p>
                 </Card>
             </div>
 
-            <EnhancedGenerationForm className="mx-auto max-w-7xl animate-fade-in" />
+            {/* Main form with improved responsiveness */}
+            <ImprovedGenerationForm />
 
+            {/* Status indicator with fixed positioning */}
             <div className="fixed bottom-4 left-4 z-10">
                 <Button variant="outline" size="sm" className="text-xs flex items-center gap-1 bg-background/80 backdrop-blur-sm">
                     <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
