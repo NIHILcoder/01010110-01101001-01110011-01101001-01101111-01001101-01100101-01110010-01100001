@@ -1,6 +1,6 @@
 "use client";
 
-import ImprovedGenerationForm from "@/components/improved-generation-form"
+import { EnhancedGenerationForm as ImprovedGenerationForm } from "@/components/improved-generation-form"
 import { EnhancedParticlesBackground } from "@/components/enhanced-particles-background"
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"

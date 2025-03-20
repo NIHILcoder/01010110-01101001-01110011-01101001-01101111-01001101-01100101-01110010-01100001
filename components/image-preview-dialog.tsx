@@ -36,7 +36,7 @@ import { cn } from "@/lib/utils";
 
 interface ImagePreviewDialogProps {
     open: boolean;
-    onOpenChange: (open: boolean) => void;
+    onOpenChangeAction: (open: boolean) => void;
     image: string;
     prompt?: string;
     negativePrompt?: string;
@@ -48,7 +48,7 @@ interface ImagePreviewDialogProps {
 
 export function ImagePreviewDialog({
                                        open,
-                                       onOpenChange,
+                                       onOpenChangeAction,
                                        image,
                                        prompt = "",
                                        negativePrompt = "",
@@ -108,7 +108,7 @@ export function ImagePreviewDialog({
     }, [open]);
 
     return (
-        <Dialog open={open} onOpenChange={onOpenChange}>
+        <Dialog open={open} onOpenChange={onOpenChangeAction}>
             <DialogContent className="max-w-6xl max-h-[90vh] flex flex-col p-0 gap-0 overflow-hidden rounded-lg bg-background">
                 <DialogHeader className="px-6 py-3 flex flex-row items-center justify-between border-b">
                     <div className="flex items-center">
@@ -117,7 +117,7 @@ export function ImagePreviewDialog({
                             {timestamp}
                         </DialogDescription>
                     </div>
-                    <Button variant="outline" size="icon" onClick={() => onOpenChange(false)}>
+                    <Button variant="outline" size="icon" onClick={() => onOpenChangeAction(false)}>
                         <X className="h-4 w-4" />
                     </Button>
                 </DialogHeader>

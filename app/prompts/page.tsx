@@ -121,7 +121,7 @@ interface Tag {
     count: number;
 }
 
-export function PromptLibrary() {
+export default function PromptLibrary() {
     // State
     const [searchQuery, setSearchQuery] = useState("");
     const [activeCategory, setActiveCategory] = useState("all");
@@ -1638,5 +1638,3 @@ export function PromptLibrary() {
         </div>
     );
 }
-
-export default PromptLibrary;

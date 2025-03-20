@@ -878,7 +878,7 @@ export default function EnhancedCommunityGallery() {
         {selectedImageIndex !== null && (
             <ImagePreviewDialog
                 open={previewOpen}
-                onOpenChange={setPreviewOpen}
+                onOpenChangeAction={setPreviewOpen}
                 image={filteredItems[selectedImageIndex]?.image || ""}
                 prompt={filteredItems[selectedImageIndex]?.description || ""}
                 timestamp={formatTimestamp(filteredItems[selectedImageIndex]?.timestamp || "")}
