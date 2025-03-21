@@ -1,10 +1,9 @@
 import type React from "react"
 import { Inter } from "next/font/google"
 import { ThemeProvider } from "@/components/theme-provider"
-import { SidebarProvider } from "@/components/ui/sidebar"
 import { AppSidebar } from "@/components/app-sidebar"
 import { Header } from "@/components/header"
-import { Toaster } from "@/components/ui/toaster"
+import { TooltipProvider } from "@/components/ui/tooltip"
 import "./globals.css"
 
 const inter = Inter({ subsets: ["latin"] })
@@ -15,19 +14,14 @@ export default function RootLayout({
     children: React.ReactNode
 }) {
     return (
-        <html lang="en" suppressHydrationWarning>
+        <html lang="ru" suppressHydrationWarning>
         <body className={inter.className}>
-        <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
-            <SidebarProvider>
-                <div className="flex min-h-screen w-full">
-                    <AppSidebar />
-                    <div className="flex flex-1 flex-col w-full">
-                        <Header />
-                        <main className="flex-1 w-full">{children}</main>
-                    </div>
-                </div>
-                <Toaster />
-            </SidebarProvider>
+        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
+            <TooltipProvider>
+                <AppSidebar />
+                <Header />
+                <main className="max-w-full">{children}</main>
+            </TooltipProvider>
         </ThemeProvider>
         </body>
         </html>

@@ -73,14 +73,6 @@ export default function EnhancedHomePage() {
                 <div className="flex-1 w-full">
                     <ImprovedGenerationForm />
                 </div>
-
-                {/* Status indicator with fixed positioning */}
-                <div className="fixed bottom-4 left-4 z-10">
-                    <Button variant="outline" size="sm" className="text-xs flex items-center gap-1 bg-background/80 backdrop-blur-sm">
-                        <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
-                        AI Models: Online
-                    </Button>
-                </div>
             </div>
 
             <style jsx global>{`
