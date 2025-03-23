@@ -8,19 +8,19 @@ import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { cn } from "@/lib/utils"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+import { useLanguage } from "@/components/language-context"
 
 export function AppSidebar() {
   const pathname = usePathname()
-  const [isLoggedIn, setIsLoggedIn] = useState(true)
-
+  // Изменено на false, чтобы показать кнопку входа по умолчанию
+  const [isLoggedIn, setIsLoggedIn] = useState(false)
   const [collapsed, setCollapsed] = useState(false)
+  const { t } = useLanguage()
 
-  // Add an effect to update document body class when sidebar state changes
   useEffect(() => {
     document.body.classList.toggle('sidebar-collapsed', collapsed);
     document.body.classList.toggle('sidebar-expanded', !collapsed);
 
-    // Update CSS variable directly
     document.documentElement.style.setProperty('--sidebar-width', collapsed ? '64px' : '240px');
 
     return () => {
@@ -31,43 +31,43 @@ export function AppSidebar() {
 
   const mainNavItems = [
     {
-      title: "Generate",
+      title: t('nav.generate'),
       href: "/",
       icon: Sparkles,
       notification: false,
     },
     {
-      title: "Prompt Library",
+      title: t('nav.prompt_library'),
       href: "/prompts",
       icon: BookText,
       notification: false,
     },
     {
-      title: "Community",
+      title: t('nav.community'),
       href: "/community",
       icon: Users,
       notification: 3,
     },
     {
-      title: "Favorites",
+      title: t('nav.favorites'),
       href: "/favorites",
       icon: Heart,
       notification: false,
     },
     {
-      title: "History",
+      title: t('nav.history'),
       href: "/history",
       icon: Clock,
       notification: false,
     },
     {
-      title: "Learning",
+      title: t('nav.learning'),
       href: "/learning",
       icon: BookOpen,
       notification: 2,
     },
     {
-      title: "About",
+      title: t('nav.about'),
       href: "/about",
       icon: Info,
       notification: false,
@@ -78,9 +78,13 @@ export function AppSidebar() {
     setCollapsed(prev => !prev)
   }
 
+  // Функция для тестового входа/выхода
+  const toggleLogin = () => {
+    setIsLoggedIn(prev => !prev);
+  }
+
   return (
       <>
-        {/* Sidebar Toggle Button (Always visible, positioned outside the sidebar) */}
         <button
             onClick={toggleSidebar}
             className="fixed left-0 top-4 z-50 flex h-8 w-8 transform items-center justify-center rounded-md border border-border/70 bg-background text-muted-foreground shadow-sm transition-all hover:bg-muted"
@@ -99,7 +103,7 @@ export function AppSidebar() {
         <div className="fixed bottom-4 right-4 z-50">
           <div className="flex items-center gap-2 px-3 py-1.5 bg-background/80 backdrop-blur-sm rounded-md border border-border/50 shadow-sm">
             <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
-            <span className="text-xs">AI Models: Online</span>
+            <span className="text-xs">{t('header.ai_models')}</span>
           </div>
         </div>
 
@@ -110,7 +114,6 @@ export function AppSidebar() {
             )}
             style={{ willChange: 'width' }}
         >
-          {/* Logo area */}
           <div className="flex items-center h-16 px-4">
             <Link href="/" className="flex items-center gap-3 transition-all duration-300">
               <div className="flex h-8 w-8 min-w-[2rem] items-center justify-center rounded-md bg-primary">
@@ -125,7 +128,6 @@ export function AppSidebar() {
             </Link>
           </div>
 
-          {/* Nav items - fixed height with scrolling */}
           <div className="flex flex-col space-y-1 overflow-y-auto py-3 px-2 h-[calc(100vh-8rem)]">
             {mainNavItems.map((item) => (
                 <Tooltip key={item.href} delayDuration={0}>
@@ -172,9 +174,41 @@ export function AppSidebar() {
                   )}
                 </Tooltip>
             ))}
+
+            {/* Добавляем прямую ссылку на страницу логина */}
+            <Tooltip delayDuration={0}>
+              <TooltipTrigger asChild>
+                <Link
+                    href="/login"
+                    className={cn(
+                        "flex h-10 items-center gap-3 rounded-md px-3 text-sm transition-colors relative group",
+                        pathname === "/login"
+                            ? "bg-primary/10 text-primary"
+                            : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                    )}
+                >
+                  <div className="relative flex items-center justify-center min-w-[1.5rem]">
+                    <LogIn className="h-5 w-5" />
+                  </div>
+                  <span className={cn(
+                      "transition-all duration-300 whitespace-nowrap",
+                      collapsed ? "opacity-0 w-0 translate-x-5" : "opacity-100"
+                  )}>
+                    {t('nav.sign_in')}
+                  </span>
+                  {collapsed && pathname === "/login" && (
+                      <span className="absolute left-0 top-1/2 h-6 w-1 -translate-y-1/2 rounded-full bg-primary"></span>
+                  )}
+                </Link>
+              </TooltipTrigger>
+              {collapsed && (
+                  <TooltipContent side="right" sideOffset={6}>
+                    {t('nav.sign_in')}
+                  </TooltipContent>
+              )}
+            </Tooltip>
           </div>
 
-          {/* Settings item - fixed at the bottom */}
           <div className="mt-auto px-2 py-3 border-t border-border/30">
             <Tooltip>
               <TooltipTrigger asChild>
@@ -192,24 +226,23 @@ export function AppSidebar() {
                       "transition-all duration-300 whitespace-nowrap",
                       collapsed ? "opacity-0 w-0 translate-x-5" : "opacity-100"
                   )}>
-                    Settings
+                    {t('nav.settings')}
                   </span>
                 </Link>
               </TooltipTrigger>
               {collapsed && (
                   <TooltipContent side="right" sideOffset={6}>
-                    Settings
+                    {t('nav.settings')}
                   </TooltipContent>
               )}
             </Tooltip>
           </div>
 
-          {/* User area */}
           <div className="px-3 py-3 border-t border-border/30">
             {isLoggedIn ? (
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-3 cursor-pointer" onClick={toggleLogin}>
                       <Avatar className="h-8 w-8 min-w-[2rem] border border-border/40">
                         <AvatarImage src="/placeholder.svg?height=32&width=32" />
                         <AvatarFallback>UN</AvatarFallback>
@@ -240,28 +273,26 @@ export function AppSidebar() {
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <Button
-                        asChild
                         variant="ghost"
                         size={collapsed ? "icon" : "default"}
                         className={cn("w-full", collapsed ? "px-0" : "")}
+                        onClick={toggleLogin} // Добавлен обработчик для тестирования входа
                     >
-                      <Link href="/login">
-                        <LogIn className={cn(
-                            "h-4 w-4",
-                            !collapsed && "mr-2"
-                        )} />
-                        <span className={cn(
-                            "transition-all duration-300",
-                            collapsed ? "opacity-0 w-0 hidden" : "opacity-100"
-                        )}>
-                        Sign In
+                      <LogIn className={cn(
+                          "h-4 w-4",
+                          !collapsed && "mr-2"
+                      )} />
+                      <span className={cn(
+                          "transition-all duration-300",
+                          collapsed ? "opacity-0 w-0 hidden" : "opacity-100"
+                      )}>
+                        {t('nav.sign_in')}
                       </span>
-                      </Link>
                     </Button>
                   </TooltipTrigger>
                   {collapsed && (
                       <TooltipContent side="right" sideOffset={6}>
-                        Sign In
+                        {t('nav.sign_in')}
                       </TooltipContent>
                   )}
                 </Tooltip>
@@ -269,7 +300,6 @@ export function AppSidebar() {
           </div>
         </div>
 
-        {/* Add required CSS to layout.tsx or globals.css */}
         <style jsx global>{`
           /* Make sidebar fixed position */
           .sidebar-container {

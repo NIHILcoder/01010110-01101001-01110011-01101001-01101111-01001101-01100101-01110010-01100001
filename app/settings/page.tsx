@@ -43,6 +43,7 @@ import {
     TooltipProvider,
     TooltipTrigger
 } from "@/components/ui/tooltip"
+import { useLanguage, useLocalTranslation } from "@/components/language-context"
 
 export default function SettingsPage() {
     const [editMode, setEditMode] = useState(false)
@@ -52,50 +53,129 @@ export default function SettingsPage() {
         bio: "AI art enthusiast and digital creator passionate about exploring the intersection of technology and creativity."
     })
 
+    const { t, language } = useLanguage();
+
+    // Локальные переводы для страницы настроек
+    const pageTranslations = {
+        en: {
+            'settings.title': 'Settings',
+            'settings.description': 'Manage your account preferences and application settings',
+            'settings.tab.account': 'Account',
+            'settings.tab.appearance': 'Appearance',
+            'settings.tab.notifications': 'Notifications',
+            'settings.tab.subscription': 'Subscription',
+            'settings.tab.privacy': 'Privacy',
+            'settings.tab.api': 'API',
+            'settings.profile.title': 'Profile Information',
+            'settings.profile.description': 'Manage your account details and public profile',
+            'settings.profile.display_name': 'Display Name',
+            'settings.profile.username': 'Username',
+            'settings.profile.email': 'Email',
+            'settings.profile.bio': 'Bio',
+            'settings.profile.edit': 'Edit Profile',
+            'settings.profile.cancel': 'Cancel',
+            'settings.profile.save': 'Save Changes',
+            'settings.profile.change_avatar': 'Change Avatar',
+            'settings.security.title': 'Account Security',
+            'settings.security.description': 'Manage your password and security settings',
+            'settings.security.current_password': 'Current Password',
+            'settings.security.new_password': 'New Password',
+            'settings.security.confirm_password': 'Confirm New Password',
+            'settings.security.2fa': 'Two-Factor Authentication',
+            'settings.security.2fa_app': 'Authenticator App',
+            'settings.security.recommended': 'Recommended',
+            'settings.security.2fa_description': 'Use an authenticator app to get two-factor authentication codes',
+            'settings.security.enable': 'Enable',
+            'settings.security.update': 'Update Security Settings',
+            'settings.danger.title': 'Danger Zone',
+            'settings.danger.description': 'Irreversible account actions',
+            'settings.danger.delete_account': 'Delete Account',
+            'settings.danger.delete_warning': 'Once you delete your account, there is no going back. This action cannot be undone.',
+        },
+        ru: {
+            'settings.title': 'Настройки',
+            'settings.description': 'Управление предпочтениями аккаунта и настройками приложения',
+            'settings.tab.account': 'Аккаунт',
+            'settings.tab.appearance': 'Внешний вид',
+            'settings.tab.notifications': 'Уведомления',
+            'settings.tab.subscription': 'Подписка',
+            'settings.tab.privacy': 'Приватность',
+            'settings.tab.api': 'API',
+            'settings.profile.title': 'Информация профиля',
+            'settings.profile.description': 'Управление данными вашего аккаунта и публичного профиля',
+            'settings.profile.display_name': 'Отображаемое имя',
+            'settings.profile.username': 'Имя пользователя',
+            'settings.profile.email': 'Email',
+            'settings.profile.bio': 'О себе',
+            'settings.profile.edit': 'Редактировать профиль',
+            'settings.profile.cancel': 'Отмена',
+            'settings.profile.save': 'Сохранить изменения',
+            'settings.profile.change_avatar': 'Изменить аватар',
+            'settings.security.title': 'Безопасность аккаунта',
+            'settings.security.description': 'Управление паролем и настройками безопасности',
+            'settings.security.current_password': 'Текущий пароль',
+            'settings.security.new_password': 'Новый пароль',
+            'settings.security.confirm_password': 'Подтвердите новый пароль',
+            'settings.security.2fa': 'Двухфакторная аутентификация',
+            'settings.security.2fa_app': 'Приложение-аутентификатор',
+            'settings.security.recommended': 'Рекомендуется',
+            'settings.security.2fa_description': 'Используйте приложение-аутентификатор для получения кодов двухфакторной аутентификации',
+            'settings.security.enable': 'Включить',
+            'settings.security.update': 'Обновить настройки безопасности',
+            'settings.danger.title': 'Опасная зона',
+            'settings.danger.description': 'Необратимые действия с аккаунтом',
+            'settings.danger.delete_account': 'Удалить аккаунт',
+            'settings.danger.delete_warning': 'После удаления аккаунта пути назад нет. Это действие нельзя отменить.',
+        }
+    };
+
+    // Функция локального перевода
+    const { localT } = useLocalTranslation(pageTranslations);
+
+
     return (
         <div className="container relative mx-auto py-8">
             <ParticlesBackground />
 
             <div className="mb-8 space-y-4">
-                <h1 className="text-3xl font-bold">Settings</h1>
-                <p className="text-muted-foreground">Manage your account preferences and application settings</p>
+                <h1 className="text-3xl font-bold">{localT('settings.title')}</h1>
+                <p className="text-muted-foreground">{localT('settings.description')}</p>
             </div>
 
             <Tabs defaultValue="account" className="space-y-8">
                 <TabsList className="grid w-full grid-cols-2 md:grid-cols-6 gap-2">
                     <TabsTrigger value="account" className="flex gap-2 items-center">
                         <User className="h-4 w-4" />
-                        <span className="hidden md:inline">Account</span>
+                        <span className="hidden md:inline">{localT('settings.tab.account')}</span>
                     </TabsTrigger>
                     <TabsTrigger value="appearance" className="flex gap-2 items-center">
                         <Brush className="h-4 w-4" />
-                        <span className="hidden md:inline">Appearance</span>
+                        <span className="hidden md:inline">{localT('settings.tab.appearance')}</span>
                     </TabsTrigger>
                     <TabsTrigger value="notifications" className="flex gap-2 items-center">
                         <Bell className="h-4 w-4" />
-                        <span className="hidden md:inline">Notifications</span>
+                        <span className="hidden md:inline">{localT('settings.tab.notifications')}</span>
                     </TabsTrigger>
                     <TabsTrigger value="subscription" className="flex gap-2 items-center">
                         <CreditCard className="h-4 w-4" />
-                        <span className="hidden md:inline">Subscription</span>
+                        <span className="hidden md:inline">{localT('settings.tab.subscription')}</span>
                     </TabsTrigger>
                     <TabsTrigger value="privacy" className="flex gap-2 items-center">
                         <Shield className="h-4 w-4" />
-                        <span className="hidden md:inline">Privacy</span>
+                        <span className="hidden md:inline">{localT('settings.tab.privacy')}</span>
                     </TabsTrigger>
                     <TabsTrigger value="api" className="flex gap-2 items-center">
                         <Webhook className="h-4 w-4" />
-                        <span className="hidden md:inline">API</span>
+                        <span className="hidden md:inline">{localT('settings.tab.api')}</span>
                     </TabsTrigger>
                 </TabsList>
 
-                {/* Account Settings */}
                 <TabsContent value="account" className="space-y-6">
                     <Card>
                         <CardHeader>
-                            <CardTitle>Profile Information</CardTitle>
+                            <CardTitle>{localT('settings.profile.title')}</CardTitle>
                             <CardDescription>
-                                Manage your account details and public profile
+                                {localT('settings.profile.description')}
                             </CardDescription>
                         </CardHeader>
                         <CardContent className="space-y-6">
@@ -105,13 +185,13 @@ export default function SettingsPage() {
                                         <AvatarImage src="/placeholder.svg?height=96&width=96&text=UN" alt="User" />
                                         <AvatarFallback>UN</AvatarFallback>
                                     </Avatar>
-                                    <Button variant="outline" size="sm">Change Avatar</Button>
+                                    <Button variant="outline" size="sm">{localT('settings.profile.change_avatar')}</Button>
                                 </div>
 
                                 <div className="flex-1 space-y-4">
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                         <div className="space-y-2">
-                                            <Label htmlFor="name">Display Name</Label>
+                                            <Label htmlFor="name">{localT('settings.profile.display_name')}</Label>
                                             <Input
                                                 id="name"
                                                 value={profileData.name}
@@ -120,13 +200,13 @@ export default function SettingsPage() {
                                             />
                                         </div>
                                         <div className="space-y-2">
-                                            <Label htmlFor="username">Username</Label>
+                                            <Label htmlFor="username">{localT('settings.profile.username')}</Label>
                                             <Input id="username" value="@username" disabled />
                                         </div>
                                     </div>
 
                                     <div className="space-y-2">
-                                        <Label htmlFor="email">Email</Label>
+                                        <Label htmlFor="email">{localT('settings.profile.email')}</Label>
                                         <Input
                                             id="email"
                                             type="email"
@@ -137,7 +217,7 @@ export default function SettingsPage() {
                                     </div>
 
                                     <div className="space-y-2">
-                                        <Label htmlFor="bio">Bio</Label>
+                                        <Label htmlFor="bio">{localT('settings.profile.bio')}</Label>
                                         <Textarea
                                             id="bio"
                                             value={profileData.bio}
@@ -151,12 +231,12 @@ export default function SettingsPage() {
                         </CardContent>
                         <CardFooter className="flex justify-between">
                             <Button variant="outline" onClick={() => setEditMode(!editMode)}>
-                                {editMode ? "Cancel" : "Edit Profile"}
+                                {editMode ? localT('settings.profile.cancel') : localT('settings.profile.edit')}
                             </Button>
                             {editMode && (
                                 <Button>
                                     <Save className="mr-2 h-4 w-4" />
-                                    Save Changes
+                                    {localT('settings.profile.save')}
                                 </Button>
                             )}
                         </CardFooter>
@@ -164,103 +244,66 @@ export default function SettingsPage() {
 
                     <Card>
                         <CardHeader>
-                            <CardTitle>Account Security</CardTitle>
+                            <CardTitle>{localT('settings.security.title')}</CardTitle>
                             <CardDescription>
-                                Manage your password and security settings
+                                {localT('settings.security.description')}
                             </CardDescription>
                         </CardHeader>
                         <CardContent className="space-y-4">
                             <div className="space-y-2">
-                                <Label htmlFor="current-password">Current Password</Label>
+                                <Label htmlFor="current-password">{localT('settings.security.current_password')}</Label>
                                 <Input id="current-password" type="password" placeholder="••••••••" />
                             </div>
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div className="space-y-2">
-                                    <Label htmlFor="new-password">New Password</Label>
+                                    <Label htmlFor="new-password">{localT('settings.security.new_password')}</Label>
                                     <Input id="new-password" type="password" placeholder="••••••••" />
                                 </div>
                                 <div className="space-y-2">
-                                    <Label htmlFor="confirm-password">Confirm New Password</Label>
+                                    <Label htmlFor="confirm-password">{localT('settings.security.confirm_password')}</Label>
                                     <Input id="confirm-password" type="password" placeholder="••••••••" />
                                 </div>
                             </div>
 
                             <div className="pt-4">
-                                <h3 className="text-sm font-medium mb-3">Two-Factor Authentication</h3>
+                                <h3 className="text-sm font-medium mb-3">{localT('settings.security.2fa')}</h3>
                                 <div className="flex items-center justify-between rounded-lg border p-4">
                                     <div className="space-y-0.5">
                                         <div className="flex items-center">
-                                            <h4 className="font-medium">Authenticator App</h4>
-                                            <Badge variant="outline" className="ml-2">Recommended</Badge>
+                                            <h4 className="font-medium">{localT('settings.security.2fa_app')}</h4>
+                                            <Badge variant="outline" className="ml-2">{localT('settings.security.recommended')}</Badge>
                                         </div>
                                         <p className="text-sm text-muted-foreground">
-                                            Use an authenticator app to get two-factor authentication codes
+                                            {localT('settings.security.2fa_description')}
                                         </p>
                                     </div>
-                                    <Button variant="outline">Enable</Button>
+                                    <Button variant="outline">{localT('settings.security.enable')}</Button>
                                 </div>
                             </div>
                         </CardContent>
                         <CardFooter>
                             <Button>
                                 <Lock className="mr-2 h-4 w-4" />
-                                Update Security Settings
+                                {localT('settings.security.update')}
                             </Button>
                         </CardFooter>
                     </Card>
 
-                    <Card>
-                        <CardHeader>
-                            <CardTitle>Linked Accounts</CardTitle>
-                            <CardDescription>
-                                Connect third-party accounts for easier login and sharing
-                            </CardDescription>
-                        </CardHeader>
-                        <CardContent className="space-y-4">
-                            {[
-                                { name: "Google", connected: true },
-                                { name: "GitHub", connected: false },
-                                { name: "Discord", connected: false },
-                            ].map((account) => (
-                                <div key={account.name} className="flex items-center justify-between rounded-lg border p-4">
-                                    <div className="flex items-center space-x-4">
-                                        <div className="h-10 w-10 flex items-center justify-center rounded-full bg-muted">
-                                            <img
-                                                src={`/placeholder.svg?height=40&width=40&text=${account.name.charAt(0)}`}
-                                                alt={account.name}
-                                                className="h-full w-full rounded-full"
-                                            />
-                                        </div>
-                                        <div>
-                                            <p className="font-medium">{account.name}</p>
-                                            <p className="text-sm text-muted-foreground">
-                                                {account.connected ? "Connected" : "Not connected"}
-                                            </p>
-                                        </div>
-                                    </div>
-                                    <Button variant={account.connected ? "destructive" : "outline"}>
-                                        {account.connected ? "Disconnect" : "Connect"}
-                                    </Button>
-                                </div>
-                            ))}
-                        </CardContent>
-                    </Card>
-
                     <Card className="border-destructive/50">
                         <CardHeader>
-                            <CardTitle className="text-destructive">Danger Zone</CardTitle>
+                            <CardTitle className="text-destructive">{localT('settings.danger.title')}</CardTitle>
                             <CardDescription>
-                                Irreversible account actions
+                                {localT('settings.danger.description')}
                             </CardDescription>
                         </CardHeader>
                         <CardContent className="space-y-4">
                             <div className="rounded-lg border border-destructive/30 p-4">
-                                <h3 className="font-medium text-destructive mb-1">Delete Account</h3>
+                                <h3 className="font-medium text-destructive mb-1">{localT('settings.danger.delete_account')}</h3>
                                 <p className="text-sm text-muted-foreground mb-4">
-                                    Once you delete your account, there is no going back. This action cannot be undone.
+                                    {localT('settings.danger.delete_warning')}
                                 </p>
-                                <Button variant="destructive">Delete Account</Button>
+                                <Button variant="destructive">{localT('settings.danger.delete_account')}</Button>
                             </div>
                         </CardContent>
                     </Card>

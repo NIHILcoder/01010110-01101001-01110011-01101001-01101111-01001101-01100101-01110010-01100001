@@ -3,6 +3,8 @@
 import { useState } from "react"
 import { Bell, Zap, Sparkles } from "lucide-react"
 import { ThemeToggle } from "@/components/theme-toggle"
+import { LanguageToggle } from "@/components/language-toggle"
+import { useLanguage } from "@/components/language-context"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import {
@@ -17,6 +19,7 @@ import {
 export function Header() {
     const [notificationCount, setNotificationCount] = useState(5)
     const [credits, setCredits] = useState(250)
+    const { t } = useLanguage()
 
     return (
         <header className="fixed top-0 right-0 left-0 z-50 flex h-14 items-center justify-between border-b bg-background px-4 backdrop-blur-sm">
@@ -28,15 +31,14 @@ export function Header() {
             </div>
 
             <div className="ml-auto flex items-center gap-3">
-                {/* AI Status индикатор */}
                 <div className="flex items-center gap-1.5 bg-background/30 backdrop-blur px-2 py-1 rounded-full border text-xs">
                     <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></div>
-                    <span className="text-foreground/80 whitespace-nowrap">AI Models: Online</span>
+                    <span className="text-foreground/80 whitespace-nowrap">{t('header.ai_models')}</span>
                 </div>
 
                 <div className="flex items-center gap-1 text-xs font-medium">
                     <Zap className="h-3.5 w-3.5 text-yellow-500" />
-                    <span className="whitespace-nowrap">{credits} credits</span>
+                    <span className="whitespace-nowrap">{credits} {t('header.credits')}</span>
                 </div>
 
                 <DropdownMenu>
@@ -100,6 +102,7 @@ export function Header() {
                     </DropdownMenuContent>
                 </DropdownMenu>
 
+                <LanguageToggle />
                 <ThemeToggle />
             </div>
         </header>

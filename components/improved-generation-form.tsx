@@ -54,9 +54,10 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
+import { useLanguage } from "@/components/language-context";
 
 export function EnhancedGenerationForm() {
-    // State variables
+    const { t } = useLanguage();
     const [generating, setGenerating] = useState<boolean>(false);
     const [progress, setProgress] = useState<number>(0);
     const [generatedImage, setGeneratedImage] = useState<string | null>(null);
@@ -75,13 +76,13 @@ export function EnhancedGenerationForm() {
     const promptInputRef = useRef<HTMLTextAreaElement>(null);
     const generationContainerRef = useRef<HTMLDivElement>(null);
 
-    // Handle prompt change
+
     const handlePromptChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
         setPrompt(e.target.value);
         setShowTagSuggestions(e.target.value.length > 0);
     };
 
-    // Generate image
+
     const handleGenerate = () => {
         if (!prompt.trim()) {
             return;
@@ -90,7 +91,7 @@ export function EnhancedGenerationForm() {
         setGenerating(true);
         setProgress(0);
 
-        // Simulate generation process with progress updates
+
         const interval = setInterval(() => {
             setProgress((prev) => {
                 if (prev >= 100) {
@@ -106,39 +107,37 @@ export function EnhancedGenerationForm() {
 
     return (
         <div className="w-full h-full">
-            {/* Main Content - Expanded layout to fill available space */}
             <div className="w-full grid grid-cols-1 lg:grid-cols-3 gap-6">
-                {/* Left side: Generation Settings */}
                 <div className="w-full lg:col-span-1 space-y-4">
                     <Card>
                         <CardHeader className="pb-3">
                             <div className="flex items-center justify-between">
-                                <CardTitle>Image Settings</CardTitle>
+                                <CardTitle>{t('generation.image_settings')}</CardTitle>
                                 <Select value={aspectRatio} onValueChange={setAspectRatio}>
                                     <SelectTrigger className="w-[150px]">
-                                        <SelectValue placeholder="Aspect Ratio" />
+                                        <SelectValue placeholder={t('ui.aspect_ratio')} />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        <SelectItem value="1:1">1:1 Square</SelectItem>
-                                        <SelectItem value="4:3">4:3 Standard</SelectItem>
-                                        <SelectItem value="16:9">16:9 Widescreen</SelectItem>
-                                        <SelectItem value="9:16">9:16 Portrait</SelectItem>
-                                        <SelectItem value="2:3">2:3 Portrait</SelectItem>
-                                        <SelectItem value="3:2">3:2 Landscape</SelectItem>
+                                        <SelectItem value="1:1">1:1 {t('ui.square')}</SelectItem>
+                                        <SelectItem value="4:3">4:3 {t('ui.standard')}</SelectItem>
+                                        <SelectItem value="16:9">16:9 {t('ui.widescreen')}</SelectItem>
+                                        <SelectItem value="9:16">9:16 {t('ui.portrait')}</SelectItem>
+                                        <SelectItem value="2:3">2:3 {t('ui.portrait')}</SelectItem>
+                                        <SelectItem value="3:2">3:2 {t('ui.landscape')}</SelectItem>
                                     </SelectContent>
                                 </Select>
                             </div>
-                            <CardDescription>Configure your generation parameters</CardDescription>
+                            <CardDescription>{t('generation.configure_parameters')}</CardDescription>
                         </CardHeader>
 
                         <Tabs value={activeTab} onValueChange={setActiveTab}>
                             <div className="px-6">
                                 <TabsList className="w-full">
                                     <TabsTrigger value="basic" className="flex-1">
-                                        Basic
+                                        {t('generation.basic')}
                                     </TabsTrigger>
                                     <TabsTrigger value="advanced" className="flex-1">
-                                        Advanced
+                                        {t('generation.advanced')}
                                     </TabsTrigger>
                                 </TabsList>
                             </div>
@@ -147,14 +146,14 @@ export function EnhancedGenerationForm() {
                                 <CardContent className="space-y-4">
                                     <div className="space-y-2">
                                         <div className="flex items-center justify-between">
-                                            <Label htmlFor="prompt" className="text-base font-medium">Prompt</Label>
+                                            <Label htmlFor="prompt" className="text-base font-medium">{t('generation.prompt')}</Label>
                                             <div className="flex items-center space-x-2">
                                                 <Switch
                                                     id="enhance-prompt"
                                                     checked={enhancePrompt}
                                                     onCheckedChange={setEnhancePrompt}
                                                 />
-                                                <Label htmlFor="enhance-prompt" className="text-xs">AI Enhance</Label>
+                                                <Label htmlFor="enhance-prompt" className="text-xs">{t('generation.ai_enhance')}</Label>
                                                 <Tooltip>
                                                     <TooltipTrigger asChild>
                                                         <Button variant="ghost" size="icon" className="h-6 w-6">
@@ -170,7 +169,7 @@ export function EnhancedGenerationForm() {
                                         <div className="relative">
                                             <Textarea
                                                 id="prompt"
-                                                placeholder="Describe your image in detail... (e.g., A serene landscape with mountains, a calm lake under twilight sky with stars beginning to appear)"
+                                                placeholder={t('generation.prompt_placeholder')}
                                                 className="min-h-[120px] resize-none"
                                                 value={prompt}
                                                 onChange={handlePromptChange}
@@ -186,23 +185,23 @@ export function EnhancedGenerationForm() {
                                                 className="text-xs"
                                             >
                                                 <Plus className="mr-1 h-3 w-3" />
-                                                Suggestions
+                                                {t('generation.suggestions')}
                                             </Button>
 
                                             <Button variant="outline" size="sm" className="text-xs">
                                                 <Save className="mr-1 h-3 w-3" />
-                                                Save Prompt
+                                                {t('generation.save_prompt')}
                                             </Button>
                                         </div>
                                     </div>
 
                                     <div className="space-y-2">
                                         <Label htmlFor="negative-prompt" className="flex items-center gap-2">
-                                            Negative Prompt
+                                            {t('generation.negative_prompt')}
                                         </Label>
                                         <Textarea
                                             id="negative-prompt"
-                                            placeholder="Elements to avoid in the image... (e.g., blurry, bad anatomy, distorted, watermark, signature)"
+                                            placeholder={t('generation.negative_prompt_placeholder')}
                                             className="min-h-[80px] resize-none"
                                             value={negativePrompt}
                                             onChange={(e) => setNegativePrompt(e.target.value)}
@@ -210,7 +209,7 @@ export function EnhancedGenerationForm() {
                                     </div>
 
                                     <div className="space-y-3">
-                                        <Label className="text-base font-medium">Model Selection</Label>
+                                        <Label className="text-base font-medium">{t('generation.model_selection')}</Label>
                                         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                                             {[
                                                 { id: "flux", name: "Flux Realistic", image: "/placeholder.svg?height=80&width=80&text=Flux" },
@@ -242,7 +241,7 @@ export function EnhancedGenerationForm() {
                             <TabsContent value="advanced" className="pt-2">
                                 <CardContent className="space-y-4">
                                     <div className="space-y-2">
-                                        <Label htmlFor="seed">Seed</Label>
+                                        <Label htmlFor="seed">{t('generation.seed')}</Label>
                                         <div className="flex gap-2">
                                             <Input id="seed" type="number" placeholder="Random" className="flex-1" />
                                             <Button variant="outline" size="icon">
@@ -253,7 +252,7 @@ export function EnhancedGenerationForm() {
 
                                     <div className="space-y-2">
                                         <div className="flex items-center justify-between">
-                                            <Label htmlFor="steps">Sampling Steps</Label>
+                                            <Label htmlFor="steps">{t('generation.sampling_steps')}</Label>
                                             <span className="text-xs text-muted-foreground">30</span>
                                         </div>
                                         <Slider id="steps" defaultValue={[30]} min={20} max={150} step={1} className="py-2" />
@@ -261,14 +260,14 @@ export function EnhancedGenerationForm() {
 
                                     <div className="space-y-2">
                                         <div className="flex items-center justify-between">
-                                            <Label htmlFor="cfg">CFG Scale</Label>
+                                            <Label htmlFor="cfg">{t('generation.cfg_scale')}</Label>
                                             <span className="text-xs text-muted-foreground">7.0</span>
                                         </div>
                                         <Slider id="cfg" defaultValue={[7]} min={1} max={20} step={0.1} className="py-2" />
                                     </div>
 
                                     <div className="space-y-2">
-                                        <Label htmlFor="sampler">Sampler</Label>
+                                        <Label htmlFor="sampler">{t('generation.sampler')}</Label>
                                         <Select defaultValue="euler_a">
                                             <SelectTrigger id="sampler">
                                                 <SelectValue placeholder="Select sampler" />
@@ -285,13 +284,13 @@ export function EnhancedGenerationForm() {
                                     </div>
 
                                     <div className="space-y-2">
-                                        <Label>Image to Image</Label>
+                                        <Label>{t('generation.image_to_image')}</Label>
                                         <div
                                             className="flex h-32 cursor-pointer flex-col items-center justify-center rounded-md border border-dashed transition-colors hover:border-primary hover:bg-secondary/50"
                                             onClick={() => fileInputRef.current?.click()}
                                         >
                                             <Upload className="mb-2 h-6 w-6 text-muted-foreground" />
-                                            <p className="text-sm text-muted-foreground">Click to upload an image</p>
+                                            <p className="text-sm text-muted-foreground">{t('generation.upload_image')}</p>
                                             <input ref={fileInputRef} type="file" accept="image/*" className="hidden" />
                                         </div>
                                     </div>
@@ -304,12 +303,12 @@ export function EnhancedGenerationForm() {
                                 {generating ? (
                                     <>
                                         <RotateCw className="mr-2 h-4 w-4 animate-spin" />
-                                        Generating... {progress}%
+                                        {t('generation.generating')} {progress}%
                                     </>
                                 ) : (
                                     <>
                                         <Sparkles className="mr-2 h-4 w-4" />
-                                        Generate
+                                        {t('generation.generate')}
                                     </>
                                 )}
                             </Button>
@@ -317,11 +316,10 @@ export function EnhancedGenerationForm() {
                     </Card>
                 </div>
 
-                {/* Right side: Preview - Expanded to take more space */}
                 <div className="w-full lg:col-span-2 space-y-4">
                     <Card className="flex flex-col h-full">
                         <CardHeader className="flex flex-row items-center justify-between pb-3">
-                            <CardTitle>Preview</CardTitle>
+                            <CardTitle>{t('generation.preview')}</CardTitle>
                             <div className="flex items-center gap-2">
                                 {generatedImage && (
                                     <div className="flex items-center gap-2">
@@ -358,12 +356,12 @@ export function EnhancedGenerationForm() {
                                     <div className="flex h-full w-full flex-col items-center justify-center">
                                         <RotateCw className="mb-4 h-12 w-12 animate-spin text-primary" />
                                         <Progress value={progress} className="w-2/3 max-w-md" />
-                                        <p className="mt-4 text-sm text-muted-foreground">Creating your masterpiece... {progress}%</p>
+                                        <p className="mt-4 text-sm text-muted-foreground">{t('generation.creating_masterpiece')} {progress}%</p>
                                         <div className="mt-2 text-xs text-muted-foreground">
-                                            {progress < 30 && "Analyzing prompt..."}
-                                            {progress >= 30 && progress < 60 && "Generating base composition..."}
-                                            {progress >= 60 && progress < 90 && "Adding details and refining..."}
-                                            {progress >= 90 && "Finalizing image..."}
+                                            {progress < 30 && t('generation.analyzing_prompt')}
+                                            {progress >= 30 && progress < 60 && t('generation.generating_composition')}
+                                            {progress >= 60 && progress < 90 && t('generation.adding_details')}
+                                            {progress >= 90 && t('generation.finalizing')}
                                         </div>
                                     </div>
                                 ) : generatedImage ? (
@@ -386,8 +384,8 @@ export function EnhancedGenerationForm() {
                                         <div className="rounded-full bg-muted p-4">
                                             <Sparkles className="h-8 w-8 text-muted-foreground" />
                                         </div>
-                                        <p className="mt-4 text-muted-foreground">Your generated image will appear here</p>
-                                        <p className="mt-2 text-xs text-muted-foreground">Start by entering a detailed prompt</p>
+                                        <p className="mt-4 text-muted-foreground">{t('generation.your_image_will_appear')}</p>
+                                        <p className="mt-2 text-xs text-muted-foreground">{t('generation.enter_prompt')}</p>
                                     </div>
                                 )}
                             </div>
@@ -398,40 +396,39 @@ export function EnhancedGenerationForm() {
                                 <div className="flex gap-2">
                                     <Button variant="outline" size="sm">
                                         <Save className="mr-2 h-4 w-4" />
-                                        Save
+                                        {t('generation.save')}
                                     </Button>
                                     <Button variant="outline" size="sm">
                                         <Share2 className="mr-2 h-4 w-4" />
-                                        Share
+                                        {t('generation.share')}
                                     </Button>
                                     <Button variant="outline" size="sm">
                                         <Download className="mr-2 h-4 w-4" />
-                                        Download
+                                        {t('generation.download')}
                                     </Button>
                                 </div>
 
                                 <div className="flex gap-2">
                                     <Button variant="outline" size="sm">
                                         <Wand2 className="mr-2 h-4 w-4" />
-                                        Variations
+                                        {t('generation.variations')}
                                     </Button>
                                     <Button variant="outline" size="sm">
                                         <Star className="mr-2 h-4 w-4" />
-                                        Favorite
+                                        {t('generation.favorite')}
                                     </Button>
                                     <Button variant="default" size="sm">
                                         <Send className="mr-2 h-4 w-4" />
-                                        Share to Community
+                                        {t('generation.share_community')}
                                     </Button>
                                 </div>
                             </CardFooter>
                         )}
                     </Card>
 
-                    {/* Visual workflow editor button */}
                     <Button variant="outline" className="w-full">
                         <Layers className="mr-2 h-4 w-4" />
-                        Open Visual Workflow Editor
+                        {t('generation.open_workflow')}
                     </Button>
                 </div>
             </div>

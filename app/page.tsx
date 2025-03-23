@@ -27,19 +27,6 @@ export default function EnhancedHomePage() {
                     <p className="text-sm sm:text-base md:text-lg text-muted-foreground max-w-2xl mx-auto px-2">
                         Transform your imagination into stunning visuals with our AI-powered creative platform
                     </p>
-
-                    <Tabs defaultValue="standard" className="w-full max-w-md">
-                        <TabsList className="grid w-full grid-cols-2">
-                            <TabsTrigger value="standard" className="flex items-center gap-2">
-                                <Sparkles className="h-4 w-4" />
-                                Standard
-                            </TabsTrigger>
-                            <TabsTrigger value="advanced" className="flex items-center gap-2">
-                                <Zap className="h-4 w-4" />
-                                Advanced
-                            </TabsTrigger>
-                        </TabsList>
-                    </Tabs>
                 </div>
 
                 {/* Features section with improved responsive grid */}

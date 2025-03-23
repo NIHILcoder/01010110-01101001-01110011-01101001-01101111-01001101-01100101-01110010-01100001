@@ -1,6 +1,7 @@
 import type React from "react"
 import { Inter } from "next/font/google"
 import { ThemeProvider } from "@/components/theme-provider"
+import { LanguageProvider } from "@/components/language-context"
 import { AppSidebar } from "@/components/app-sidebar"
 import { Header } from "@/components/header"
 import { TooltipProvider } from "@/components/ui/tooltip"
@@ -17,11 +18,13 @@ export default function RootLayout({
         <html lang="ru" suppressHydrationWarning>
         <body className={inter.className}>
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
-            <TooltipProvider>
-                <AppSidebar />
-                <Header />
-                <main className="max-w-full">{children}</main>
-            </TooltipProvider>
+            <LanguageProvider>
+                <TooltipProvider>
+                    <AppSidebar />
+                    <Header />
+                    <main className="max-w-full">{children}</main>
+                </TooltipProvider>
+            </LanguageProvider>
         </ThemeProvider>
         </body>
         </html>
