@@ -114,8 +114,6 @@
   z-index: 0;
 }
 
-/* Add these styles to your global.css file */
-
 @keyframes gradient {
   0% { background-position: 0% center; }
   100% { background-position: 300% center; }
@@ -127,4 +125,26 @@
 
 .bg-gradient-size {
   background-size: 300% auto;
+}
+
+/* Предотвращение "прыжка" контента при открытии модальных окон */
+/* Предотвращение "прыжка" контента при открытии модальных окон */
+:root {
+  --scrollbar-width: 0px; /* Задаем начальное значение */
+}
+
+/* Альтернативный подход: зафиксировать ширину страницы */
+html.dialog-open,
+body.dialog-open {
+  overflow: hidden;
+  /* Предотвращает сдвиг при открытии модального окна */
+  width: 100%;
+  position: fixed;
+  overscroll-behavior: none;
+}
+
+/* Стиль для внутреннего контейнера с прокруткой в модальных окнах */
+.modal-scrollable {
+  overflow-y: auto;
+  max-height: 90vh;
 }

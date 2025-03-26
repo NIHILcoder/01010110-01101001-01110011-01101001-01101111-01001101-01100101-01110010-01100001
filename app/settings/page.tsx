@@ -55,7 +55,53 @@ export default function SettingsPage() {
 
     const { t, language } = useLanguage();
 
-    // Локальные переводы для страницы настроек
+    // Helper function to localize features
+    const localizeFeature = (featureId: string): string => {
+        const featureTranslations: Record<string, string> = {
+            "credits": "1000 кредитов генерации в месяц",
+            "models": "Доступ ко всем моделям",
+            "resolution": "Максимальное разрешение: 2048×2048",
+            "queue": "Приоритетная очередь генерации",
+            "parameters": "Расширенные параметры",
+            "license": "Коммерческая лицензия",
+            "api_access": "Доступ к API",
+            "controlnet": "Поддержка ControlNet"
+        };
+
+        return featureTranslations[featureId] || featureId;
+    };
+
+    // Helper function to localize subscription plan features
+    const localizeSubscriptionFeature = (feature: string): string => {
+        const subscriptionTranslations: Record<string, string> = {
+            "100 generation credits per month": "100 кредитов генерации в месяц",
+            "1000 generation credits per month": "1000 кредитов генерации в месяц",
+            "5000 generation credits per month": "5000 кредитов генерации в месяц",
+            "Access to basic models": "Доступ к базовым моделям",
+            "Access to all models": "Доступ ко всем моделям",
+            "Maximum resolution: 512×512": "Максимальное разрешение: 512×512",
+            "Maximum resolution: 2048×2048": "Максимальное разрешение: 2048×2048",
+            "Maximum resolution: 4096×4096": "Максимальное разрешение: 4096×4096",
+            "Standard generation queue": "Стандартная очередь генерации",
+            "Priority generation queue": "Приоритетная очередь генерации",
+            "Highest priority queue": "Наивысший приоритет в очереди",
+            "Basic parameters": "Базовые параметры",
+            "Advanced parameters": "Расширенные параметры",
+            "All parameters": "Все параметры",
+            "Personal use only": "Только для личного использования",
+            "Commercial license": "Коммерческая лицензия",
+            "Extended commercial license": "Расширенная коммерческая лицензия",
+            "API access": "Доступ к API",
+            "Full API access": "Полный доступ к API",
+            "ControlNet support": "Поддержка ControlNet",
+            "Dedicated support": "Выделенная поддержка",
+            "Team collaboration features": "Функции для совместной работы команды",
+            "Custom model fine-tuning": "Индивидуальная настройка моделей"
+        };
+
+        return subscriptionTranslations[feature] || feature;
+    };
+
     const pageTranslations = {
         en: {
             'settings.title': 'Settings',
@@ -91,6 +137,148 @@ export default function SettingsPage() {
             'settings.danger.description': 'Irreversible account actions',
             'settings.danger.delete_account': 'Delete Account',
             'settings.danger.delete_warning': 'Once you delete your account, there is no going back. This action cannot be undone.',
+
+            // Appearance Tab
+            'settings.appearance.title': 'Theme Preferences',
+            'settings.appearance.description': 'Customize how VisioMera looks and feels',
+            'settings.appearance.color_theme': 'Color Theme',
+            'settings.appearance.light': 'Light',
+            'settings.appearance.dark': 'Dark',
+            'settings.appearance.system': 'System',
+            'settings.appearance.ui_density': 'UI Density',
+            'settings.appearance.compact': 'Compact',
+            'settings.appearance.comfortable': 'Comfortable',
+            'settings.appearance.spacious': 'Spacious',
+            'settings.appearance.effects': 'Effects & Animations',
+            'settings.appearance.particles': 'Background particles',
+            'settings.appearance.transitions': 'UI transitions',
+            'settings.appearance.reduced_motion': 'Reduced motion',
+            'settings.appearance.haptic': 'Haptic feedback',
+            'settings.appearance.save': 'Save Preferences',
+            'settings.appearance.customization': 'Interface Customization',
+            'settings.appearance.customization_description': 'Configure your workspace layout',
+            'settings.appearance.default_view': 'Default View',
+            'settings.appearance.standard': 'Standard Mode',
+            'settings.appearance.standard_description': 'Simplified interface with essential controls',
+            'settings.appearance.advanced': 'Advanced Mode',
+            'settings.appearance.advanced_description': 'Full control with all parameters and options',
+            'settings.appearance.gallery': 'Gallery View Preferences',
+            'settings.appearance.gallery_grid': 'Default to grid view',
+            'settings.appearance.gallery_info': 'Show image info on hover',
+            'settings.appearance.gallery_autosave': 'Auto-save generations',
+            'settings.appearance.gallery_prompt': 'Show prompts with images',
+
+            // Notifications Tab
+            'settings.notifications.title': 'Notification Preferences',
+            'settings.notifications.description': 'Configure how and when you receive notifications',
+            'settings.notifications.email': 'Email Notifications',
+            'settings.notifications.email_account': 'Account updates and security alerts',
+            'settings.notifications.email_comments': 'Comments on your creations',
+            'settings.notifications.email_likes': 'Likes and reactions',
+            'settings.notifications.email_features': 'New features and announcements',
+            'settings.notifications.email_tips': 'Tips and tutorials',
+            'settings.notifications.in_app': 'In-App Notifications',
+            'settings.notifications.in_app_comments': 'Comments on your creations',
+            'settings.notifications.in_app_likes': 'Likes and reactions',
+            'settings.notifications.in_app_follows': 'New followers',
+            'settings.notifications.in_app_mentions': 'Mentions and tags',
+            'settings.notifications.in_app_competitions': 'Competition updates',
+            'settings.notifications.in_app_generation': 'Generation completions',
+            'settings.notifications.schedule': 'Notification Schedule',
+            'settings.notifications.quiet_from': 'Quiet hours start',
+            'settings.notifications.quiet_to': 'Quiet hours end',
+            'settings.notifications.weekend_pause': 'Pause all notifications on weekends',
+            'settings.notifications.save': 'Save Notification Settings',
+
+            // Subscription Tab
+            'settings.subscription.title': 'Current Plan',
+            'settings.subscription.description': 'Manage your subscription and billing',
+            'settings.subscription.pro_plan': 'Pro Plan',
+            'settings.subscription.price': 'per month',
+            'settings.subscription.next_billing': 'Your next billing date is April 15, 2025',
+            'settings.subscription.manage': 'Manage Subscription',
+            'settings.subscription.credits': 'Generation Credits',
+            'settings.subscription.monthly_limit': 'Monthly Limit',
+            'settings.subscription.credits_used': 'Credits Used',
+            'settings.subscription.credits_remaining': 'Credits Remaining',
+            'settings.subscription.buy_additional': 'Buy Additional Credits',
+            'settings.subscription.buy_credits_tooltip': 'Purchase more credits when you reach your limit',
+            'settings.subscription.features': 'Plan Features',
+            'settings.subscription.history': 'View Billing History',
+            'settings.subscription.upgrade': 'Upgrade Plan',
+            'settings.subscription.available_plans': 'Available Plans',
+            'settings.subscription.compare_plans': 'Compare plans and find the right fit for your needs',
+            'settings.subscription.free': 'Free',
+            'settings.subscription.business': 'Business',
+            'settings.subscription.most_popular': 'Most Popular',
+            'settings.subscription.current_plan': 'Current Plan',
+            'settings.subscription.upgrade_to': 'Upgrade to',
+
+            // Privacy Tab
+            'settings.privacy.title': 'Privacy Settings',
+            'settings.privacy.description': 'Control how your data is used and shared',
+            'settings.privacy.profile': 'Profile Privacy',
+            'settings.privacy.public_profile': 'Make profile public',
+            'settings.privacy.public_profile_description': 'Allow anyone to view your profile and creations',
+            'settings.privacy.searchable': 'Searchable profile',
+            'settings.privacy.searchable_description': 'Allow your profile to appear in search results',
+            'settings.privacy.share_activity': 'Share activity',
+            'settings.privacy.share_activity_description': 'Show your activity (likes, comments) to followers',
+            'settings.privacy.content': 'Content Sharing',
+            'settings.privacy.auto_public': 'Automatically make my creations public',
+            'settings.privacy.auto_public_description': 'New generations will be visible to the community',
+            'settings.privacy.show_prompts': 'Share my prompts with the community',
+            'settings.privacy.show_prompts_description': 'Allow others to view the prompts used for your public creations',
+            'settings.privacy.allow_remix': 'Allow others to remix my work',
+            'settings.privacy.allow_remix_description': 'Let community members use your images as reference for their creations',
+            'settings.privacy.data': 'Data Privacy',
+            'settings.privacy.anon_analytics': 'Allow anonymous analytics',
+            'settings.privacy.anon_analytics_description': 'Help us improve by sharing anonymous usage data',
+            'settings.privacy.model_training': 'Allow model training contribution',
+            'settings.privacy.model_training_description': 'Your creations may be used to improve AI models',
+            'settings.privacy.personalization': 'Personalized experience',
+            'settings.privacy.personalization_description': 'Use your activity to customize your experience',
+            'settings.privacy.save': 'Save Privacy Settings',
+            'settings.privacy.data_management': 'Data Management',
+            'settings.privacy.data_export': 'Data Export',
+            'settings.privacy.data_export_description': 'Download a copy of your data, including your profile information, creations, and account activity',
+            'settings.privacy.request_export': 'Request Data Export',
+            'settings.privacy.data_removal': 'Data Removal',
+            'settings.privacy.data_removal_description': 'If you\'d like us to delete specific content or data types instead of your entire account, you can request targeted data removal',
+            'settings.privacy.request_removal': 'Request Data Removal',
+
+            // API Tab
+            'settings.api.title': 'API Access',
+            'settings.api.description': 'Manage your API keys and usage for programmatic access',
+            'settings.api.keys': 'Your API Keys',
+            'settings.api.production_key': 'Production Key',
+            'settings.api.development_key': 'Development Key',
+            'settings.api.created': 'Created',
+            'settings.api.active': 'Active',
+            'settings.api.generate': 'Generate New API Key',
+            'settings.api.usage': 'API Usage',
+            'settings.api.documentation': 'View Documentation',
+            'settings.api.monthly_limit': 'Monthly Limit',
+            'settings.api.used_month': 'Used This Month',
+            'settings.api.usage_cycle': 'Your API usage resets on the 1st of each month. Current billing cycle:',
+            'settings.api.domains': 'Allowed Domains',
+            'settings.api.domains_description': 'Restrict your API keys to specific domains for enhanced security',
+            'settings.api.add_domain': 'Add',
+            'settings.api.webhooks': 'Webhooks',
+            'settings.api.webhooks_description': 'Configure webhook endpoints to receive real-time events',
+            'settings.api.endpoints': 'Webhook Endpoints',
+            'settings.api.add_endpoint': 'Add Endpoint',
+            'settings.api.endpoint_active': 'Active',
+            'settings.api.generation_completed': 'Generation Completed',
+            'settings.api.events_description': 'Receives events when image generations complete',
+            'settings.api.edit': 'Edit',
+            'settings.api.test': 'Test',
+            'settings.api.delete': 'Delete',
+            'settings.api.enabled': 'API Access Enabled',
+            'settings.api.save': 'Save API Settings',
+
+            // Sign Out
+            'settings.sign_out': 'Sign Out'
         },
         ru: {
             'settings.title': 'Настройки',
@@ -126,12 +314,152 @@ export default function SettingsPage() {
             'settings.danger.description': 'Необратимые действия с аккаунтом',
             'settings.danger.delete_account': 'Удалить аккаунт',
             'settings.danger.delete_warning': 'После удаления аккаунта пути назад нет. Это действие нельзя отменить.',
+
+            // Appearance Tab
+            'settings.appearance.title': 'Настройки темы',
+            'settings.appearance.description': 'Настройте внешний вид и поведение VisioMera',
+            'settings.appearance.color_theme': 'Цветовая тема',
+            'settings.appearance.light': 'Светлая',
+            'settings.appearance.dark': 'Темная',
+            'settings.appearance.system': 'Системная',
+            'settings.appearance.ui_density': 'Плотность интерфейса',
+            'settings.appearance.compact': 'Компактная',
+            'settings.appearance.comfortable': 'Комфортная',
+            'settings.appearance.spacious': 'Просторная',
+            'settings.appearance.effects': 'Эффекты и анимации',
+            'settings.appearance.particles': 'Фоновые частицы',
+            'settings.appearance.transitions': 'Переходы интерфейса',
+            'settings.appearance.reduced_motion': 'Уменьшенное движение',
+            'settings.appearance.haptic': 'Тактильная обратная связь',
+            'settings.appearance.save': 'Сохранить настройки',
+            'settings.appearance.customization': 'Настройка интерфейса',
+            'settings.appearance.customization_description': 'Настройте макет рабочего пространства',
+            'settings.appearance.default_view': 'Вид по умолчанию',
+            'settings.appearance.standard': 'Стандартный режим',
+            'settings.appearance.standard_description': 'Упрощенный интерфейс с основными элементами управления',
+            'settings.appearance.advanced': 'Расширенный режим',
+            'settings.appearance.advanced_description': 'Полный контроль со всеми параметрами и опциями',
+            'settings.appearance.gallery': 'Настройки просмотра галереи',
+            'settings.appearance.gallery_grid': 'Сетка по умолчанию',
+            'settings.appearance.gallery_info': 'Показывать информацию при наведении',
+            'settings.appearance.gallery_autosave': 'Автосохранение генераций',
+            'settings.appearance.gallery_prompt': 'Показывать промпты с изображениями',
+
+            // Notifications Tab
+            'settings.notifications.title': 'Настройки уведомлений',
+            'settings.notifications.description': 'Настройте как и когда вы получаете уведомления',
+            'settings.notifications.email': 'Email уведомления',
+            'settings.notifications.email_account': 'Обновления аккаунта и оповещения безопасности',
+            'settings.notifications.email_comments': 'Комментарии к вашим работам',
+            'settings.notifications.email_likes': 'Лайки и реакции',
+            'settings.notifications.email_features': 'Новые функции и объявления',
+            'settings.notifications.email_tips': 'Советы и руководства',
+            'settings.notifications.in_app': 'Уведомления в приложении',
+            'settings.notifications.in_app_comments': 'Комментарии к вашим работам',
+            'settings.notifications.in_app_likes': 'Лайки и реакции',
+            'settings.notifications.in_app_follows': 'Новые подписчики',
+            'settings.notifications.in_app_mentions': 'Упоминания и теги',
+            'settings.notifications.in_app_competitions': 'Обновления конкурсов',
+            'settings.notifications.in_app_generation': 'Завершение генераций',
+            'settings.notifications.schedule': 'Расписание уведомлений',
+            'settings.notifications.quiet_from': 'Начало тихого времени',
+            'settings.notifications.quiet_to': 'Конец тихого времени',
+            'settings.notifications.weekend_pause': 'Приостановить все уведомления в выходные',
+            'settings.notifications.save': 'Сохранить настройки уведомлений',
+
+            // Subscription Tab
+            'settings.subscription.title': 'Текущий план',
+            'settings.subscription.description': 'Управление подпиской и оплатой',
+            'settings.subscription.pro_plan': 'Про План',
+            'settings.subscription.price': 'в месяц',
+            'settings.subscription.next_billing': 'Ваша следующая дата оплаты: 15 апреля 2025 г.',
+            'settings.subscription.manage': 'Управление подпиской',
+            'settings.subscription.credits': 'Кредиты генерации',
+            'settings.subscription.monthly_limit': 'Месячный лимит',
+            'settings.subscription.credits_used': 'Использовано кредитов',
+            'settings.subscription.credits_remaining': 'Осталось кредитов',
+            'settings.subscription.buy_additional': 'Купить дополнительные кредиты',
+            'settings.subscription.buy_credits_tooltip': 'Купите больше кредитов, когда достигнете лимита',
+            'settings.subscription.features': 'Возможности плана',
+            'settings.subscription.history': 'Просмотреть историю платежей',
+            'settings.subscription.upgrade': 'Улучшить план',
+            'settings.subscription.available_plans': 'Доступные планы',
+            'settings.subscription.compare_plans': 'Сравните планы и найдите подходящий для ваших нужд',
+            'settings.subscription.free': 'Бесплатный',
+            'settings.subscription.business': 'Бизнес',
+            'settings.subscription.most_popular': 'Самый популярный',
+            'settings.subscription.current_plan': 'Текущий план',
+            'settings.subscription.upgrade_to': 'Перейти на',
+
+            // Privacy Tab
+            'settings.privacy.title': 'Настройки приватности',
+            'settings.privacy.description': 'Управляйте использованием и доступом к вашим данным',
+            'settings.privacy.profile': 'Приватность профиля',
+            'settings.privacy.public_profile': 'Сделать профиль публичным',
+            'settings.privacy.public_profile_description': 'Разрешить всем просматривать ваш профиль и работы',
+            'settings.privacy.searchable': 'Профиль в поиске',
+            'settings.privacy.searchable_description': 'Разрешить вашему профилю появляться в результатах поиска',
+            'settings.privacy.share_activity': 'Делиться активностью',
+            'settings.privacy.share_activity_description': 'Показывать вашу активность (лайки, комментарии) подписчикам',
+            'settings.privacy.content': 'Общий доступ к контенту',
+            'settings.privacy.auto_public': 'Автоматически делать мои работы публичными',
+            'settings.privacy.auto_public_description': 'Новые генерации будут видны сообществу',
+            'settings.privacy.show_prompts': 'Делиться моими промптами с сообществом',
+            'settings.privacy.show_prompts_description': 'Разрешить другим видеть промпты, использованные для ваших публичных работ',
+            'settings.privacy.allow_remix': 'Разрешить другим переделывать мои работы',
+            'settings.privacy.allow_remix_description': 'Позволить участникам сообщества использовать ваши изображения в качестве референса для своих работ',
+            'settings.privacy.data': 'Приватность данных',
+            'settings.privacy.anon_analytics': 'Разрешить анонимную аналитику',
+            'settings.privacy.anon_analytics_description': 'Помогите нам улучшить сервис, поделившись анонимными данными об использовании',
+            'settings.privacy.model_training': 'Разрешить вклад в обучение моделей',
+            'settings.privacy.model_training_description': 'Ваши работы могут быть использованы для улучшения ИИ-моделей',
+            'settings.privacy.personalization': 'Персонализированный опыт',
+            'settings.privacy.personalization_description': 'Использовать вашу активность для настройки вашего опыта',
+            'settings.privacy.save': 'Сохранить настройки приватности',
+            'settings.privacy.data_management': 'Управление данными',
+            'settings.privacy.data_export': 'Экспорт данных',
+            'settings.privacy.data_export_description': 'Скачайте копию ваших данных, включая информацию профиля, работы и активность аккаунта',
+            'settings.privacy.request_export': 'Запросить экспорт данных',
+            'settings.privacy.data_removal': 'Удаление данных',
+            'settings.privacy.data_removal_description': 'Если вы хотите, чтобы мы удалили определенный контент или типы данных вместо всего аккаунта, вы можете запросить целевое удаление данных',
+            'settings.privacy.request_removal': 'Запросить удаление данных',
+
+            // API Tab
+            'settings.api.title': 'Доступ к API',
+            'settings.api.description': 'Управляйте вашими API-ключами и использованием для программного доступа',
+            'settings.api.keys': 'Ваши API-ключи',
+            'settings.api.production_key': 'Рабочий ключ',
+            'settings.api.development_key': 'Ключ разработки',
+            'settings.api.created': 'Создан',
+            'settings.api.active': 'Активен',
+            'settings.api.generate': 'Сгенерировать новый API-ключ',
+            'settings.api.usage': 'Использование API',
+            'settings.api.documentation': 'Просмотреть документацию',
+            'settings.api.monthly_limit': 'Месячный лимит',
+            'settings.api.used_month': 'Использовано в этом месяце',
+            'settings.api.usage_cycle': 'Ваше использование API сбрасывается 1-го числа каждого месяца. Текущий цикл оплаты:',
+            'settings.api.domains': 'Разрешенные домены',
+            'settings.api.domains_description': 'Ограничьте использование ваших API-ключей определенными доменами для повышения безопасности',
+            'settings.api.add_domain': 'Добавить',
+            'settings.api.webhooks': 'Вебхуки',
+            'settings.api.webhooks_description': 'Настройте конечные точки вебхуков для получения событий в реальном времени',
+            'settings.api.endpoints': 'Конечные точки вебхуков',
+            'settings.api.add_endpoint': 'Добавить конечную точку',
+            'settings.api.endpoint_active': 'Активна',
+            'settings.api.generation_completed': 'Генерация завершена',
+            'settings.api.events_description': 'Получает события при завершении генерации изображений',
+            'settings.api.edit': 'Редактировать',
+            'settings.api.test': 'Тест',
+            'settings.api.delete': 'Удалить',
+            'settings.api.enabled': 'Доступ к API включен',
+            'settings.api.save': 'Сохранить настройки API',
+
+            // Sign Out
+            'settings.sign_out': 'Выйти'
         }
     };
 
-    // Функция локального перевода
     const { localT } = useLocalTranslation(pageTranslations);
-
 
     return (
         <div className="container relative mx-auto py-8">
@@ -309,18 +637,17 @@ export default function SettingsPage() {
                     </Card>
                 </TabsContent>
 
-                {/* Appearance Settings */}
                 <TabsContent value="appearance" className="space-y-6">
                     <Card>
                         <CardHeader>
-                            <CardTitle>Theme Preferences</CardTitle>
+                            <CardTitle>{localT('settings.appearance.title')}</CardTitle>
                             <CardDescription>
-                                Customize how VisioMera looks and feels
+                                {localT('settings.appearance.description')}
                             </CardDescription>
                         </CardHeader>
                         <CardContent className="space-y-6">
                             <div className="space-y-4">
-                                <h3 className="text-sm font-medium">Color Theme</h3>
+                                <h3 className="text-sm font-medium">{localT('settings.appearance.color_theme')}</h3>
                                 <RadioGroup defaultValue="system" className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                     <div>
                                         <RadioGroupItem value="light" id="light" className="peer sr-only" />
@@ -329,7 +656,7 @@ export default function SettingsPage() {
                                             className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary"
                                         >
                                             <Sparkles className="mb-3 h-6 w-6" />
-                                            <div className="font-medium">Light</div>
+                                            <div className="font-medium">{localT('settings.appearance.light')}</div>
                                         </Label>
                                     </div>
                                     <div>
@@ -339,7 +666,7 @@ export default function SettingsPage() {
                                             className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary"
                                         >
                                             <Sparkles className="mb-3 h-6 w-6" />
-                                            <div className="font-medium">Dark</div>
+                                            <div className="font-medium">{localT('settings.appearance.dark')}</div>
                                         </Label>
                                     </div>
                                     <div>
@@ -349,7 +676,7 @@ export default function SettingsPage() {
                                             className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary"
                                         >
                                             <Sparkles className="mb-3 h-6 w-6" />
-                                            <div className="font-medium">System</div>
+                                            <div className="font-medium">{localT('settings.appearance.system')}</div>
                                         </Label>
                                     </div>
                                 </RadioGroup>
@@ -358,7 +685,7 @@ export default function SettingsPage() {
                             <Separator />
 
                             <div className="space-y-4">
-                                <h3 className="text-sm font-medium">UI Density</h3>
+                                <h3 className="text-sm font-medium">{localT('settings.appearance.ui_density')}</h3>
                                 <RadioGroup defaultValue="comfortable" className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                     <div>
                                         <RadioGroupItem value="compact" id="compact" className="peer sr-only" />
@@ -367,7 +694,7 @@ export default function SettingsPage() {
                                             className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary"
                                         >
                                             <Layout className="mb-3 h-6 w-6" />
-                                            <div className="font-medium">Compact</div>
+                                            <div className="font-medium">{localT('settings.appearance.compact')}</div>
                                         </Label>
                                     </div>
                                     <div>
@@ -377,7 +704,7 @@ export default function SettingsPage() {
                                             className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary"
                                         >
                                             <Layout className="mb-3 h-6 w-6" />
-                                            <div className="font-medium">Comfortable</div>
+                                            <div className="font-medium">{localT('settings.appearance.comfortable')}</div>
                                         </Label>
                                     </div>
                                     <div>
@@ -387,7 +714,7 @@ export default function SettingsPage() {
                                             className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary"
                                         >
                                             <Layout className="mb-3 h-6 w-6" />
-                                            <div className="font-medium">Spacious</div>
+                                            <div className="font-medium">{localT('settings.appearance.spacious')}</div>
                                         </Label>
                                     </div>
                                 </RadioGroup>
@@ -396,23 +723,23 @@ export default function SettingsPage() {
                             <Separator />
 
                             <div className="space-y-4">
-                                <h3 className="text-sm font-medium">Effects & Animations</h3>
+                                <h3 className="text-sm font-medium">{localT('settings.appearance.effects')}</h3>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div className="flex items-center space-x-2">
                                         <Switch id="particles" defaultChecked />
-                                        <Label htmlFor="particles">Background particles</Label>
+                                        <Label htmlFor="particles">{localT('settings.appearance.particles')}</Label>
                                     </div>
                                     <div className="flex items-center space-x-2">
                                         <Switch id="transitions" defaultChecked />
-                                        <Label htmlFor="transitions">UI transitions</Label>
+                                        <Label htmlFor="transitions">{localT('settings.appearance.transitions')}</Label>
                                     </div>
                                     <div className="flex items-center space-x-2">
                                         <Switch id="reduced-motion" />
-                                        <Label htmlFor="reduced-motion">Reduced motion</Label>
+                                        <Label htmlFor="reduced-motion">{localT('settings.appearance.reduced_motion')}</Label>
                                     </div>
                                     <div className="flex items-center space-x-2">
                                         <Switch id="haptic" />
-                                        <Label htmlFor="haptic">Haptic feedback</Label>
+                                        <Label htmlFor="haptic">{localT('settings.appearance.haptic')}</Label>
                                     </div>
                                 </div>
                             </div>
@@ -420,21 +747,21 @@ export default function SettingsPage() {
                         <CardFooter>
                             <Button>
                                 <Save className="mr-2 h-4 w-4" />
-                                Save Preferences
+                                {localT('settings.appearance.save')}
                             </Button>
                         </CardFooter>
                     </Card>
 
                     <Card>
                         <CardHeader>
-                            <CardTitle>Interface Customization</CardTitle>
+                            <CardTitle>{localT('settings.appearance.customization')}</CardTitle>
                             <CardDescription>
-                                Configure your workspace layout
+                                {localT('settings.appearance.customization_description')}
                             </CardDescription>
                         </CardHeader>
                         <CardContent className="space-y-6">
                             <div className="space-y-4">
-                                <h3 className="text-sm font-medium">Default View</h3>
+                                <h3 className="text-sm font-medium">{localT('settings.appearance.default_view')}</h3>
                                 <RadioGroup defaultValue="standard" className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div>
                                         <RadioGroupItem value="standard" id="standard-view" className="peer sr-only" />
@@ -443,9 +770,9 @@ export default function SettingsPage() {
                                             className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary"
                                         >
                                             <Sparkles className="mb-3 h-6 w-6" />
-                                            <div className="font-medium">Standard Mode</div>
+                                            <div className="font-medium">{localT('settings.appearance.standard')}</div>
                                             <p className="text-sm text-muted-foreground text-center mt-2">
-                                                Simplified interface with essential controls
+                                                {localT('settings.appearance.standard_description')}
                                             </p>
                                         </Label>
                                     </div>
@@ -456,9 +783,9 @@ export default function SettingsPage() {
                                             className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary"
                                         >
                                             <SettingsIcon className="mb-3 h-6 w-6" />
-                                            <div className="font-medium">Advanced Mode</div>
+                                            <div className="font-medium">{localT('settings.appearance.advanced')}</div>
                                             <p className="text-sm text-muted-foreground text-center mt-2">
-                                                Full control with all parameters and options
+                                                {localT('settings.appearance.advanced_description')}
                                             </p>
                                         </Label>
                                     </div>
@@ -468,23 +795,23 @@ export default function SettingsPage() {
                             <Separator />
 
                             <div className="space-y-4">
-                                <h3 className="text-sm font-medium">Gallery View Preferences</h3>
+                                <h3 className="text-sm font-medium">{localT('settings.appearance.gallery')}</h3>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div className="flex items-center space-x-2">
                                         <Switch id="auto-grid" defaultChecked />
-                                        <Label htmlFor="auto-grid">Default to grid view</Label>
+                                        <Label htmlFor="auto-grid">{localT('settings.appearance.gallery_grid')}</Label>
                                     </div>
                                     <div className="flex items-center space-x-2">
                                         <Switch id="image-info" defaultChecked />
-                                        <Label htmlFor="image-info">Show image info on hover</Label>
+                                        <Label htmlFor="image-info">{localT('settings.appearance.gallery_info')}</Label>
                                     </div>
                                     <div className="flex items-center space-x-2">
                                         <Switch id="auto-save" />
-                                        <Label htmlFor="auto-save">Auto-save generations</Label>
+                                        <Label htmlFor="auto-save">{localT('settings.appearance.gallery_autosave')}</Label>
                                     </div>
                                     <div className="flex items-center space-x-2">
                                         <Switch id="show-prompt" defaultChecked />
-                                        <Label htmlFor="show-prompt">Show prompts with images</Label>
+                                        <Label htmlFor="show-prompt">{localT('settings.appearance.gallery_prompt')}</Label>
                                     </div>
                                 </div>
                             </div>
@@ -492,25 +819,24 @@ export default function SettingsPage() {
                     </Card>
                 </TabsContent>
 
-                {/* Notifications Settings */}
                 <TabsContent value="notifications" className="space-y-6">
                     <Card>
                         <CardHeader>
-                            <CardTitle>Notification Preferences</CardTitle>
+                            <CardTitle>{localT('settings.notifications.title')}</CardTitle>
                             <CardDescription>
-                                Configure how and when you receive notifications
+                                {localT('settings.notifications.description')}
                             </CardDescription>
                         </CardHeader>
                         <CardContent className="space-y-6">
                             <div className="space-y-4">
-                                <h3 className="text-sm font-medium">Email Notifications</h3>
+                                <h3 className="text-sm font-medium">{localT('settings.notifications.email')}</h3>
                                 <div className="space-y-2">
                                     {[
-                                        { id: "email-account", label: "Account updates and security alerts" },
-                                        { id: "email-comments", label: "Comments on your creations" },
-                                        { id: "email-likes", label: "Likes and reactions" },
-                                        { id: "email-features", label: "New features and announcements" },
-                                        { id: "email-tips", label: "Tips and tutorials" },
+                                        { id: "email-account", label: localT('settings.notifications.email_account') },
+                                        { id: "email-comments", label: localT('settings.notifications.email_comments') },
+                                        { id: "email-likes", label: localT('settings.notifications.email_likes') },
+                                        { id: "email-features", label: localT('settings.notifications.email_features') },
+                                        { id: "email-tips", label: localT('settings.notifications.email_tips') },
                                     ].map((item) => (
                                         <div key={item.id} className="flex items-center space-x-2">
                                             <Checkbox id={item.id} defaultChecked={item.id === "email-account"} />
@@ -523,15 +849,15 @@ export default function SettingsPage() {
                             <Separator />
 
                             <div className="space-y-4">
-                                <h3 className="text-sm font-medium">In-App Notifications</h3>
+                                <h3 className="text-sm font-medium">{localT('settings.notifications.in_app')}</h3>
                                 <div className="space-y-2">
                                     {[
-                                        { id: "in-app-comments", label: "Comments on your creations", defaultChecked: true },
-                                        { id: "in-app-likes", label: "Likes and reactions", defaultChecked: true },
-                                        { id: "in-app-follows", label: "New followers", defaultChecked: true },
-                                        { id: "in-app-mentions", label: "Mentions and tags", defaultChecked: true },
-                                        { id: "in-app-competitions", label: "Competition updates", defaultChecked: true },
-                                        { id: "in-app-generation", label: "Generation completions", defaultChecked: true },
+                                        { id: "in-app-comments", label: localT('settings.notifications.in_app_comments'), defaultChecked: true },
+                                        { id: "in-app-likes", label: localT('settings.notifications.in_app_likes'), defaultChecked: true },
+                                        { id: "in-app-follows", label: localT('settings.notifications.in_app_follows'), defaultChecked: true },
+                                        { id: "in-app-mentions", label: localT('settings.notifications.in_app_mentions'), defaultChecked: true },
+                                        { id: "in-app-competitions", label: localT('settings.notifications.in_app_competitions'), defaultChecked: true },
+                                        { id: "in-app-generation", label: localT('settings.notifications.in_app_generation'), defaultChecked: true },
                                     ].map((item) => (
                                         <div key={item.id} className="flex items-center space-x-2">
                                             <Switch id={item.id} defaultChecked={item.defaultChecked} />
@@ -544,11 +870,11 @@ export default function SettingsPage() {
                             <Separator />
 
                             <div className="space-y-4">
-                                <h3 className="text-sm font-medium">Notification Schedule</h3>
+                                <h3 className="text-sm font-medium">{localT('settings.notifications.schedule')}</h3>
                                 <div className="space-y-2">
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                         <div className="space-y-2">
-                                            <Label htmlFor="quiet-from">Quiet hours start</Label>
+                                            <Label htmlFor="quiet-from">{localT('settings.notifications.quiet_from')}</Label>
                                             <Select defaultValue="22:00">
                                                 <SelectTrigger id="quiet-from">
                                                     <SelectValue placeholder="Select time" />
@@ -563,7 +889,7 @@ export default function SettingsPage() {
                                             </Select>
                                         </div>
                                         <div className="space-y-2">
-                                            <Label htmlFor="quiet-to">Quiet hours end</Label>
+                                            <Label htmlFor="quiet-to">{localT('settings.notifications.quiet_to')}</Label>
                                             <Select defaultValue="07:00">
                                                 <SelectTrigger id="quiet-to">
                                                     <SelectValue placeholder="Select time" />
@@ -580,7 +906,7 @@ export default function SettingsPage() {
                                     </div>
                                     <div className="flex items-center space-x-2 pt-2">
                                         <Switch id="weekend-pause" />
-                                        <Label htmlFor="weekend-pause">Pause all notifications on weekends</Label>
+                                        <Label htmlFor="weekend-pause">{localT('settings.notifications.weekend_pause')}</Label>
                                     </div>
                                 </div>
                             </div>
@@ -588,45 +914,44 @@ export default function SettingsPage() {
                         <CardFooter>
                             <Button>
                                 <Save className="mr-2 h-4 w-4" />
-                                Save Notification Settings
+                                {localT('settings.notifications.save')}
                             </Button>
                         </CardFooter>
                     </Card>
                 </TabsContent>
 
-                {/* Subscription Settings */}
                 <TabsContent value="subscription" className="space-y-6">
                     <Card>
                         <CardHeader>
-                            <CardTitle>Current Plan</CardTitle>
+                            <CardTitle>{localT('settings.subscription.title')}</CardTitle>
                             <CardDescription>
-                                Manage your subscription and billing
+                                {localT('settings.subscription.description')}
                             </CardDescription>
                         </CardHeader>
                         <CardContent className="space-y-6">
                             <div className="rounded-lg border p-6 text-center space-y-4">
-                                <Badge variant="secondary" className="px-3 py-1 text-base">Pro Plan</Badge>
-                                <h2 className="text-3xl font-bold">$12.99 <span className="text-muted-foreground text-base font-normal">/month</span></h2>
-                                <p className="text-muted-foreground">Your next billing date is April 15, 2025</p>
+                                <Badge variant="secondary" className="px-3 py-1 text-base">{localT('settings.subscription.pro_plan')}</Badge>
+                                <h2 className="text-3xl font-bold">$12.99 <span className="text-muted-foreground text-base font-normal">/{localT('settings.subscription.price')}</span></h2>
+                                <p className="text-muted-foreground">{localT('settings.subscription.next_billing')}</p>
                                 <Button variant="outline" className="mt-2">
-                                    Manage Subscription
+                                    {localT('settings.subscription.manage')}
                                 </Button>
                             </div>
 
                             <div className="space-y-4">
-                                <h3 className="text-sm font-medium">Generation Credits</h3>
+                                <h3 className="text-sm font-medium">{localT('settings.subscription.credits')}</h3>
                                 <div className="space-y-2">
                                     <div className="flex items-center justify-between">
-                                        <span>Monthly Limit</span>
-                                        <span className="font-medium">1000 credits</span>
+                                        <span>{localT('settings.subscription.monthly_limit')}</span>
+                                        <span className="font-medium">{language === 'ru' ? '1000 кредитов' : '1000 credits'}</span>
                                     </div>
                                     <div className="flex items-center justify-between">
-                                        <span>Credits Used</span>
-                                        <span className="font-medium">750 credits</span>
+                                        <span>{localT('settings.subscription.credits_used')}</span>
+                                        <span className="font-medium">{language === 'ru' ? '750 кредитов' : '750 credits'}</span>
                                     </div>
                                     <div className="flex items-center justify-between">
-                                        <span>Credits Remaining</span>
-                                        <span className="font-medium">250 credits</span>
+                                        <span>{localT('settings.subscription.credits_remaining')}</span>
+                                        <span className="font-medium">{language === 'ru' ? '250 кредитов' : '250 credits'}</span>
                                     </div>
                                     <Progress value={75} className="h-2 mt-1" />
                                     <div className="flex justify-end mt-2">
@@ -635,11 +960,11 @@ export default function SettingsPage() {
                                                 <TooltipTrigger asChild>
                                                     <Button variant="outline" size="sm">
                                                         <CreditCard className="mr-2 h-4 w-4" />
-                                                        Buy Additional Credits
+                                                        {localT('settings.subscription.buy_additional')}
                                                     </Button>
                                                 </TooltipTrigger>
                                                 <TooltipContent>
-                                                    <p>Purchase more credits when you reach your limit</p>
+                                                    <p>{localT('settings.subscription.buy_credits_tooltip')}</p>
                                                 </TooltipContent>
                                             </Tooltip>
                                         </TooltipProvider>
@@ -650,17 +975,17 @@ export default function SettingsPage() {
                             <Separator />
 
                             <div className="space-y-4">
-                                <h3 className="text-sm font-medium">Plan Features</h3>
+                                <h3 className="text-sm font-medium">{localT('settings.subscription.features')}</h3>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-y-2">
                                     {[
-                                        "1000 generation credits per month",
-                                        "Access to all models",
-                                        "Maximum resolution: 2048×2048",
-                                        "Priority generation queue",
-                                        "Advanced parameters",
-                                        "Commercial license",
-                                        "API access",
-                                        "ControlNet support",
+                                        { id: "credits", text: "1000 generation credits per month" },
+                                        { id: "models", text: "Access to all models" },
+                                        { id: "resolution", text: "Maximum resolution: 2048×2048" },
+                                        { id: "queue", text: "Priority generation queue" },
+                                        { id: "parameters", text: "Advanced parameters" },
+                                        { id: "license", text: "Commercial license" },
+                                        { id: "api_access", text: "API access" },
+                                        { id: "controlnet", text: "ControlNet support" },
                                     ].map((feature, index) => (
                                         <div key={index} className="flex items-center space-x-2">
                                             <div className="flex h-5 w-5 items-center justify-center rounded-full bg-primary">
@@ -677,23 +1002,23 @@ export default function SettingsPage() {
                                                     <path d="M20 6L9 17l-5-5" />
                                                 </svg>
                                             </div>
-                                            <span className="text-sm">{feature}</span>
+                                            <span className="text-sm">{language === 'ru' ? localizeFeature(feature.id) : feature.text}</span>
                                         </div>
                                     ))}
                                 </div>
                             </div>
                         </CardContent>
                         <CardFooter className="flex justify-between">
-                            <Button variant="outline">View Billing History</Button>
-                            <Button variant="default">Upgrade Plan</Button>
+                            <Button variant="outline">{localT('settings.subscription.history')}</Button>
+                            <Button variant="default">{localT('settings.subscription.upgrade')}</Button>
                         </CardFooter>
                     </Card>
 
                     <Card>
                         <CardHeader>
-                            <CardTitle>Available Plans</CardTitle>
+                            <CardTitle>{localT('settings.subscription.available_plans')}</CardTitle>
                             <CardDescription>
-                                Compare plans and find the right fit for your needs
+                                {localT('settings.subscription.compare_plans')}
                             </CardDescription>
                         </CardHeader>
                         <CardContent>
@@ -701,7 +1026,7 @@ export default function SettingsPage() {
                                 <div className="flex w-max space-x-4 p-4">
                                     {[
                                         {
-                                            name: "Free",
+                                            name: localT('settings.subscription.free'),
                                             price: "$0",
                                             popular: false,
                                             features: [
@@ -729,7 +1054,7 @@ export default function SettingsPage() {
                                             ],
                                         },
                                         {
-                                            name: "Business",
+                                            name: localT('settings.subscription.business'),
                                             price: "$49.99",
                                             popular: false,
                                             features: [
@@ -753,13 +1078,13 @@ export default function SettingsPage() {
                                         >
                                             {plan.popular && (
                                                 <div className="absolute -top-3 left-0 right-0 mx-auto w-fit rounded-full bg-primary px-3 py-1 text-xs font-medium text-primary-foreground">
-                                                    Most Popular
+                                                    {localT('settings.subscription.most_popular')}
                                                 </div>
                                             )}
                                             <div className="p-6 space-y-4">
                                                 <h3 className="text-xl font-bold">{plan.name}</h3>
                                                 <p className="text-3xl font-bold">
-                                                    {plan.price} <span className="text-muted-foreground text-base font-normal">/month</span>
+                                                    {plan.price} <span className="text-muted-foreground text-base font-normal">/{localT('settings.subscription.price')}</span>
                                                 </p>
                                                 <div className="space-y-2">
                                                     {plan.features.map((feature, index) => (
@@ -778,7 +1103,7 @@ export default function SettingsPage() {
                                                                     <path d="M20 6L9 17l-5-5" />
                                                                 </svg>
                                                             </div>
-                                                            <span className="text-sm">{feature}</span>
+                                                            <span className="text-sm">{language === 'ru' ? localizeSubscriptionFeature(feature) : feature}</span>
                                                         </div>
                                                     ))}
                                                 </div>
@@ -788,7 +1113,7 @@ export default function SettingsPage() {
                                                     variant={plan.popular ? "default" : "outline"}
                                                     className="w-full"
                                                 >
-                                                    {plan.name === "Pro" ? "Current Plan" : `Upgrade to ${plan.name}`}
+                                                    {plan.name === "Pro" ? localT('settings.subscription.current_plan') : `${localT('settings.subscription.upgrade_to')} ${plan.name}`}
                                                 </Button>
                                             </div>
                                         </div>
@@ -799,23 +1124,22 @@ export default function SettingsPage() {
                     </Card>
                 </TabsContent>
 
-                {/* Privacy Settings */}
                 <TabsContent value="privacy" className="space-y-6">
                     <Card>
                         <CardHeader>
-                            <CardTitle>Privacy Settings</CardTitle>
+                            <CardTitle>{localT('settings.privacy.title')}</CardTitle>
                             <CardDescription>
-                                Control how your data is used and shared
+                                {localT('settings.privacy.description')}
                             </CardDescription>
                         </CardHeader>
                         <CardContent className="space-y-6">
                             <div className="space-y-4">
-                                <h3 className="text-sm font-medium">Profile Privacy</h3>
+                                <h3 className="text-sm font-medium">{localT('settings.privacy.profile')}</h3>
                                 <div className="space-y-2">
                                     {[
-                                        { id: "public-profile", label: "Make profile public", description: "Allow anyone to view your profile and creations" },
-                                        { id: "searchable", label: "Searchable profile", description: "Allow your profile to appear in search results" },
-                                        { id: "share-activity", label: "Share activity", description: "Show your activity (likes, comments) to followers" },
+                                        { id: "public-profile", label: localT('settings.privacy.public_profile'), description: localT('settings.privacy.public_profile_description') },
+                                        { id: "searchable", label: localT('settings.privacy.searchable'), description: localT('settings.privacy.searchable_description') },
+                                        { id: "share-activity", label: localT('settings.privacy.share_activity'), description: localT('settings.privacy.share_activity_description') },
                                     ].map((item) => (
                                         <div key={item.id} className="flex items-start space-x-2">
                                             <div className="pt-0.5">
@@ -833,12 +1157,12 @@ export default function SettingsPage() {
                             <Separator />
 
                             <div className="space-y-4">
-                                <h3 className="text-sm font-medium">Content Sharing</h3>
+                                <h3 className="text-sm font-medium">{localT('settings.privacy.content')}</h3>
                                 <div className="space-y-2">
                                     {[
-                                        { id: "auto-public", label: "Automatically make my creations public", description: "New generations will be visible to the community" },
-                                        { id: "show-prompts", label: "Share my prompts with the community", description: "Allow others to view the prompts used for your public creations" },
-                                        { id: "allow-remix", label: "Allow others to remix my work", description: "Let community members use your images as reference for their creations" },
+                                        { id: "auto-public", label: localT('settings.privacy.auto_public'), description: localT('settings.privacy.auto_public_description') },
+                                        { id: "show-prompts", label: localT('settings.privacy.show_prompts'), description: localT('settings.privacy.show_prompts_description') },
+                                        { id: "allow-remix", label: localT('settings.privacy.allow_remix'), description: localT('settings.privacy.allow_remix_description') },
                                     ].map((item) => (
                                         <div key={item.id} className="flex items-start space-x-2">
                                             <div className="pt-0.5">
@@ -856,12 +1180,12 @@ export default function SettingsPage() {
                             <Separator />
 
                             <div className="space-y-4">
-                                <h3 className="text-sm font-medium">Data Privacy</h3>
+                                <h3 className="text-sm font-medium">{localT('settings.privacy.data')}</h3>
                                 <div className="space-y-2">
                                     {[
-                                        { id: "anon-analytics", label: "Allow anonymous analytics", description: "Help us improve by sharing anonymous usage data" },
-                                        { id: "model-training", label: "Allow model training contribution", description: "Your creations may be used to improve AI models" },
-                                        { id: "personalization", label: "Personalized experience", description: "Use your activity to customize your experience" },
+                                        { id: "anon-analytics", label: localT('settings.privacy.anon_analytics'), description: localT('settings.privacy.anon_analytics_description') },
+                                        { id: "model-training", label: localT('settings.privacy.model_training'), description: localT('settings.privacy.model_training_description') },
+                                        { id: "personalization", label: localT('settings.privacy.personalization'), description: localT('settings.privacy.personalization_description') },
                                     ].map((item) => (
                                         <div key={item.id} className="flex items-start space-x-2">
                                             <div className="pt-0.5">
@@ -879,63 +1203,60 @@ export default function SettingsPage() {
                         <CardFooter>
                             <Button>
                                 <Save className="mr-2 h-4 w-4" />
-                                Save Privacy Settings
+                                {localT('settings.privacy.save')}
                             </Button>
                         </CardFooter>
                     </Card>
 
                     <Card>
                         <CardHeader>
-                            <CardTitle>Data Management</CardTitle>
+                            <CardTitle>{localT('settings.privacy.data_management')}</CardTitle>
                             <CardDescription>
-                                Export or delete your data
+                                {localT('settings.privacy.data_export')}
                             </CardDescription>
                         </CardHeader>
                         <CardContent className="space-y-6">
                             <div className="rounded-lg border p-4">
-                                <h3 className="font-medium mb-2">Data Export</h3>
+                                <h3 className="font-medium mb-2">{localT('settings.privacy.data_export')}</h3>
                                 <p className="text-sm text-muted-foreground mb-4">
-                                    Download a copy of your data, including your profile information,
-                                    creations, and account activity.
+                                    {localT('settings.privacy.data_export_description')}
                                 </p>
                                 <Button variant="outline">
                                     <Download className="mr-2 h-4 w-4" />
-                                    Request Data Export
+                                    {localT('settings.privacy.request_export')}
                                 </Button>
                             </div>
 
                             <div className="rounded-lg border border-destructive/30 p-4">
-                                <h3 className="font-medium text-destructive mb-2">Data Removal</h3>
+                                <h3 className="font-medium text-destructive mb-2">{localT('settings.privacy.data_removal')}</h3>
                                 <p className="text-sm text-muted-foreground mb-4">
-                                    If you'd like us to delete specific content or data types instead of your
-                                    entire account, you can request targeted data removal.
+                                    {localT('settings.privacy.data_removal_description')}
                                 </p>
-                                <Button variant="destructive">Request Data Removal</Button>
+                                <Button variant="destructive">{localT('settings.privacy.request_removal')}</Button>
                             </div>
                         </CardContent>
                     </Card>
                 </TabsContent>
 
-                {/* API Settings */}
                 <TabsContent value="api" className="space-y-6">
                     <Card>
                         <CardHeader>
-                            <CardTitle>API Access</CardTitle>
+                            <CardTitle>{localT('settings.api.title')}</CardTitle>
                             <CardDescription>
-                                Manage your API keys and usage for programmatic access
+                                {localT('settings.api.description')}
                             </CardDescription>
                         </CardHeader>
                         <CardContent className="space-y-6">
                             <div className="space-y-4">
-                                <h3 className="text-sm font-medium">Your API Keys</h3>
+                                <h3 className="text-sm font-medium">{localT('settings.api.keys')}</h3>
                                 <div className="rounded-lg border p-4 space-y-4">
                                     <div className="space-y-2">
                                         <div className="flex items-center justify-between">
                                             <div>
-                                                <h4 className="font-medium">Production Key</h4>
-                                                <p className="text-xs text-muted-foreground">Created: Mar 15, 2025</p>
+                                                <h4 className="font-medium">{localT('settings.api.production_key')}</h4>
+                                                <p className="text-xs text-muted-foreground">{localT('settings.api.created')}: {language === 'ru' ? '15 марта 2025' : 'Mar 15, 2025'}</p>
                                             </div>
-                                            <Badge variant="outline">Active</Badge>
+                                            <Badge variant="outline">{localT('settings.api.active')}</Badge>
                                         </div>
                                         <div className="flex items-center space-x-2">
                                             <Input
@@ -952,10 +1273,10 @@ export default function SettingsPage() {
                                     <div className="space-y-2">
                                         <div className="flex items-center justify-between">
                                             <div>
-                                                <h4 className="font-medium">Development Key</h4>
-                                                <p className="text-xs text-muted-foreground">Created: Mar 10, 2025</p>
+                                                <h4 className="font-medium">{localT('settings.api.development_key')}</h4>
+                                                <p className="text-xs text-muted-foreground">{localT('settings.api.created')}: {language === 'ru' ? '10 марта 2025' : 'Mar 10, 2025'}</p>
                                             </div>
-                                            <Badge variant="outline">Active</Badge>
+                                            <Badge variant="outline">{localT('settings.api.active')}</Badge>
                                         </div>
                                         <div className="flex items-center space-x-2">
                                             <Input
@@ -971,7 +1292,7 @@ export default function SettingsPage() {
                                     </div>
                                     <Button className="w-full">
                                         <Key className="mr-2 h-4 w-4" />
-                                        Generate New API Key
+                                        {localT('settings.api.generate')}
                                     </Button>
                                 </div>
                             </div>
@@ -980,21 +1301,21 @@ export default function SettingsPage() {
 
                             <div className="space-y-4">
                                 <div className="flex justify-between items-center">
-                                    <h3 className="text-sm font-medium">API Usage</h3>
-                                    <Button variant="outline" size="sm">View Documentation</Button>
+                                    <h3 className="text-sm font-medium">{localT('settings.api.usage')}</h3>
+                                    <Button variant="outline" size="sm">{localT('settings.api.documentation')}</Button>
                                 </div>
                                 <div className="space-y-4">
                                     <div className="flex items-center justify-between">
-                                        <span>Monthly Limit</span>
-                                        <span className="font-medium">10,000 requests</span>
+                                        <span>{localT('settings.api.monthly_limit')}</span>
+                                        <span className="font-medium">{language === 'ru' ? '10 000 запросов' : '10,000 requests'}</span>
                                     </div>
                                     <div className="flex items-center justify-between">
-                                        <span>Used This Month</span>
-                                        <span className="font-medium">3,254 requests</span>
+                                        <span>{localT('settings.api.used_month')}</span>
+                                        <span className="font-medium">{language === 'ru' ? '3 254 запроса' : '3,254 requests'}</span>
                                     </div>
                                     <Progress value={32.54} className="h-2" />
                                     <p className="text-xs text-muted-foreground">
-                                        Your API usage resets on the 1st of each month. Current billing cycle: Mar 1 - Mar 31, 2025
+                                        {localT('settings.api.usage_cycle')} {language === 'ru' ? '1 марта - 31 марта 2025' : 'Mar 1 - Mar 31, 2025'}
                                     </p>
                                 </div>
                             </div>
@@ -1002,25 +1323,25 @@ export default function SettingsPage() {
                             <Separator />
 
                             <div className="space-y-4">
-                                <h3 className="text-sm font-medium">Allowed Domains</h3>
+                                <h3 className="text-sm font-medium">{localT('settings.api.domains')}</h3>
                                 <p className="text-sm text-muted-foreground">
-                                    Restrict your API keys to specific domains for enhanced security
+                                    {localT('settings.api.domains_description')}
                                 </p>
                                 <div className="space-y-2">
                                     <div className="flex items-center space-x-2">
                                         <Input placeholder="Enter domain (e.g., example.com)" />
-                                        <Button variant="outline">Add</Button>
+                                        <Button variant="outline">{localT('settings.api.add_domain')}</Button>
                                     </div>
                                     <div className="rounded-lg border p-4">
                                         <div className="flex items-center justify-between">
-                                            <span className="font-mono text-sm">yourwebsite.com</span>
+                                            <span className="font-mono text-sm">{language === 'ru' ? 'вашсайт.рф' : 'yourwebsite.com'}</span>
                                             <Button variant="ghost" size="icon">
                                                 <X className="h-4 w-4" />
                                             </Button>
                                         </div>
                                         <Separator className="my-2" />
                                         <div className="flex items-center justify-between">
-                                            <span className="font-mono text-sm">app.yourwebsite.com</span>
+                                            <span className="font-mono text-sm">{language === 'ru' ? 'приложение.вашсайт.рф' : 'app.yourwebsite.com'}</span>
                                             <Button variant="ghost" size="icon">
                                                 <X className="h-4 w-4" />
                                             </Button>
@@ -1039,45 +1360,45 @@ export default function SettingsPage() {
                         <CardFooter className="flex justify-between">
                             <div className="flex items-center space-x-2">
                                 <Switch id="api-enabled" defaultChecked />
-                                <Label htmlFor="api-enabled">API Access Enabled</Label>
+                                <Label htmlFor="api-enabled">{localT('settings.api.enabled')}</Label>
                             </div>
-                            <Button>Save API Settings</Button>
+                            <Button>{localT('settings.api.save')}</Button>
                         </CardFooter>
                     </Card>
 
                     <Card>
                         <CardHeader>
-                            <CardTitle>Webhooks</CardTitle>
+                            <CardTitle>{localT('settings.api.webhooks')}</CardTitle>
                             <CardDescription>
-                                Configure webhook endpoints to receive real-time events
+                                {localT('settings.api.webhooks_description')}
                             </CardDescription>
                         </CardHeader>
                         <CardContent className="space-y-4">
                             <div className="flex items-center justify-between">
-                                <h3 className="text-sm font-medium">Webhook Endpoints</h3>
+                                <h3 className="text-sm font-medium">{localT('settings.api.endpoints')}</h3>
                                 <Button variant="outline" size="sm">
                                     <Plus className="mr-2 h-4 w-4" />
-                                    Add Endpoint
+                                    {localT('settings.api.add_endpoint')}
                                 </Button>
                             </div>
                             <div className="rounded-lg border">
                                 <div className="p-4 space-y-2">
                                     <div className="flex items-center justify-between">
-                                        <h4 className="font-medium">Generation Completed</h4>
-                                        <Badge variant="outline">Active</Badge>
+                                        <h4 className="font-medium">{localT('settings.api.generation_completed')}</h4>
+                                        <Badge variant="outline">{localT('settings.api.endpoint_active')}</Badge>
                                     </div>
-                                    <p className="font-mono text-sm text-muted-foreground">https://example.com/webhooks/generations</p>
+                                    <p className="font-mono text-sm text-muted-foreground">https://{language === 'ru' ? 'вашсайт.рф' : 'yourwebsite.com'}/api/webhooks/generations</p>
                                     <div className="flex items-center space-x-2">
                                         <Globe className="h-4 w-4 text-muted-foreground" />
-                                        <span className="text-xs text-muted-foreground">Receives events when image generations complete</span>
+                                        <span className="text-xs text-muted-foreground">{localT('settings.api.events_description')}</span>
                                     </div>
                                 </div>
                                 <Separator />
                                 <div className="p-4">
                                     <div className="flex gap-2">
-                                        <Button variant="outline" size="sm">Edit</Button>
-                                        <Button variant="outline" size="sm">Test</Button>
-                                        <Button variant="destructive" size="sm">Delete</Button>
+                                        <Button variant="outline" size="sm">{localT('settings.api.edit')}</Button>
+                                        <Button variant="outline" size="sm">{localT('settings.api.test')}</Button>
+                                        <Button variant="destructive" size="sm">{localT('settings.api.delete')}</Button>
                                     </div>
                                 </div>
                             </div>
@@ -1089,7 +1410,7 @@ export default function SettingsPage() {
             <div className="fixed bottom-4 right-4 z-10">
                 <Button variant="secondary" size="sm" className="text-xs flex items-center gap-1 bg-background/80 backdrop-blur-sm">
                     <LogOut className="mr-1 h-4 w-4" />
-                    Sign Out
+                    {localT('settings.sign_out')}
                 </Button>
             </div>
         </div>

@@ -27,12 +27,12 @@ import {
     Sparkles,
     Code,
     X,
-    MessageSquare,
     Send
 } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
+import { useScrollLock } from "./hooks/useScrollLock";
 
 interface ImagePreviewDialogProps {
     open: boolean;
@@ -66,6 +66,9 @@ export function ImagePreviewDialog({
     const [copied, setCopied] = useState(false);
     const imageContainerRef = useRef<HTMLDivElement>(null);
 
+    // Применяем хук для предотвращения тряски
+    useScrollLock(open);
+
     const handleZoomIn = () => {
         setZoomLevel((prev) => Math.min(prev + 10, 200));
     };
@@ -90,7 +93,7 @@ export function ImagePreviewDialog({
 
     const submitComment = () => {
         if (comment.trim()) {
-            // Submit comment logic would go here
+
             setComment("");
         }
     };
@@ -123,7 +126,7 @@ export function ImagePreviewDialog({
                 </DialogHeader>
 
                 <div className="flex flex-1 overflow-hidden">
-                    {/* Left side: Image view */}
+                    {/* Left side - Image */}
                     <div className="w-3/5 h-full bg-black/50 relative overflow-hidden">
                         <div
                             ref={imageContainerRef}
@@ -142,7 +145,7 @@ export function ImagePreviewDialog({
                             />
                         </div>
 
-                        {/* Image controls */}
+                        {/* Zoom controls */}
                         <div className="absolute bottom-4 right-4 flex gap-2">
                             <TooltipProvider>
                                 <Tooltip>
@@ -241,7 +244,7 @@ export function ImagePreviewDialog({
                         </div>
                     </div>
 
-                    {/* Right side: Info and controls */}
+                    {/* Right side - Details */}
                     <div className="w-2/5 flex flex-col border-l">
                         <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col">
                             <TabsList className="w-full justify-start px-4 pt-4 bg-transparent">
@@ -257,7 +260,7 @@ export function ImagePreviewDialog({
                             </TabsList>
 
                             <TabsContent value="details" className="flex-1 p-0 mt-0">
-                                <ScrollArea className="h-[calc(80vh-8rem)]">
+                                <ScrollArea className="h-[calc(80vh-8rem)] modal-scrollable">
                                     <div className="px-6 py-4 space-y-6">
                                         <div className="space-y-4">
                                             <div className="flex justify-between items-start">
@@ -379,7 +382,7 @@ export function ImagePreviewDialog({
                             </TabsContent>
 
                             <TabsContent value="comments" className="flex-1 flex flex-col p-0 mt-0">
-                                <ScrollArea className="flex-1">
+                                <ScrollArea className="flex-1 modal-scrollable">
                                     <div className="px-6 py-4 space-y-4">
                                         {Array.from({ length: 3 }).map((_, index) => (
                                             <div key={index} className="flex gap-3">
@@ -451,7 +454,7 @@ export function ImagePreviewDialog({
                             </TabsContent>
 
                             <TabsContent value="variations" className="flex-1 p-0 mt-0">
-                                <div className="p-6">
+                                <div className="p-6 modal-scrollable">
                                     <div className="mb-4">
                                         <h3 className="text-base font-medium mb-2">Generate Variations</h3>
                                         <p className="text-sm text-muted-foreground">

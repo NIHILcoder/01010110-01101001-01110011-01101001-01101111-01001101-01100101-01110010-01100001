@@ -45,23 +45,30 @@ import {
 } from "@/components/ui/dialog"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Separator } from "@/components/ui/separator"
+import { useScrollLock } from "@/components/hooks/useScrollLock";
 
 interface GenerationFormProps {
   className?: string
 }
 
 export function GenerationForm({ className }: GenerationFormProps) {
-  const [generating, setGenerating] = useState(false)
-  const [progress, setProgress] = useState(0)
-  const [generatedImage, setGeneratedImage] = useState<string | null>(null)
-  const [prompt, setPrompt] = useState("")
-  const [showTagSuggestions, setShowTagSuggestions] = useState(false)
+  const [generating, setGenerating] = useState(false);
+  const [progress, setProgress] = useState(0);
+  const [generatedImage, setGeneratedImage] = useState<string | null>(null);
+  const [prompt, setPrompt] = useState("");
+  const [showTagSuggestions, setShowTagSuggestions] = useState(false);
   const [recentGenerations, setRecentGenerations] = useState<string[]>([
     "/placeholder.svg?height=512&width=512&text=Recent+1",
     "/placeholder.svg?height=512&width=512&text=Recent+2",
     "/placeholder.svg?height=512&width=512&text=Recent+3",
     "/placeholder.svg?height=512&width=512&text=Recent+4",
-  ])
+  ]);
+
+  // Добавляем состояние для отслеживания открытого диалога
+  const [workflowDialogOpen, setWorkflowDialogOpen] = useState(false);
+
+  // Используем хук для предотвращения тряски
+  useScrollLock(workflowDialogOpen);
 
   const fileInputRef = useRef<HTMLInputElement>(null)
 
@@ -581,7 +588,7 @@ export function GenerationForm({ className }: GenerationFormProps) {
           </Card>
 
           {/* Visual workflow editor for advanced mode */}
-          <Dialog>
+          <Dialog open={workflowDialogOpen} onOpenChange={setWorkflowDialogOpen}>
             <DialogTrigger asChild>
               <Button variant="outline" className="w-full">
                 <Layers className="mr-2 h-4 w-4" />
@@ -593,7 +600,7 @@ export function GenerationForm({ className }: GenerationFormProps) {
                 <DialogTitle>Visual Workflow Editor</DialogTitle>
                 <DialogDescription>Create and customize advanced generation workflows</DialogDescription>
               </DialogHeader>
-              <div className="h-[500px] rounded-md border bg-muted/20 p-4">
+              <div className="h-[500px] rounded-md border bg-muted/20 p-4 modal-scrollable">
                 <div className="flex h-full items-center justify-center">
                   <p className="text-muted-foreground">Visual workflow editor would be displayed here</p>
                 </div>

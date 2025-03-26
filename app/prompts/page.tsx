@@ -1,5 +1,5 @@
 "use client";
-
+import { useScrollLock } from "@/components/hooks/useScrollLock";
 import { useState, useRef, useEffect } from "react";
 import {
     BookOpen,
@@ -130,10 +130,13 @@ export default function PromptLibrary() {
     const [sortBy, setSortBy] = useState("updated");
     const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
     const [selectedPrompt, setSelectedPrompt] = useState<Prompt | null>(null);
-    const [promptDialogOpen, setPromptDialogOpen] = useState(false);
+    const [promptDialogOpen, setPromptDialogOpen] = useState<boolean>(false);
+    const [createPromptOpen, setCreatePromptOpen] = useState<boolean>(false);
     const [editMode, setEditMode] = useState(false);
     const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
     const [showOnlyFavorites, setShowOnlyFavorites] = useState(false);
+    useScrollLock(promptDialogOpen);
+    useScrollLock(createPromptOpen);
 
     // Form state for creating/editing prompts
     const [formState, setFormState] = useState({
