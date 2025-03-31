@@ -1,90 +1,94 @@
 "use client";
-
-import { EnhancedGenerationForm as ImprovedGenerationForm } from "@/components/improved-generation-form"
 import { EnhancedParticlesBackground } from "@/components/enhanced-particles-background"
-import { Button } from "@/components/ui/button"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Card } from "@/components/ui/card"
-import { Sparkles, Zap, Lightbulb, Info } from "lucide-react"
-import type { MouseEvent as ReactMouseEvent } from 'react';
+import { Zap, Lightbulb, Info } from "lucide-react"
+import { useLanguage } from "@/components/language-context"
+import { ImprovedGenerationForm } from "@/components/improved-generation-form"
 
 export default function EnhancedHomePage() {
+    const { t, language } = useLanguage();
+
+    // Define translations for this page
+    const pageTranslations = {
+        'home.subtitle': {
+            en: 'Transform your imagination into stunning visuals with our AI-powered creative platform',
+            ru: 'Превратите ваше воображение в потрясающие визуальные образы с нашей креативной платформой на базе ИИ'
+        },
+        'home.feature.rapid.title': {
+            en: 'Rapid Generation',
+            ru: 'Быстрая генерация'
+        },
+        'home.feature.rapid.desc': {
+            en: 'Create images in seconds with our optimized models',
+            ru: 'Создавайте изображения за секунды с нашими оптимизированными моделями'
+        },
+        'home.feature.prompts.title': {
+            en: 'AI-Enhanced Prompts',
+            ru: 'ИИ-улучшенные промпты'
+        },
+        'home.feature.prompts.desc': {
+            en: 'Get better results with our intelligent prompt enhancement',
+            ru: 'Получайте лучшие результаты с нашим интеллектуальным улучшением промптов'
+        },
+        'home.feature.options.title': {
+            en: 'Advanced Options',
+            ru: 'Расширенные настройки'
+        },
+        'home.feature.options.desc': {
+            en: 'Fine-tune your generation with powerful controls',
+            ru: 'Тонко настраивайте генерацию с помощью мощных элементов управления'
+        }
+    };
+
+    // Helper function to get translation for this page
+    const getPageTranslation = (key: string) => {
+        const currentLang = language;
+        // @ts-ignore
+        if (pageTranslations[key] && pageTranslations[key][currentLang]) {
+            // @ts-ignore
+            return pageTranslations[key][currentLang];
+        }
+        return key;
+    };
+
     return (
-        <div className="w-full h-full relative px-4 py-6 md:py-8">
-            <EnhancedParticlesBackground variant="sparkles" density={60} />
-
-            {/* Main content container that fills entire available space */}
-            <div className="w-full mx-auto h-full flex flex-col">
-                {/* Header section with improved responsiveness */}
-                <div className="mb-6 md:mb-8 flex flex-col items-center justify-center text-center space-y-4">
-                    <div className="flex items-center justify-center mb-2">
-                        <div className="text-2xl sm:text-3xl md:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-primary via-primary/80 to-primary flex items-center">
-                            <Sparkles className="h-6 w-6 md:h-8 md:w-8 mr-2 text-primary animate-pulse" />
-                            VisioMera Studio
-                        </div>
-                    </div>
-
-                    <p className="text-sm sm:text-base md:text-lg text-muted-foreground max-w-2xl mx-auto px-2">
-                        Transform your imagination into stunning visuals with our AI-powered creative platform
+        <div className="w-full h-full relative px-3 py-4">
+            <EnhancedParticlesBackground variant="sparkles" density={40} />
+            <div className="w-full mx-auto h-full flex flex-col max-w-6xl">
+                <div className="mb-4">
+                    <p className="text-center text-sm sm:text-base text-muted-foreground mx-auto">
+                        {getPageTranslation('home.subtitle')}
                     </p>
                 </div>
 
-                {/* Features section with improved responsive grid */}
-                <div className="features-section mb-6 md:mb-8 grid grid-cols-1 sm:grid-cols-3 gap-3 md:gap-4">
-                    <Card className="bg-secondary/30 p-3 md:p-4 rounded-lg border border-border/50 flex flex-col items-center text-center hover:shadow-md hover:border-primary/30 transition-all duration-300">
-                        <div className="p-2 md:p-3 rounded-full bg-primary/10 mb-2 md:mb-3">
-                            <Zap className="h-5 w-5 md:h-6 md:w-6 text-primary" />
+                <div className="features-section mb-4 grid grid-cols-3 gap-2">
+                    <Card className="bg-secondary/30 p-2 border border-border/50 flex flex-col items-center text-center hover:shadow-sm hover:border-primary/20 transition-all">
+                        <div className="p-1.5 rounded-full bg-primary/10 mb-1">
+                            <Zap className="h-4 w-4 text-primary" />
                         </div>
-                        <h3 className="font-medium text-sm md:text-base">Rapid Generation</h3>
-                        <p className="text-xs md:text-sm text-muted-foreground">Create images in seconds with our optimized models</p>
+                        <h3 className="font-medium text-xs">{getPageTranslation('home.feature.rapid.title')}</h3>
+                        <p className="text-xs text-muted-foreground line-clamp-2">{getPageTranslation('home.feature.rapid.desc')}</p>
                     </Card>
-
-                    <Card className="bg-secondary/30 p-3 md:p-4 rounded-lg border border-border/50 flex flex-col items-center text-center hover:shadow-md hover:border-primary/30 transition-all duration-300">
-                        <div className="p-2 md:p-3 rounded-full bg-primary/10 mb-2 md:mb-3">
-                            <Lightbulb className="h-5 w-5 md:h-6 md:w-6 text-primary" />
+                    <Card className="bg-secondary/30 p-2 border border-border/50 flex flex-col items-center text-center hover:shadow-sm hover:border-primary/20 transition-all">
+                        <div className="p-1.5 rounded-full bg-primary/10 mb-1">
+                            <Lightbulb className="h-4 w-4 text-primary" />
                         </div>
-                        <h3 className="font-medium text-sm md:text-base">AI-Enhanced Prompts</h3>
-                        <p className="text-xs md:text-sm text-muted-foreground">Get better results with our intelligent prompt enhancement</p>
+                        <h3 className="font-medium text-xs">{getPageTranslation('home.feature.prompts.title')}</h3>
+                        <p className="text-xs text-muted-foreground line-clamp-2">{getPageTranslation('home.feature.prompts.desc')}</p>
                     </Card>
-
-                    <Card className="bg-secondary/30 p-3 md:p-4 rounded-lg border border-border/50 flex flex-col items-center text-center hover:shadow-md hover:border-primary/30 transition-all duration-300">
-                        <div className="p-2 md:p-3 rounded-full bg-primary/10 mb-2 md:mb-3">
-                            <Info className="h-5 w-5 md:h-6 md:w-6 text-primary" />
+                    <Card className="bg-secondary/30 p-2 border border-border/50 flex flex-col items-center text-center hover:shadow-sm hover:border-primary/20 transition-all">
+                        <div className="p-1.5 rounded-full bg-primary/10 mb-1">
+                            <Info className="h-4 w-4 text-primary" />
                         </div>
-                        <h3 className="font-medium text-sm md:text-base">Advanced Options</h3>
-                        <p className="text-xs md:text-sm text-muted-foreground">Fine-tune your generation with powerful controls</p>
+                        <h3 className="font-medium text-xs">{getPageTranslation('home.feature.options.title')}</h3>
+                        <p className="text-xs text-muted-foreground line-clamp-2">{getPageTranslation('home.feature.options.desc')}</p>
                     </Card>
                 </div>
 
-                {/* Main form with improved responsiveness - full width */}
                 <div className="flex-1 w-full">
                     <ImprovedGenerationForm />
                 </div>
             </div>
-
-            <style jsx global>{`
-                @keyframes fade-in {
-                    from { opacity: 0; transform: translateY(10px); }
-                    to { opacity: 1; transform: translateY(0); }
-                }
-
-                .animate-fade-in {
-                    animation: fade-in 0.6s ease-out forwards;
-                }
-
-                .animate-pulse {
-                    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-                }
-
-                @keyframes pulse {
-                    0%, 100% {
-                        opacity: 1;
-                    }
-                    50% {
-                        opacity: 0.6;
-                    }
-                }
-            `}</style>
         </div>
     )
 }

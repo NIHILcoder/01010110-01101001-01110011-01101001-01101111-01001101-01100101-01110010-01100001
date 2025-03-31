@@ -1,24 +1,17 @@
 "use client";
-
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 
-// Define available languages
 export type Language = 'en' | 'ru';
-
-// Define translation key type - a union of all possible translation keys
 type TranslationKey = keyof typeof translations.en | keyof typeof translations.ru;
 
-// Define context type
 type LanguageContextType = {
     language: Language;
     setLanguage: (language: Language) => void;
     t: (key: string) => string;
 };
 
-// Translation objects for each language
 const translations = {
     en: {
-        // Navigation
         'nav.generate': 'Generate',
         'nav.prompt_library': 'Prompt Library',
         'nav.community': 'Community',
@@ -28,12 +21,8 @@ const translations = {
         'nav.about': 'About',
         'nav.settings': 'Settings',
         'nav.sign_in': 'Sign In',
-
-        // Header
         'header.ai_models': 'AI Models: Online',
         'header.credits': 'credits',
-
-        // Generation Form
         'generation.title': 'Create New Image',
         'generation.image_settings': 'Image Settings',
         'generation.configure_parameters': 'Configure your generation parameters',
@@ -70,8 +59,6 @@ const translations = {
         'generation.favorite': 'Favorite',
         'generation.share_community': 'Share to Community',
         'generation.open_workflow': 'Open Visual Workflow Editor',
-
-        // General UI
         'ui.aspect_ratio': 'Aspect Ratio',
         'ui.square': 'Square',
         'ui.standard': 'Standard',
@@ -79,7 +66,21 @@ const translations = {
         'ui.portrait': 'Portrait',
         'ui.landscape': 'Landscape',
 
-        // Login Page
+        // Additional translations for optimized generation form
+        'generation.tag.add': 'Add Tag',
+        'generation.model.flux': 'Flux Realistic',
+        'generation.model.anime': 'Anime Diffusion',
+        'generation.model.dream': 'Dreamshaper',
+        'generation.model.real': 'Realistic Vision',
+        'generation.ai_enhance.tooltip': 'Let AI enhance your prompt with additional details',
+        'generation.resolution': 'Resolution',
+        'generation.batch_count': 'Batch Count',
+        'generation.tag.suggestions': 'Suggested Tags',
+        'generation.upscaler': 'Upscaler',
+        'generation.vae': 'VAE Model',
+        'generation.lora.add': 'Add LoRA',
+        'generation.lora.weight': 'Weight',
+
         'login.title': 'Sign in to VisioMera',
         'login.description': 'Enter your email and password to access your account',
         'login.email': 'Email',
@@ -95,8 +96,6 @@ const translations = {
         'login.terms_of_service': 'Terms of Service',
         'login.and': 'and',
         'login.privacy_policy': 'Privacy Policy',
-
-        // Settings Page
         'settings.title': 'Settings',
         'settings.description': 'Manage your account preferences and application settings',
         'settings.tab.account': 'Account',
@@ -130,8 +129,6 @@ const translations = {
         'settings.danger.description': 'Irreversible account actions',
         'settings.danger.delete_account': 'Delete Account',
         'settings.danger.delete_warning': 'Once you delete your account, there is no going back. This action cannot be undone.',
-
-        // Community Page
         'community.title': 'Community Hub',
         'community.subtitle': 'Explore creations from the VisioMera community',
         'community.search': 'Search artworks...',
@@ -142,8 +139,6 @@ const translations = {
         'community.hours_ago': 'hours ago',
         'community.just_now': 'Just now',
         'community.view_all': 'View all',
-
-        // History Page
         'history.title': 'Generation History',
         'history.subtitle': 'View and manage your previous generations',
         'history.recent': 'Recent Generations',
@@ -156,8 +151,6 @@ const translations = {
         'history.list': 'List View',
         'history.export': 'Export History',
         'history.load_more': 'Load More',
-
-        // Favorites Page
         'favorites.title': 'Favorites',
         'favorites.subtitle': 'Organize and manage your saved images',
         'favorites.search': 'Search favorites...',
@@ -167,8 +160,6 @@ const translations = {
         'favorites.description': 'Description (Optional)',
         'favorites.all_favorites': 'All Favorites',
         'favorites.recently': 'Recently Favorited',
-
-        // About Page
         'about.title': 'About VisioMera',
         'about.subtitle': 'Empowering creativity through AI art generation',
         'about.mission.title': 'Our Mission',
@@ -206,8 +197,6 @@ const translations = {
         'about.contact.subject': 'Subject',
         'about.contact.message': 'Message',
         'about.contact.send': 'Send Message',
-
-        // Prompts Page
         'prompts.title': 'Prompt Library',
         'prompts.subtitle': 'Manage, organize, and share your AI image generation prompts',
         'prompts.search': 'Search prompts...',
@@ -222,7 +211,6 @@ const translations = {
         'prompts.unfavorite': 'Unfavorite',
     },
     ru: {
-        // Navigation
         'nav.generate': 'Создать',
         'nav.prompt_library': 'Библиотека промптов',
         'nav.community': 'Сообщество',
@@ -232,12 +220,8 @@ const translations = {
         'nav.about': 'О нас',
         'nav.settings': 'Настройки',
         'nav.sign_in': 'Войти',
-
-        // Header
         'header.ai_models': 'ИИ Модели: Онлайн',
         'header.credits': 'кредитов',
-
-        // Generation Form
         'generation.title': 'Создать новое изображение',
         'generation.image_settings': 'Настройки изображения',
         'generation.configure_parameters': 'Настройка параметров генерации',
@@ -274,8 +258,6 @@ const translations = {
         'generation.favorite': 'В избранное',
         'generation.share_community': 'Поделиться с сообществом',
         'generation.open_workflow': 'Открыть визуальный редактор воркфлоу',
-
-        // General UI
         'ui.aspect_ratio': 'Соотношение сторон',
         'ui.square': 'Квадрат',
         'ui.standard': 'Стандарт',
@@ -283,7 +265,21 @@ const translations = {
         'ui.portrait': 'Портрет',
         'ui.landscape': 'Пейзаж',
 
-        // Login Page
+        // Additional translations for optimized generation form
+        'generation.tag.add': 'Добавить тег',
+        'generation.model.flux': 'Flux Реалистичный',
+        'generation.model.anime': 'Anime Диффузия',
+        'generation.model.dream': 'Dreamshaper',
+        'generation.model.real': 'Realistic Vision',
+        'generation.ai_enhance.tooltip': 'Позвольте ИИ улучшить ваш промпт дополнительными деталями',
+        'generation.resolution': 'Разрешение',
+        'generation.batch_count': 'Количество в партии',
+        'generation.tag.suggestions': 'Предлагаемые теги',
+        'generation.upscaler': 'Апскейлер',
+        'generation.vae': 'Модель VAE',
+        'generation.lora.add': 'Добавить LoRA',
+        'generation.lora.weight': 'Вес',
+
         'login.title': 'Вход в VisioMera',
         'login.description': 'Введите ваш email и пароль для доступа к аккаунту',
         'login.email': 'Email',
@@ -299,8 +295,6 @@ const translations = {
         'login.terms_of_service': 'Условиями использования',
         'login.and': 'и',
         'login.privacy_policy': 'Политикой конфиденциальности',
-
-        // Settings Page
         'settings.title': 'Настройки',
         'settings.description': 'Управление предпочтениями аккаунта и настройками приложения',
         'settings.tab.account': 'Аккаунт',
@@ -334,8 +328,6 @@ const translations = {
         'settings.danger.description': 'Необратимые действия с аккаунтом',
         'settings.danger.delete_account': 'Удалить аккаунт',
         'settings.danger.delete_warning': 'После удаления аккаунта пути назад нет. Это действие нельзя отменить.',
-
-        // Community Page
         'community.title': 'Сообщество',
         'community.subtitle': 'Исследуйте работы сообщества VisioMera',
         'community.search': 'Поиск работ...',
@@ -346,8 +338,6 @@ const translations = {
         'community.hours_ago': 'часов назад',
         'community.just_now': 'Только что',
         'community.view_all': 'Показать все',
-
-        // History Page
         'history.title': 'История генерации',
         'history.subtitle': 'Просмотр и управление вашими предыдущими генерациями',
         'history.recent': 'Недавние генерации',
@@ -360,8 +350,6 @@ const translations = {
         'history.list': 'Список',
         'history.export': 'Экспорт истории',
         'history.load_more': 'Загрузить еще',
-
-        // Favorites Page
         'favorites.title': 'Избранное',
         'favorites.subtitle': 'Организуйте и управляйте вашими сохраненными изображениями',
         'favorites.search': 'Поиск в избранном...',
@@ -371,8 +359,6 @@ const translations = {
         'favorites.description': 'Описание (опционально)',
         'favorites.all_favorites': 'Все избранное',
         'favorites.recently': 'Недавно добавленные',
-
-        // About Page
         'about.title': 'О VisioMera',
         'about.subtitle': 'Расширение возможностей творчества с помощью ИИ-генерации изображений',
         'about.mission.title': 'Наша миссия',
@@ -410,8 +396,6 @@ const translations = {
         'about.contact.subject': 'Тема',
         'about.contact.message': 'Сообщение',
         'about.contact.send': 'Отправить сообщение',
-
-        // Prompts Page
         'prompts.title': 'Библиотека промптов',
         'prompts.subtitle': 'Управляйте, организуйте и делитесь промптами для генерации изображений',
         'prompts.search': 'Поиск промптов...',
@@ -427,30 +411,24 @@ const translations = {
     }
 } as const;
 
-// Create the context with default values
 const LanguageContext = createContext<LanguageContextType>({
     language: 'en',
     setLanguage: () => {},
     t: (key) => key,
 });
 
-// Define props for the language provider
 interface LanguageProviderProps {
     children: ReactNode;
 }
 
-// Create the language provider component
 export const LanguageProvider = ({ children }: LanguageProviderProps) => {
-    // Initialize with browser language or default to English
     const [language, setLanguage] = useState<Language>('en');
 
-    // Effect to load language preference from localStorage on client side
     useEffect(() => {
         const savedLanguage = localStorage.getItem('language') as Language;
         if (savedLanguage && (savedLanguage === 'en' || savedLanguage === 'ru')) {
             setLanguage(savedLanguage);
         } else {
-            // Try to detect browser language
             const browserLanguage = navigator.language.split('-')[0];
             if (browserLanguage === 'ru') {
                 setLanguage('ru');
@@ -458,23 +436,16 @@ export const LanguageProvider = ({ children }: LanguageProviderProps) => {
         }
     }, []);
 
-    // Handler for changing the language
     const handleSetLanguage = (newLanguage: Language) => {
         setLanguage(newLanguage);
         localStorage.setItem('language', newLanguage);
-
-        // Optional: Set html lang attribute
         document.documentElement.lang = newLanguage;
     };
 
-    // Translation function
     const t = (key: string): string => {
-        // Type assertion to satisfy TypeScript
         if (key in translations[language]) {
             return translations[language][key as keyof typeof translations[typeof language]];
         }
-
-        // Return the key itself if translation not found
         return key;
     };
 
@@ -491,22 +462,17 @@ export const LanguageProvider = ({ children }: LanguageProviderProps) => {
     );
 };
 
-// Create a custom hook for using the language context
 export const useLanguage = () => useContext(LanguageContext);
 
-// Helper function for page-specific translations
 export const useLocalTranslation = (
     pageTranslations: Record<Language, Record<string, string>>
 ) => {
     const { language, t } = useLanguage();
 
     const localT = (key: string): string => {
-        // First check page-specific translations
         if (pageTranslations[language] && key in pageTranslations[language]) {
             return pageTranslations[language][key];
         }
-
-        // Fall back to global translations
         return t(key);
     };
 

@@ -1,5 +1,4 @@
 "use client";
-
 import { useState, useEffect } from "react";
 import {
   Trophy,
@@ -26,7 +25,7 @@ import {
   Lightbulb,
   ThumbsUp,
   Eye,
-  Play // Added Play icon import
+  Play
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -64,10 +63,119 @@ import {
   StaggeredContainer
 } from "@/components/animated-components";
 import { cn } from "@/lib/utils";
+import { useLanguage, useLocalTranslation } from "@/components/language-context";
 
 export default function EnhancedCommunityGallery() {
+  const { language } = useLanguage();
 
-  // State for UI controls
+  // Добавляем переводы для страницы Community
+  const pageTranslations = {
+    en: {
+      'community.title': 'Community Hub',
+      'community.subtitle': 'Explore creations from the VisioMera community',
+      'community.search_artworks': 'Search artworks...',
+      'community.upload_creation': 'Upload Creation',
+      'community.featured_competitions': 'Featured Competitions',
+      'community.view_all': 'View All',
+      'community.prize': 'Prize:',
+      'community.entries': 'entries',
+      'community.days_left': 'days left',
+      'community.enter_competition': 'Enter Competition',
+      'community.community_gallery': 'Community Gallery',
+      'community.trending': 'Trending',
+      'community.newest': 'Newest',
+      'community.collaborations': 'Collaborations',
+      'community.tutorials': 'Tutorials',
+      'community.load_more': 'Load More',
+      'community.loading': 'Loading...',
+      'community.no_results_found': 'No results found',
+      'community.try_adjusting': 'Try adjusting your search or filters to find what you\'re looking for.',
+      'community.reset_filters': 'Reset Filters',
+      'community.by': 'By',
+      'community.members': 'members',
+      'community.view_project': 'View Project',
+      'community.active_project': 'Active Project',
+      'community.watch_tutorial': 'Watch Tutorial',
+      'community.trending_tags': 'Trending Tags',
+      'community.ai_art_tips': 'AI Art Creation Tips',
+      'community.ai_art_description': 'Looking to improve your generations? Try using detailed descriptions, specify lighting conditions, and include style references in your prompts.',
+      'community.view_guides': 'View Guides',
+      'community.just_now': 'Just now',
+      'community.hours_ago': 'hours ago',
+      'community.day_ago': 'day ago',
+      'community.days_ago': 'days ago',
+      'community.most_popular': 'Most Popular',
+      'community.upload_your_creation': 'Upload Your Creation',
+      'community.filter_options': 'Filter Options',
+      'community.model_type': 'Model Type',
+      'community.select_model': 'Select model',
+      'community.time_range': 'Time Range',
+      'community.select_time_range': 'Select time range',
+      'community.featured_only': 'Featured Only',
+      'community.all_models': 'All Models',
+      'community.all_time': 'All Time',
+      'community.today': 'Today',
+      'community.this_week': 'This Week',
+      'community.this_month': 'This Month',
+      'community.min': 'min',
+      'community.views': 'views',
+      'community.level': 'level'
+    },
+    ru: {
+      'community.title': 'Сообщество',
+      'community.subtitle': 'Исследуйте работы сообщества VisioMera',
+      'community.search_artworks': 'Поиск работ...',
+      'community.upload_creation': 'Загрузить работу',
+      'community.featured_competitions': 'Избранные конкурсы',
+      'community.view_all': 'Показать все',
+      'community.prize': 'Приз:',
+      'community.entries': 'работ',
+      'community.days_left': 'дней осталось',
+      'community.enter_competition': 'Участвовать в конкурсе',
+      'community.community_gallery': 'Галерея сообщества',
+      'community.trending': 'Популярное',
+      'community.newest': 'Новейшее',
+      'community.collaborations': 'Коллаборации',
+      'community.tutorials': 'Руководства',
+      'community.load_more': 'Загрузить ещё',
+      'community.loading': 'Загрузка...',
+      'community.no_results_found': 'Результаты не найдены',
+      'community.try_adjusting': 'Попробуйте изменить поисковый запрос или фильтры, чтобы найти то, что вы ищете.',
+      'community.reset_filters': 'Сбросить фильтры',
+      'community.by': 'Автор',
+      'community.members': 'участников',
+      'community.view_project': 'Посмотреть проект',
+      'community.active_project': 'Активный проект',
+      'community.watch_tutorial': 'Смотреть руководство',
+      'community.trending_tags': 'Популярные теги',
+      'community.ai_art_tips': 'Советы по созданию ИИ-искусства',
+      'community.ai_art_description': 'Хотите улучшить свои генерации? Попробуйте использовать подробные описания, указывайте условия освещения и включайте стилистические рекомендации в ваши промпты.',
+      'community.view_guides': 'Смотреть руководства',
+      'community.just_now': 'Только что',
+      'community.hours_ago': 'часов назад',
+      'community.day_ago': 'день назад',
+      'community.days_ago': 'дней назад',
+      'community.most_popular': 'Самое популярное',
+      'community.upload_your_creation': 'Загрузить свою работу',
+      'community.filter_options': 'Параметры фильтра',
+      'community.model_type': 'Тип модели',
+      'community.select_model': 'Выберите модель',
+      'community.time_range': 'Временной интервал',
+      'community.select_time_range': 'Выберите интервал',
+      'community.featured_only': 'Только избранное',
+      'community.all_models': 'Все модели',
+      'community.all_time': 'Всё время',
+      'community.today': 'Сегодня',
+      'community.this_week': 'Эта неделя',
+      'community.this_month': 'Этот месяц',
+      'community.min': 'мин',
+      'community.views': 'просмотров',
+      'community.level': 'уровень'
+    }
+  };
+
+  const { localT } = useLocalTranslation(pageTranslations);
+
   const [viewMode, setViewMode] = useState<"grid" | "rows">("grid");
   const [filterOpen, setFilterOpen] = useState(false);
   const [activeCategory, setActiveCategory] = useState("all");
@@ -79,7 +187,6 @@ export default function EnhancedCommunityGallery() {
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
 
-  // Mock data for the gallery
   const categories = [
     { id: "all", label: "All" },
     { id: "portraits", label: "Portraits" },
@@ -94,17 +201,17 @@ export default function EnhancedCommunityGallery() {
 
   const filters = {
     modelType: [
-      { id: "all", label: "All Models" },
+      { id: "all", label: localT('community.all_models') },
       { id: "flux", label: "Flux" },
       { id: "sd", label: "Stable Diffusion" },
       { id: "dalle", label: "DALL-E" },
       { id: "midjourney", label: "Midjourney" }
     ],
     timeRange: [
-      { id: "all", label: "All Time" },
-      { id: "today", label: "Today" },
-      { id: "week", label: "This Week" },
-      { id: "month", label: "This Month" }
+      { id: "all", label: localT('community.all_time') },
+      { id: "today", label: localT('community.today') },
+      { id: "week", label: localT('community.this_week') },
+      { id: "month", label: localT('community.this_month') }
     ]
   };
 
@@ -121,7 +228,6 @@ export default function EnhancedCommunityGallery() {
     "Elegant still life with fruits and flowers in Renaissance style"
   ];
 
-  // Generate mock art gallery data
   const generateGalleryData = (count: number) => {
     return Array.from({ length: count }).map((_, i) => ({
       id: `art-${i}`,
@@ -140,7 +246,7 @@ export default function EnhancedCommunityGallery() {
       tags: [
         categories[Math.floor(Math.random() * categories.length)].id,
         categories[Math.floor(Math.random() * categories.length)].id
-      ].filter((v, i, a) => a.indexOf(v) === i), // Remove duplicates
+      ].filter((v, i, a) => a.indexOf(v) === i),
       timestamp: new Date(Date.now() - Math.floor(Math.random() * 7 * 24 * 60 * 60 * 1000)).toISOString(),
       featured: Math.random() > 0.8,
       prompt: samplePrompts[i % samplePrompts.length]
@@ -149,7 +255,6 @@ export default function EnhancedCommunityGallery() {
 
   const [galleryItems, setGalleryItems] = useState(generateGalleryData(24));
 
-  // Featured competition data
   const competitions = [
     {
       title: "Futuristic Utopias",
@@ -177,7 +282,6 @@ export default function EnhancedCommunityGallery() {
     }
   ];
 
-  // Collaboration projects data
   const collaborations = [
     {
       title: "Evolving Cityscapes",
@@ -199,7 +303,6 @@ export default function EnhancedCommunityGallery() {
     }
   ];
 
-  // Tutorial data
   const tutorials = [
     {
       title: "Mastering Prompt Engineering",
@@ -227,16 +330,13 @@ export default function EnhancedCommunityGallery() {
     }
   ];
 
-  // Animation on initial load
   useEffect(() => {
     setAnimateItems(true);
   }, []);
 
-  // Load more items when the page changes
   useEffect(() => {
     if (page > 1) {
       setLoading(true);
-      // Simulate API call delay
       setTimeout(() => {
         setGalleryItems(prev => [...prev, ...generateGalleryData(12)]);
         setLoading(false);
@@ -244,16 +344,11 @@ export default function EnhancedCommunityGallery() {
     }
   }, [page]);
 
-  // Filter gallery items based on filters
   const getFilteredItems = () => {
     let filtered = [...galleryItems];
-
-    // Filter by category
     if (activeCategory !== "all") {
       filtered = filtered.filter(item => item.tags.includes(activeCategory));
     }
-
-    // Filter by search term
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
       filtered = filtered.filter(
@@ -263,8 +358,6 @@ export default function EnhancedCommunityGallery() {
               item.author.name.toLowerCase().includes(query)
       );
     }
-
-    // Sort items
     if (sortBy === "trending") {
       filtered.sort((a, b) => b.stats.likes - a.stats.likes);
     } else if (sortBy === "newest") {
@@ -272,13 +365,11 @@ export default function EnhancedCommunityGallery() {
     } else if (sortBy === "top") {
       filtered.sort((a, b) => (b.stats.likes * 2 + b.stats.comments) - (a.stats.likes * 2 + a.stats.comments));
     }
-
     return filtered;
   };
 
   const filteredItems = getFilteredItems();
 
-  // Format the timestamp to a readable format
   const formatTimestamp = (timestamp: string) => {
     const date = new Date(timestamp);
     const now = new Date();
@@ -287,21 +378,19 @@ export default function EnhancedCommunityGallery() {
     const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
 
     if (diffDays > 0) {
-      return `${diffDays} day${diffDays > 1 ? 's' : ''} ago`;
+      return `${diffDays} ${diffDays > 1 ? localT('community.days_ago') : localT('community.day_ago')}`;
     } else if (diffHours > 0) {
-      return `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`;
+      return `${diffHours} ${localT('community.hours_ago')}`;
     } else {
-      return 'Just now';
+      return localT('community.just_now');
     }
   };
 
-  // Handle view item/preview
   const handleViewItem = (index: number) => {
     setSelectedImageIndex(index);
     setPreviewOpen(true);
   };
 
-  // Load more function
   const handleLoadMore = () => {
     setPage(prev => prev + 1);
   };
@@ -309,15 +398,13 @@ export default function EnhancedCommunityGallery() {
   return (
       <div className="container relative mx-auto py-8">
         <EnhancedParticlesBackground variant="waves" />
-
-        {/* Header */}
+        {}
         <div className="mb-8 space-y-4">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div>
-              <h1 className="text-3xl font-bold">Community Hub</h1>
-              <p className="text-muted-foreground">Explore creations from the VisioMera community</p>
+              <h1 className="text-3xl font-bold">{localT('community.title')}</h1>
+              <p className="text-muted-foreground">{localT('community.subtitle')}</p>
             </div>
-
             <div className="flex flex-wrap items-center gap-2">
               <Select value={activeCategory} onValueChange={setActiveCategory}>
                 <SelectTrigger className="w-[150px]">
@@ -331,17 +418,15 @@ export default function EnhancedCommunityGallery() {
                   ))}
                 </SelectContent>
               </Select>
-
               <div className="relative">
                 <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                 <Input
-                    placeholder="Search artworks..."
+                    placeholder={localT('community.search_artworks')}
                     className="pl-8 w-[200px]"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                 />
               </div>
-
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="outline" size="icon">
@@ -349,14 +434,13 @@ export default function EnhancedCommunityGallery() {
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-56">
-                  <DropdownMenuLabel>Filter Options</DropdownMenuLabel>
+                  <DropdownMenuLabel>{localT('community.filter_options')}</DropdownMenuLabel>
                   <DropdownMenuSeparator />
-
                   <div className="px-2 py-1.5">
-                    <p className="mb-1 text-xs font-medium">Model Type</p>
+                    <p className="mb-1 text-xs font-medium">{localT('community.model_type')}</p>
                     <Select defaultValue="all">
                       <SelectTrigger className="h-8 text-xs">
-                        <SelectValue placeholder="Select model" />
+                        <SelectValue placeholder={localT('community.select_model')} />
                       </SelectTrigger>
                       <SelectContent>
                         {filters.modelType.map(model => (
@@ -367,12 +451,11 @@ export default function EnhancedCommunityGallery() {
                       </SelectContent>
                     </Select>
                   </div>
-
                   <div className="px-2 py-1.5">
-                    <p className="mb-1 text-xs font-medium">Time Range</p>
+                    <p className="mb-1 text-xs font-medium">{localT('community.time_range')}</p>
                     <Select defaultValue="all">
                       <SelectTrigger className="h-8 text-xs">
-                        <SelectValue placeholder="Select time range" />
+                        <SelectValue placeholder={localT('community.select_time_range')} />
                       </SelectTrigger>
                       <SelectContent>
                         {filters.timeRange.map(time => (
@@ -383,16 +466,14 @@ export default function EnhancedCommunityGallery() {
                       </SelectContent>
                     </Select>
                   </div>
-
                   <div className="px-2 py-1.5">
                     <div className="flex items-center justify-between">
-                      <Label htmlFor="featured-only" className="text-xs">Featured Only</Label>
+                      <Label htmlFor="featured-only" className="text-xs">{localT('community.featured_only')}</Label>
                       <Switch id="featured-only" />
                     </div>
                   </div>
                 </DropdownMenuContent>
               </DropdownMenu>
-
               <div className="flex border rounded-md overflow-hidden">
                 <Button
                     variant={viewMode === "grid" ? "secondary" : "ghost"}
@@ -411,31 +492,27 @@ export default function EnhancedCommunityGallery() {
                   <Rows className="h-4 w-4" />
                 </Button>
               </div>
-
               <SparkleButton className="hidden md:flex">
-                Upload Creation
+                {localT('community.upload_creation')}
               </SparkleButton>
             </div>
           </div>
-
-          {/* Mobile upload button */}
+          {}
           <div className="md:hidden">
             <SparkleButton className="w-full">
-              Upload Your Creation
+              {localT('community.upload_your_creation')}
             </SparkleButton>
           </div>
         </div>
-
-        {/* Featured Competitions */}
+        {}
         <div className="mb-12">
           <div className="mb-4 flex items-center justify-between">
-            <h2 className="text-2xl font-bold">Featured Competitions</h2>
+            <h2 className="text-2xl font-bold">{localT('community.featured_competitions')}</h2>
             <Button variant="ghost" size="sm">
-              View All
+              {localT('community.view_all')}
               <ChevronDown className="ml-1 h-4 w-4" />
             </Button>
           </div>
-
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
             {competitions.map((competition, index) => (
                 <AnimatedCard
@@ -451,7 +528,7 @@ export default function EnhancedCommunityGallery() {
                     <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent" />
                     <div className="absolute bottom-0 left-0 p-4">
                       <h3 className="text-lg font-bold text-white">{competition.title}</h3>
-                      <p className="text-sm text-white/80">Prize: {competition.prize}</p>
+                      <p className="text-sm text-white/80">{localT('community.prize')} {competition.prize}</p>
                       <div className="mt-2 flex flex-wrap items-center gap-2">
                         <AnimatedBadge
                             className="bg-black/50 text-white"
@@ -462,7 +539,7 @@ export default function EnhancedCommunityGallery() {
                         </AnimatedBadge>
                         <Badge variant="secondary" className="bg-black/50 text-white">
                           <Trophy className="mr-1 h-3 w-3" />
-                          {competition.entries} entries
+                          {competition.entries} {localT('community.entries')}
                         </Badge>
                       </div>
                     </div>
@@ -475,7 +552,7 @@ export default function EnhancedCommunityGallery() {
                   <CardFooter className="p-4 pt-0">
                     <Button className="w-full group">
                   <span className="relative">
-                    Enter Competition
+                    {localT('community.enter_competition')}
                     <span className="absolute -bottom-1 left-0 h-[2px] w-0 bg-primary-foreground transition-all group-hover:w-full"></span>
                   </span>
                     </Button>
@@ -484,11 +561,10 @@ export default function EnhancedCommunityGallery() {
             ))}
           </div>
         </div>
-
-        {/* Main Gallery */}
+        {}
         <div className="mb-12">
           <div className="mb-4 flex items-center justify-between">
-            <h2 className="text-2xl font-bold">Community Gallery</h2>
+            <h2 className="text-2xl font-bold">{localT('community.community_gallery')}</h2>
             <Select value={sortBy} onValueChange={setSortBy}>
               <SelectTrigger className="w-[150px]">
                 <SelectValue placeholder="Sort by" />
@@ -497,45 +573,43 @@ export default function EnhancedCommunityGallery() {
                 <SelectItem value="trending">
                   <div className="flex items-center">
                     <Flame className="mr-2 h-4 w-4 text-orange-500" />
-                    Trending
+                    {localT('community.trending')}
                   </div>
                 </SelectItem>
                 <SelectItem value="newest">
                   <div className="flex items-center">
                     <Calendar className="mr-2 h-4 w-4 text-blue-500" />
-                    Newest
+                    {localT('community.newest')}
                   </div>
                 </SelectItem>
                 <SelectItem value="top">
                   <div className="flex items-center">
                     <Award className="mr-2 h-4 w-4 text-yellow-500" />
-                    Top Rated
+                    {localT('community.most_popular')}
                   </div>
                 </SelectItem>
               </SelectContent>
             </Select>
           </div>
-
           <Tabs defaultValue="trending">
             <TabsList className="mb-6">
               <TabsTrigger value="trending">
                 <Flame className="mr-2 h-4 w-4" />
-                Trending
+                {localT('community.trending')}
               </TabsTrigger>
               <TabsTrigger value="newest">
                 <Calendar className="mr-2 h-4 w-4" />
-                Newest
+                {localT('community.newest')}
               </TabsTrigger>
               <TabsTrigger value="collaborations">
                 <Users className="mr-2 h-4 w-4" />
-                Collaborations
+                {localT('community.collaborations')}
               </TabsTrigger>
               <TabsTrigger value="tutorials">
                 <BookOpen className="mr-2 h-4 w-4" />
-                Tutorials
+                {localT('community.tutorials')}
               </TabsTrigger>
             </TabsList>
-
             <TabsContent value="trending" className="mt-0">
               {viewMode === "grid" ? (
                   <StaggeredContainer
@@ -632,7 +706,6 @@ export default function EnhancedCommunityGallery() {
                                   </AnimatedBadge>
                               )}
                             </div>
-
                             <div className="mt-2 flex flex-wrap gap-1">
                               {item.tags.map(tag => {
                                 const category = categories.find(c => c.id === tag);
@@ -643,7 +716,6 @@ export default function EnhancedCommunityGallery() {
                                 ) : null;
                               })}
                             </div>
-
                             <div className="flex items-center justify-between mt-auto pt-3">
                               <div className="flex items-center gap-2">
                                 <img
@@ -656,7 +728,6 @@ export default function EnhancedCommunityGallery() {
                             {formatTimestamp(item.timestamp)}
                           </span>
                               </div>
-
                               <div className="flex items-center gap-3 text-muted-foreground">
                                 <div className="flex items-center gap-1">
                                   <ThumbsUp className="h-4 w-4" />
@@ -677,8 +748,7 @@ export default function EnhancedCommunityGallery() {
                     ))}
                   </StaggeredContainer>
               )}
-
-              {/* Load more button */}
+              {}
               {filteredItems.length > 0 && (
                   <div className="mt-8 flex justify-center">
                     <Button
@@ -705,24 +775,23 @@ export default function EnhancedCommunityGallery() {
                                   d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                               />
                             </svg>
-                            Loading...
+                            {localT('community.loading')}
                           </>
                       ) : (
-                          <>Load More</>
+                          <>{localT('community.load_more')}</>
                       )}
                     </Button>
                   </div>
               )}
-
-              {/* Empty state */}
+              {}
               {filteredItems.length === 0 && (
                   <div className="py-12 text-center">
                     <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-muted">
                       <Search className="h-10 w-10 text-muted-foreground" />
                     </div>
-                    <h3 className="mt-4 text-lg font-medium">No results found</h3>
+                    <h3 className="mt-4 text-lg font-medium">{localT('community.no_results_found')}</h3>
                     <p className="mt-2 text-sm text-muted-foreground">
-                      Try adjusting your search or filter to find what you're looking for.
+                      {localT('community.try_adjusting')}
                     </p>
                     <Button
                         variant="outline"
@@ -732,21 +801,19 @@ export default function EnhancedCommunityGallery() {
                           setActiveCategory("all");
                         }}
                     >
-                      Reset Filters
+                      {localT('community.reset_filters')}
                     </Button>
                   </div>
               )}
             </TabsContent>
-
             <TabsContent value="newest" className="mt-0">
               <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-                {/* Newest content would go here - using the same structure as trending */}
+                {}
                 <p className="py-12 text-center text-muted-foreground col-span-full">
                   Check out the latest artwork from our talented community.
                 </p>
               </div>
             </TabsContent>
-
             <TabsContent value="collaborations" className="mt-0">
               <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
                 {collaborations.map((collab, index) => (
@@ -763,7 +830,6 @@ export default function EnhancedCommunityGallery() {
                         <p className="mt-1 text-sm text-muted-foreground line-clamp-2">
                           {collab.description}
                         </p>
-
                         <div className="mt-4 flex items-center justify-between">
                           <div className="flex -space-x-2">
                             {Array.from({ length: Math.min(5, collab.members) }).map((_, j) => (
@@ -780,18 +846,16 @@ export default function EnhancedCommunityGallery() {
                                 </div>
                             )}
                           </div>
-
-                          <Badge variant="outline">Active Project</Badge>
+                          <Badge variant="outline">{localT('community.active_project')}</Badge>
                         </div>
                       </CardContent>
                       <CardFooter className="p-4 pt-0">
-                        <Button className="w-full">View Project</Button>
+                        <Button className="w-full">{localT('community.view_project')}</Button>
                       </CardFooter>
                     </AnimatedCard>
                 ))}
               </div>
             </TabsContent>
-
             <TabsContent value="tutorials" className="mt-0">
               <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
                 {tutorials.map((tutorial, index) => (
@@ -811,7 +875,7 @@ export default function EnhancedCommunityGallery() {
                       <CardContent className="p-4">
                         <h3 className="font-bold line-clamp-1">{tutorial.title}</h3>
                         <p className="text-sm text-muted-foreground">
-                          By {tutorial.author} • {tutorial.views.toLocaleString()} views
+                          {localT('community.by')} {tutorial.author} • {tutorial.views.toLocaleString()} {localT('community.views')}
                         </p>
                         <div className="mt-2 flex items-center gap-2">
                           <Badge variant="secondary">
@@ -820,12 +884,12 @@ export default function EnhancedCommunityGallery() {
                           </Badge>
                           <Badge variant="secondary">
                             <BookOpen className="mr-1 h-3 w-3" />
-                            {tutorial.level}
+                            {tutorial.level} {localT('community.level')}
                           </Badge>
                         </div>
                       </CardContent>
                       <CardFooter className="p-4 pt-0">
-                        <Button className="w-full">Watch Tutorial</Button>
+                        <Button className="w-full">{localT('community.watch_tutorial')}</Button>
                       </CardFooter>
                     </AnimatedCard>
                 ))}
@@ -833,10 +897,9 @@ export default function EnhancedCommunityGallery() {
             </TabsContent>
           </Tabs>
         </div>
-
-        {/* Trending Tags Section */}
+        {}
         <div className="mb-12">
-          <h2 className="text-2xl font-bold mb-4">Trending Tags</h2>
+          <h2 className="text-2xl font-bold mb-4">{localT('community.trending_tags')}</h2>
           <div className="flex flex-wrap gap-2">
             {categories.slice(1).map((category) => (
                 <Button
@@ -854,27 +917,24 @@ export default function EnhancedCommunityGallery() {
             ))}
           </div>
         </div>
-
-        {/* Tips Section */}
+        {}
         <div className="mb-4 rounded-lg border bg-muted/20 p-6">
           <div className="flex flex-col md:flex-row items-start md:items-center gap-4">
             <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
               <Lightbulb className="h-6 w-6 text-primary" />
             </div>
             <div className="flex-1">
-              <h3 className="text-lg font-medium">AI Art Creation Tips</h3>
+              <h3 className="text-lg font-medium">{localT('community.ai_art_tips')}</h3>
               <p className="text-muted-foreground">
-                Looking to improve your generations? Try using detailed descriptions, specify lighting conditions,
-                and include style references in your prompts.
+                {localT('community.ai_art_description')}
               </p>
             </div>
             <Button className="mt-2 md:mt-0">
-              View Guides
+              {localT('community.view_guides')}
             </Button>
           </div>
         </div>
-
-        {/* Image Preview Dialog */}
+        {}
         {selectedImageIndex !== null && (
             <ImagePreviewDialog
                 open={previewOpen}

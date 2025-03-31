@@ -86,8 +86,8 @@ import {
     StaggeredContainer
 } from "@/components/animated-components";
 import { cn } from "@/lib/utils";
+import { useLanguage, useLocalTranslation } from "@/components/language-context";
 
-// Types
 interface Prompt {
     id: string;
     title: string;
@@ -122,7 +122,6 @@ interface Tag {
 }
 
 export default function PromptLibrary() {
-    // State
     const [searchQuery, setSearchQuery] = useState("");
     const [activeCategory, setActiveCategory] = useState("all");
     const [activeTab, setActiveTab] = useState("my-prompts");
@@ -135,10 +134,138 @@ export default function PromptLibrary() {
     const [editMode, setEditMode] = useState(false);
     const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
     const [showOnlyFavorites, setShowOnlyFavorites] = useState(false);
+
+    const { language } = useLanguage();
+
+    // Define page-specific translations
+    const pageTranslations = {
+        en: {
+            'prompts.title': 'Prompt Library',
+            'prompts.subtitle': 'Manage, organize, and share your AI image generation prompts',
+            'prompts.search': 'Search prompts...',
+            'prompts.category': 'Category',
+            'prompts.new_prompt': 'New Prompt',
+            'prompts.categories.all': 'All Prompts',
+            'prompts.categories.title': 'Categories',
+            'prompts.tags.title': 'Popular Tags',
+            'prompts.templates.title': 'Prompt Templates',
+            'prompts.tips.title': 'AI Art Creation Tips',
+            'prompts.tips.description': 'Be specific about details, lighting, camera angles, and styles. Include keywords like "high resolution" and "detailed".',
+            'prompts.tips.learn_more': 'Learn More',
+            'prompts.my_prompts': 'My Prompts',
+            'prompts.community': 'Community',
+            'prompts.favorites_only': 'Favorites Only',
+            'prompts.sort': 'Sort',
+            'prompts.sort_by': 'Sort by',
+            'prompts.sort_direction': 'Direction',
+            'prompts.ascending': 'Ascending',
+            'prompts.descending': 'Descending',
+            'prompts.no_prompts': 'No prompts found',
+            'prompts.try_changing': 'Try changing your search or filters',
+            'prompts.clear_filters': 'Clear Filters',
+            'prompts.create_prompt': 'Create Prompt',
+            'prompts.edit_prompt': 'Edit Prompt',
+            'prompts.save_changes': 'Save Changes',
+            'prompts.save_prompt': 'Save Prompt',
+            'prompts.cancel': 'Cancel',
+            'prompts.delete': 'Delete',
+            'prompts.use_prompt': 'Use Prompt',
+            'prompts.copy': 'Copy',
+            'prompts.copy_prompt': 'Copy Prompt',
+            'prompts.edit': 'Edit',
+            'prompts.share': 'Share Publicly',
+            'prompts.make_private': 'Make Private',
+            'prompts.details': 'Prompt Details',
+            'prompts.form.title': 'Title',
+            'prompts.form.title_placeholder': 'Give your prompt a descriptive title',
+            'prompts.form.text': 'Prompt Text',
+            'prompts.form.text_placeholder': 'Enter your detailed prompt here...',
+            'prompts.form.negative': 'Negative Prompt (Optional)',
+            'prompts.form.negative_placeholder': 'Elements to avoid in your generation...',
+            'prompts.form.category': 'Category',
+            'prompts.form.tags': 'Tags',
+            'prompts.form.add_tag': 'Add tag',
+            'prompts.form.add': 'Add',
+            'prompts.form.notes': 'Notes (Optional)',
+            'prompts.form.notes_placeholder': 'Add any notes about this prompt...',
+            'prompts.form.public': 'Share with community',
+            'prompts.details.prompt': 'Prompt',
+            'prompts.details.negative': 'Negative Prompt',
+            'prompts.details.tags': 'Tags',
+            'prompts.details.category': 'Category',
+            'prompts.details.created': 'Created',
+            'prompts.details.parameters': 'Parameters',
+            'prompts.template.use': 'Use Template',
+            'prompts.no_results.title': 'No prompts found',
+            'prompts.no_results.description': 'Try changing your search or filters'
+        },
+        ru: {
+            'prompts.title': 'Библиотека промптов',
+            'prompts.subtitle': 'Управляйте, организуйте и делитесь вашими промптами для генерации изображений',
+            'prompts.search': 'Поиск промптов...',
+            'prompts.category': 'Категория',
+            'prompts.new_prompt': 'Новый промпт',
+            'prompts.categories.all': 'Все промпты',
+            'prompts.categories.title': 'Категории',
+            'prompts.tags.title': 'Популярные теги',
+            'prompts.templates.title': 'Шаблоны промптов',
+            'prompts.tips.title': 'Советы по созданию промптов',
+            'prompts.tips.description': 'Будьте конкретны в деталях, освещении, ракурсах и стилях. Включайте ключевые слова вроде "высокое разрешение" и "детализированный".',
+            'prompts.tips.learn_more': 'Подробнее',
+            'prompts.my_prompts': 'Мои промпты',
+            'prompts.community': 'Сообщество',
+            'prompts.favorites_only': 'Только избранное',
+            'prompts.sort': 'Сортировка',
+            'prompts.sort_by': 'Сортировать по',
+            'prompts.sort_direction': 'Направление',
+            'prompts.ascending': 'По возрастанию',
+            'prompts.descending': 'По убыванию',
+            'prompts.no_prompts': 'Промпты не найдены',
+            'prompts.try_changing': 'Измените параметры поиска или фильтры',
+            'prompts.clear_filters': 'Сбросить фильтры',
+            'prompts.create_prompt': 'Создать промпт',
+            'prompts.edit_prompt': 'Редактировать промпт',
+            'prompts.save_changes': 'Сохранить изменения',
+            'prompts.save_prompt': 'Сохранить промпт',
+            'prompts.cancel': 'Отмена',
+            'prompts.delete': 'Удалить',
+            'prompts.use_prompt': 'Использовать промпт',
+            'prompts.copy': 'Копировать',
+            'prompts.copy_prompt': 'Копировать промпт',
+            'prompts.edit': 'Редактировать',
+            'prompts.share': 'Опубликовать',
+            'prompts.make_private': 'Сделать приватным',
+            'prompts.details': 'Детали промпта',
+            'prompts.form.title': 'Заголовок',
+            'prompts.form.title_placeholder': 'Дайте вашему промпту описательное название',
+            'prompts.form.text': 'Текст промпта',
+            'prompts.form.text_placeholder': 'Введите ваш детальный промпт здесь...',
+            'prompts.form.negative': 'Негативный промпт (Опционально)',
+            'prompts.form.negative_placeholder': 'Элементы, которых следует избегать...',
+            'prompts.form.category': 'Категория',
+            'prompts.form.tags': 'Теги',
+            'prompts.form.add_tag': 'Добавить тег',
+            'prompts.form.add': 'Добавить',
+            'prompts.form.notes': 'Заметки (Опционально)',
+            'prompts.form.notes_placeholder': 'Добавьте любые заметки об этом промпте...',
+            'prompts.form.public': 'Поделиться с сообществом',
+            'prompts.details.prompt': 'Промпт',
+            'prompts.details.negative': 'Негативный промпт',
+            'prompts.details.tags': 'Теги',
+            'prompts.details.category': 'Категория',
+            'prompts.details.created': 'Создан',
+            'prompts.details.parameters': 'Параметры',
+            'prompts.template.use': 'Использовать шаблон',
+            'prompts.no_results.title': 'Промпты не найдены',
+            'prompts.no_results.description': 'Попробуйте изменить поисковый запрос или фильтры'
+        }
+    };
+
+    const { localT } = useLocalTranslation(pageTranslations);
+
     useScrollLock(promptDialogOpen);
     useScrollLock(createPromptOpen);
 
-    // Form state for creating/editing prompts
     const [formState, setFormState] = useState({
         title: "",
         text: "",
@@ -148,6 +275,7 @@ export default function PromptLibrary() {
         notes: "",
         isPublic: false
     });
+
     const [tagInput, setTagInput] = useState("");
 
     // Store references for DOM elements
@@ -155,7 +283,7 @@ export default function PromptLibrary() {
 
     // Mock data for categories
     const categories: Category[] = [
-        { id: "all", name: "All Prompts", count: 42 },
+        { id: "all", name: localT('prompts.categories.all'), count: 42 },
         { id: "portraits", name: "Portraits", count: 12, color: "#f97316" },
         { id: "landscapes", name: "Landscapes", count: 8, color: "#84cc16" },
         { id: "fantasy", name: "Fantasy", count: 7, color: "#8b5cf6" },
@@ -165,7 +293,6 @@ export default function PromptLibrary() {
         { id: "architecture", name: "Architecture", count: 3, color: "#64748b" }
     ];
 
-    // Mock data for tags
     const tags: Tag[] = [
         { id: "detailed", name: "detailed", count: 28 },
         { id: "photorealistic", name: "photorealistic", count: 22 },
@@ -181,7 +308,6 @@ export default function PromptLibrary() {
         { id: "vibrant", name: "vibrant", count: 5 }
     ];
 
-    // Generate mock prompts data
     const generatePrompts = (): Prompt[] => {
         const samplePrompts = [
             {
@@ -245,7 +371,6 @@ export default function PromptLibrary() {
         return samplePrompts.map((prompt, index) => {
             const createdDate = new Date();
             createdDate.setDate(createdDate.getDate() - Math.floor(Math.random() * 60));
-
             const updatedDate = new Date(createdDate);
             updatedDate.setDate(updatedDate.getDate() + Math.floor(Math.random() * 30));
 
@@ -321,7 +446,6 @@ export default function PromptLibrary() {
         }
     ];
 
-    // Example prompt templates
     const promptTemplates = [
         {
             title: "Character Portrait",
@@ -343,16 +467,11 @@ export default function PromptLibrary() {
         }
     ];
 
-    // Filter and sort prompts based on current state
     useEffect(() => {
         let filtered = [...prompts];
-
-        // Filter by category
         if (activeCategory !== "all") {
             filtered = filtered.filter(prompt => prompt.category === activeCategory);
         }
-
-        // Filter by search query
         if (searchQuery) {
             const query = searchQuery.toLowerCase();
             filtered = filtered.filter(prompt =>
@@ -361,16 +480,12 @@ export default function PromptLibrary() {
                 prompt.tags.some(tag => tag.toLowerCase().includes(query))
             );
         }
-
-        // Filter by favorites
         if (showOnlyFavorites) {
             filtered = filtered.filter(prompt => prompt.favorite);
         }
 
-        // Sort prompts
         filtered.sort((a, b) => {
             let comparison = 0;
-
             switch (sortBy) {
                 case "title":
                     comparison = a.title.localeCompare(b.title);
@@ -390,21 +505,18 @@ export default function PromptLibrary() {
                 default:
                     comparison = new Date(a.updatedAt).getTime() - new Date(b.updatedAt).getTime();
             }
-
             return sortDirection === "asc" ? comparison : -comparison;
         });
 
         setFilteredPrompts(filtered);
     }, [prompts, activeCategory, searchQuery, sortBy, sortDirection, showOnlyFavorites]);
 
-    // Handle prompt selection
     const handleSelectPrompt = (prompt: Prompt) => {
         setSelectedPrompt(prompt);
         setPromptDialogOpen(true);
         setEditMode(false);
     };
 
-    // Handle prompt favorite toggle
     const handleToggleFavorite = (e: React.MouseEvent, promptId: string) => {
         e.stopPropagation();
         setPrompts(prev =>
@@ -412,26 +524,21 @@ export default function PromptLibrary() {
         );
     };
 
-    // Direct toggle favorite without event (for non-event contexts)
     const toggleFavorite = (promptId: string) => {
         setPrompts(prev =>
             prev.map(p => p.id === promptId ? { ...p, favorite: !p.favorite } : p)
         );
     };
 
-    // Handle prompt deletion
     const handleDeletePrompt = (promptId: string) => {
         setPrompts(prev => prev.filter(p => p.id !== promptId));
         setPromptDialogOpen(false);
     };
 
-    // Handle prompt copy
     const handleCopyPrompt = (text: string) => {
         navigator.clipboard.writeText(text);
-        // Could add a toast message here
     };
 
-    // Handle tag addition in form
     const handleAddTag = () => {
         if (tagInput.trim() && !formState.tags.includes(tagInput.trim())) {
             setFormState(prev => ({
@@ -523,7 +630,6 @@ export default function PromptLibrary() {
                 notes: formState.notes,
                 isPublic: formState.isPublic
             };
-
             setPrompts(prev => [newPrompt, ...prev]);
         }
 
@@ -546,7 +652,6 @@ export default function PromptLibrary() {
         return activeTab === "my-prompts" ? filteredPrompts : communityPrompts;
     };
 
-    // Render star rating
     const renderStarRating = (rating: number) => {
         const stars = [];
         const fullStars = Math.floor(rating);
@@ -572,28 +677,25 @@ export default function PromptLibrary() {
         <div className="container relative mx-auto py-8">
             <EnhancedParticlesBackground variant="bubbles" density={50} />
 
-            {/* Header */}
             <div className="mb-8 space-y-4">
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                     <div>
                         <h1 className="text-3xl font-bold flex items-center gap-2">
                             <BookOpen className="h-8 w-8 text-primary" />
-                            Prompt Library
+                            {localT('prompts.title')}
                         </h1>
-                        <p className="text-muted-foreground">Manage, organize, and share your AI image generation prompts</p>
+                        <p className="text-muted-foreground">{localT('prompts.subtitle')}</p>
                     </div>
-
                     <div className="flex flex-wrap items-center gap-2">
                         <div className="relative flex-1 md:flex-none">
                             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                             <Input
-                                placeholder="Search prompts..."
+                                placeholder={localT('prompts.search')}
                                 className="pl-8 w-full md:w-[200px]"
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
                             />
                         </div>
-
                         <div className="flex border rounded-md overflow-hidden">
                             <Button
                                 variant={viewMode === "grid" ? "secondary" : "ghost"}
@@ -644,63 +746,58 @@ export default function PromptLibrary() {
                                 </svg>
                             </Button>
                         </div>
-
                         <Dialog>
                             <DialogTrigger asChild>
                                 <SparkleButton>
                                     <Plus className="h-4 w-4" />
-                                    New Prompt
+                                    {localT('prompts.new_prompt')}
                                 </SparkleButton>
                             </DialogTrigger>
                             <DialogContent className="sm:max-w-[600px]">
                                 <DialogHeader>
-                                    <DialogTitle>Create New Prompt</DialogTitle>
+                                    <DialogTitle>{localT('prompts.create_prompt')}</DialogTitle>
                                     <DialogDescription>
-                                        Add a new prompt to your library. Detailed prompts produce better results.
+                                        {localT('prompts.subtitle')}
                                     </DialogDescription>
                                 </DialogHeader>
-
                                 <div className="grid gap-4 py-4">
                                     <div className="grid gap-2">
-                                        <Label htmlFor="title">Title</Label>
+                                        <Label htmlFor="title">{localT('prompts.form.title')}</Label>
                                         <Input
                                             id="title"
-                                            placeholder="Give your prompt a descriptive title"
+                                            placeholder={localT('prompts.form.title_placeholder')}
                                             value={formState.title}
                                             onChange={(e) => setFormState(prev => ({ ...prev, title: e.target.value }))}
                                         />
                                     </div>
-
                                     <div className="grid gap-2">
-                                        <Label htmlFor="prompt-text">Prompt Text</Label>
+                                        <Label htmlFor="prompt-text">{localT('prompts.form.text')}</Label>
                                         <Textarea
                                             id="prompt-text"
-                                            placeholder="Enter your detailed prompt here..."
-                                            className="min-h-[120px]"
+                                            placeholder={localT('prompts.form.text_placeholder')}
+                                            className="min-h-[120px] resize-none"
                                             value={formState.text}
                                             onChange={(e) => setFormState(prev => ({ ...prev, text: e.target.value }))}
                                         />
                                     </div>
-
                                     <div className="grid gap-2">
-                                        <Label htmlFor="negative-prompt">Negative Prompt (Optional)</Label>
+                                        <Label htmlFor="negative-prompt">{localT('prompts.form.negative')}</Label>
                                         <Textarea
                                             id="negative-prompt"
-                                            placeholder="Elements to avoid in your generation..."
+                                            placeholder={localT('prompts.form.negative_placeholder')}
                                             value={formState.negative}
                                             onChange={(e) => setFormState(prev => ({ ...prev, negative: e.target.value }))}
                                         />
                                     </div>
-
                                     <div className="grid grid-cols-2 gap-4">
                                         <div className="grid gap-2">
-                                            <Label htmlFor="category">Category</Label>
+                                            <Label htmlFor="category">{localT('prompts.form.category')}</Label>
                                             <Select
                                                 value={formState.category}
                                                 onValueChange={(value) => setFormState(prev => ({ ...prev, category: value }))}
                                             >
                                                 <SelectTrigger id="category">
-                                                    <SelectValue placeholder="Select category" />
+                                                    <SelectValue placeholder={localT('prompts.category')} />
                                                 </SelectTrigger>
                                                 <SelectContent>
                                                     {categories.filter(c => c.id !== "all").map(category => (
@@ -711,25 +808,23 @@ export default function PromptLibrary() {
                                                 </SelectContent>
                                             </Select>
                                         </div>
-
                                         <div className="grid gap-2">
-                                            <Label htmlFor="add-tag">Tags</Label>
+                                            <Label htmlFor="add-tag">{localT('prompts.form.tags')}</Label>
                                             <div className="flex gap-2">
                                                 <Input
                                                     id="add-tag"
                                                     ref={tagInputRef}
-                                                    placeholder="Add tag"
+                                                    placeholder={localT('prompts.form.add_tag')}
                                                     value={tagInput}
                                                     onChange={(e) => setTagInput(e.target.value)}
                                                     onKeyDown={(e) => e.key === 'Enter' && handleAddTag()}
                                                 />
                                                 <Button type="button" size="sm" onClick={handleAddTag}>
-                                                    Add
+                                                    {localT('prompts.form.add')}
                                                 </Button>
                                             </div>
                                         </div>
                                     </div>
-
                                     {formState.tags.length > 0 && (
                                         <div className="flex flex-wrap gap-1 mt-1">
                                             {formState.tags.map(tag => (
@@ -748,30 +843,27 @@ export default function PromptLibrary() {
                                             ))}
                                         </div>
                                     )}
-
                                     <div className="grid gap-2">
-                                        <Label htmlFor="notes">Notes (Optional)</Label>
+                                        <Label htmlFor="notes">{localT('prompts.form.notes')}</Label>
                                         <Textarea
                                             id="notes"
-                                            placeholder="Add any notes about this prompt..."
+                                            placeholder={localT('prompts.form.notes_placeholder')}
                                             value={formState.notes}
                                             onChange={(e) => setFormState(prev => ({ ...prev, notes: e.target.value }))}
                                         />
                                     </div>
-
                                     <div className="flex items-center space-x-2 pt-2">
                                         <Switch
                                             id="public-prompt"
                                             checked={formState.isPublic}
                                             onCheckedChange={(checked) => setFormState(prev => ({ ...prev, isPublic: checked }))}
                                         />
-                                        <Label htmlFor="public-prompt">Share with community</Label>
+                                        <Label htmlFor="public-prompt">{localT('prompts.form.public')}</Label>
                                     </div>
                                 </div>
-
                                 <DialogFooter>
-                                    <Button variant="outline" onClick={() => resetForm()}>Cancel</Button>
-                                    <Button onClick={handleSavePrompt}>Save Prompt</Button>
+                                    <Button variant="outline" onClick={() => resetForm()}>{localT('prompts.cancel')}</Button>
+                                    <Button onClick={handleSavePrompt}>{localT('prompts.save_prompt')}</Button>
                                 </DialogFooter>
                             </DialogContent>
                         </Dialog>
@@ -779,13 +871,12 @@ export default function PromptLibrary() {
                 </div>
             </div>
 
-            {/* Main Content */}
             <div className="grid grid-cols-1 gap-6 md:grid-cols-4">
-                {/* Sidebar */}
+
                 <div className="md:col-span-1 space-y-6">
                     <Card>
                         <CardHeader className="pb-3">
-                            <CardTitle className="text-lg">Categories</CardTitle>
+                            <CardTitle className="text-lg">{localT('prompts.categories.title')}</CardTitle>
                         </CardHeader>
                         <CardContent className="pb-3">
                             <div className="space-y-1">
@@ -811,10 +902,9 @@ export default function PromptLibrary() {
                             </div>
                         </CardContent>
                     </Card>
-
                     <Card>
                         <CardHeader className="pb-3">
-                            <CardTitle className="text-lg">Popular Tags</CardTitle>
+                            <CardTitle className="text-lg">{localT('prompts.tags.title')}</CardTitle>
                         </CardHeader>
                         <CardContent>
                             <div className="flex flex-wrap gap-1">
@@ -831,10 +921,9 @@ export default function PromptLibrary() {
                             </div>
                         </CardContent>
                     </Card>
-
                     <Card>
                         <CardHeader className="pb-3">
-                            <CardTitle className="text-lg">Prompt Templates</CardTitle>
+                            <CardTitle className="text-lg">{localT('prompts.templates.title')}</CardTitle>
                         </CardHeader>
                         <CardContent className="p-0">
                             <Accordion type="single" collapsible className="w-full">
@@ -861,7 +950,7 @@ export default function PromptLibrary() {
                                                         setPromptDialogOpen(true);
                                                     }}
                                                 >
-                                                    Use Template
+                                                    {localT('prompts.template.use')}
                                                 </Button>
                                             </div>
                                         </AccordionContent>
@@ -870,32 +959,29 @@ export default function PromptLibrary() {
                             </Accordion>
                         </CardContent>
                     </Card>
-
                     <Card className="bg-gradient-to-br from-primary/5 to-primary/10 border-primary/20">
                         <CardContent className="p-4">
                             <div className="flex flex-col items-center text-center space-y-2">
                                 <div className="p-2 bg-primary/10 rounded-full">
                                     <Lightbulb className="h-5 w-5 text-primary" />
                                 </div>
-                                <h3 className="font-medium">Prompt Writing Tips</h3>
+                                <h3 className="font-medium">{localT('prompts.tips.title')}</h3>
                                 <p className="text-sm text-muted-foreground">
-                                    Be specific about details, lighting, camera angles, and styles. Include keywords like "high resolution" and "detailed".
+                                    {localT('prompts.tips.description')}
                                 </p>
-                                <Button variant="link" size="sm">Learn More</Button>
+                                <Button variant="link" size="sm">{localT('prompts.tips.learn_more')}</Button>
                             </div>
                         </CardContent>
                     </Card>
                 </div>
 
-                {/* Main Content */}
                 <div className="md:col-span-3 space-y-6">
                     <Tabs defaultValue="my-prompts" value={activeTab} onValueChange={setActiveTab}>
                         <div className="flex items-center justify-between">
                             <TabsList>
-                                <TabsTrigger value="my-prompts">My Prompts</TabsTrigger>
-                                <TabsTrigger value="community">Community</TabsTrigger>
+                                <TabsTrigger value="my-prompts">{localT('prompts.my_prompts')}</TabsTrigger>
+                                <TabsTrigger value="community">{localT('prompts.community')}</TabsTrigger>
                             </TabsList>
-
                             <div className="flex items-center gap-2">
                                 <div className="flex items-center space-x-2">
                                     <Switch
@@ -903,60 +989,47 @@ export default function PromptLibrary() {
                                         checked={showOnlyFavorites}
                                         onCheckedChange={setShowOnlyFavorites}
                                     />
-                                    <Label htmlFor="favorites-only" className="text-xs">Favorites Only</Label>
+                                    <Label htmlFor="favorites-only" className="text-xs">{localT('prompts.favorites_only')}</Label>
                                 </div>
-
                                 <DropdownMenu>
                                     <DropdownMenuTrigger asChild>
                                         <Button variant="outline" size="sm" className="gap-1">
-                                            <span>Sort</span>
+                                            <span>{localT('prompts.sort')}</span>
                                             <ChevronsUpDown className="h-3.5 w-3.5" />
                                         </Button>
                                     </DropdownMenuTrigger>
                                     <DropdownMenuContent align="end">
-                                        <DropdownMenuLabel>Sort by</DropdownMenuLabel>
+                                        <DropdownMenuLabel>{localT('prompts.sort_by')}</DropdownMenuLabel>
                                         <DropdownMenuSeparator />
                                         <DropdownMenuItem
                                             onClick={() => setSortBy("title")}
                                             className={sortBy === "title" ? "bg-muted" : ""}
                                         >
-                                            Title
+                                            {localT('prompts.form.title')}
                                         </DropdownMenuItem>
                                         <DropdownMenuItem
                                             onClick={() => setSortBy("created")}
                                             className={sortBy === "created" ? "bg-muted" : ""}
                                         >
-                                            Date Created
+                                            {localT('prompts.details.created')}
                                         </DropdownMenuItem>
                                         <DropdownMenuItem
                                             onClick={() => setSortBy("updated")}
                                             className={sortBy === "updated" ? "bg-muted" : ""}
                                         >
-                                            Date Updated
-                                        </DropdownMenuItem>
-                                        <DropdownMenuItem
-                                            onClick={() => setSortBy("usage")}
-                                            className={sortBy === "usage" ? "bg-muted" : ""}
-                                        >
-                                            Usage Count
-                                        </DropdownMenuItem>
-                                        <DropdownMenuItem
-                                            onClick={() => setSortBy("rating")}
-                                            className={sortBy === "rating" ? "bg-muted" : ""}
-                                        >
-                                            Rating
+                                            {localT('prompts.details.created')}
                                         </DropdownMenuItem>
                                         <DropdownMenuSeparator />
                                         <DropdownMenuItem onClick={() => setSortDirection(sortDirection === "asc" ? "desc" : "asc")}>
                                             {sortDirection === "asc" ? (
                                                 <div className="flex items-center">
                                                     <SortAsc className="mr-2 h-4 w-4" />
-                                                    Ascending
+                                                    {localT('prompts.ascending')}
                                                 </div>
                                             ) : (
                                                 <div className="flex items-center">
                                                     <SortDesc className="mr-2 h-4 w-4" />
-                                                    Descending
+                                                    {localT('prompts.descending')}
                                                 </div>
                                             )}
                                         </DropdownMenuItem>
@@ -964,18 +1037,17 @@ export default function PromptLibrary() {
                                 </DropdownMenu>
                             </div>
                         </div>
-
                         <TabsContent value="my-prompts" className="mt-6">
                             {getActivePromptList().length === 0 ? (
                                 <div className="flex flex-col items-center justify-center p-12 border rounded-lg border-dashed bg-muted/20">
                                     <div className="h-12 w-12 rounded-full bg-muted flex items-center justify-center mb-4">
                                         <BookOpen className="h-6 w-6 text-muted-foreground" />
                                     </div>
-                                    <h3 className="text-lg font-medium mb-2">No prompts found</h3>
+                                    <h3 className="text-lg font-medium mb-2">{localT('prompts.no_prompts')}</h3>
                                     <p className="text-muted-foreground text-center max-w-xs mb-4">
                                         {searchQuery || activeCategory !== "all" || showOnlyFavorites
-                                            ? "Try changing your search or filters"
-                                            : "Create your first prompt to get started"
+                                            ? localT('prompts.try_changing')
+                                            : localT('prompts.create_prompt')
                                         }
                                     </p>
                                     {searchQuery || activeCategory !== "all" || showOnlyFavorites ? (
@@ -987,23 +1059,22 @@ export default function PromptLibrary() {
                                                 setShowOnlyFavorites(false);
                                             }}
                                         >
-                                            Clear Filters
+                                            {localT('prompts.clear_filters')}
                                         </Button>
                                     ) : (
                                         <Dialog>
                                             <DialogTrigger asChild>
                                                 <Button>
                                                     <Plus className="mr-2 h-4 w-4" />
-                                                    Create Prompt
+                                                    {localT('prompts.create_prompt')}
                                                 </Button>
                                             </DialogTrigger>
-                                            {/* Dialog content for new prompt */}
                                         </Dialog>
                                     )}
                                 </div>
                             ) : viewMode === "grid" ? (
                                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                                    {getActivePromptList().map(prompt => (
+                                    {getActivePromptList().map((prompt, i) => (
                                         <AnimatedCard
                                             key={prompt.id}
                                             className="overflow-hidden cursor-pointer group"
@@ -1026,11 +1097,9 @@ export default function PromptLibrary() {
                                                         />
                                                     </Button>
                                                 </div>
-
                                                 <p className="text-sm text-muted-foreground mt-1 line-clamp-3">
                                                     {prompt.text}
                                                 </p>
-
                                                 {prompt.tags.length > 0 && (
                                                     <div className="flex flex-wrap gap-1 mt-2">
                                                         {prompt.tags.slice(0, 3).map(tag => (
@@ -1046,7 +1115,6 @@ export default function PromptLibrary() {
                                                     </div>
                                                 )}
                                             </div>
-
                                             <div className="flex items-center justify-between p-3 bg-muted/30 border-t text-xs text-muted-foreground">
                                                 <div className="flex items-center gap-2">
                                                     <div className="flex items-center gap-1">
@@ -1056,7 +1124,6 @@ export default function PromptLibrary() {
                                                     <span>·</span>
                                                     <span>{formatDate(prompt.updatedAt)}</span>
                                                 </div>
-
                                                 <div className="flex gap-1">
                                                     <TooltipProvider>
                                                         <Tooltip>
@@ -1073,10 +1140,9 @@ export default function PromptLibrary() {
                                                                     <Copy className="h-3.5 w-3.5" />
                                                                 </Button>
                                                             </TooltipTrigger>
-                                                            <TooltipContent>Copy prompt</TooltipContent>
+                                                            <TooltipContent>{localT('prompts.copy_prompt')}</TooltipContent>
                                                         </Tooltip>
                                                     </TooltipProvider>
-
                                                     <DropdownMenu>
                                                         <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
                                                             <Button
@@ -1097,7 +1163,7 @@ export default function PromptLibrary() {
                                                                 }}
                                                             >
                                                                 <Copy className="mr-2 h-4 w-4" />
-                                                                Copy Prompt
+                                                                {localT('prompts.copy_prompt')}
                                                             </DropdownMenuItem>
                                                             <DropdownMenuItem
                                                                 onClick={(e) => {
@@ -1107,33 +1173,31 @@ export default function PromptLibrary() {
                                                                 }}
                                                             >
                                                                 <Edit className="mr-2 h-4 w-4" />
-                                                                Edit
+                                                                {localT('prompts.edit')}
                                                             </DropdownMenuItem>
                                                             {prompt.isPublic ? (
                                                                 <DropdownMenuItem
                                                                     onClick={(e) => {
                                                                         e.stopPropagation();
-                                                                        // Set to private
                                                                         setPrompts(prev => prev.map(p =>
                                                                             p.id === prompt.id ? { ...p, isPublic: false } : p
                                                                         ));
                                                                     }}
                                                                 >
                                                                     <Share2 className="mr-2 h-4 w-4" />
-                                                                    Make Private
+                                                                    {localT('prompts.make_private')}
                                                                 </DropdownMenuItem>
                                                             ) : (
                                                                 <DropdownMenuItem
                                                                     onClick={(e) => {
                                                                         e.stopPropagation();
-                                                                        // Set to public
                                                                         setPrompts(prev => prev.map(p =>
                                                                             p.id === prompt.id ? { ...p, isPublic: true } : p
                                                                         ));
                                                                     }}
                                                                 >
                                                                     <Share2 className="mr-2 h-4 w-4" />
-                                                                    Share Publicly
+                                                                    {localT('prompts.share')}
                                                                 </DropdownMenuItem>
                                                             )}
                                                             <DropdownMenuSeparator />
@@ -1145,7 +1209,7 @@ export default function PromptLibrary() {
                                                                 }}
                                                             >
                                                                 <Trash2 className="mr-2 h-4 w-4" />
-                                                                Delete
+                                                                {localT('prompts.delete')}
                                                             </DropdownMenuItem>
                                                         </DropdownMenuContent>
                                                     </DropdownMenu>
@@ -1156,7 +1220,7 @@ export default function PromptLibrary() {
                                 </div>
                             ) : (
                                 <div className="space-y-2">
-                                    {getActivePromptList().map(prompt => (
+                                    {getActivePromptList().map((prompt, i) => (
                                         <AnimatedCard
                                             key={prompt.id}
                                             className="overflow-hidden cursor-pointer group"
@@ -1175,11 +1239,9 @@ export default function PromptLibrary() {
                                                             </Badge>
                                                         )}
                                                     </div>
-
                                                     <p className="text-sm text-muted-foreground mt-1 line-clamp-1 sm:line-clamp-2">
                                                         {prompt.text}
                                                     </p>
-
                                                     <div className="flex items-center gap-4 mt-2 text-xs text-muted-foreground">
                                                         <div className="flex items-center gap-1">
                                                             <MessageSquare className="h-3.5 w-3.5" />
@@ -1190,15 +1252,13 @@ export default function PromptLibrary() {
                                                             <span>{prompt.usageCount} uses</span>
                                                         </div>
                                                         <span className="hidden sm:inline-block">
-                              Updated {formatDate(prompt.updatedAt)}
-                            </span>
+                                                            Updated {formatDate(prompt.updatedAt)}
+                                                        </span>
                                                     </div>
                                                 </div>
-
                                                 <div className="flex flex-col justify-between ml-4">
                                                     <div className="flex items-center gap-2">
                                                         {renderStarRating(prompt.rating)}
-
                                                         <Button
                                                             variant="ghost"
                                                             size="icon"
@@ -1213,7 +1273,6 @@ export default function PromptLibrary() {
                                                             />
                                                         </Button>
                                                     </div>
-
                                                     <div className="flex gap-1 mt-auto">
                                                         <Button
                                                             variant="ghost"
@@ -1226,7 +1285,6 @@ export default function PromptLibrary() {
                                                         >
                                                             <Copy className="h-3.5 w-3.5" />
                                                         </Button>
-
                                                         <Button
                                                             variant="ghost"
                                                             size="icon"
@@ -1239,7 +1297,6 @@ export default function PromptLibrary() {
                                                         >
                                                             <Edit className="h-3.5 w-3.5" />
                                                         </Button>
-
                                                         <DropdownMenu>
                                                             <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
                                                                 <Button
@@ -1260,19 +1317,18 @@ export default function PromptLibrary() {
                                                                     }}
                                                                 >
                                                                     <Copy className="mr-2 h-4 w-4" />
-                                                                    Copy Prompt
+                                                                    {localT('prompts.copy_prompt')}
                                                                 </DropdownMenuItem>
                                                                 <DropdownMenuItem
                                                                     onClick={(e) => {
                                                                         e.stopPropagation();
-                                                                        // Toggle share status
                                                                         setPrompts(prev => prev.map(p =>
                                                                             p.id === prompt.id ? { ...p, isPublic: !p.isPublic } : p
                                                                         ));
                                                                     }}
                                                                 >
                                                                     <Share2 className="mr-2 h-4 w-4" />
-                                                                    {prompt.isPublic ? "Make Private" : "Share Publicly"}
+                                                                    {prompt.isPublic ? localT('prompts.make_private') : localT('prompts.share')}
                                                                 </DropdownMenuItem>
                                                                 <DropdownMenuSeparator />
                                                                 <DropdownMenuItem
@@ -1283,7 +1339,7 @@ export default function PromptLibrary() {
                                                                     }}
                                                                 >
                                                                     <Trash2 className="mr-2 h-4 w-4" />
-                                                                    Delete
+                                                                    {localT('prompts.delete')}
                                                                 </DropdownMenuItem>
                                                             </DropdownMenuContent>
                                                         </DropdownMenu>
@@ -1295,24 +1351,22 @@ export default function PromptLibrary() {
                                 </div>
                             )}
                         </TabsContent>
-
-                        <TabsContent value="community" className="mt-6">
+                        <TabsContent value="community">
                             <div className="bg-muted/30 rounded-lg p-4 mb-6">
                                 <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
                                     <div className="p-2 bg-primary/10 rounded-full">
                                         <Info className="h-6 w-6 text-primary" />
                                     </div>
                                     <div className="flex-1">
-                                        <h3 className="text-lg font-medium">Community Prompts</h3>
+                                        <h3 className="text-lg font-medium">{localT('prompts.community')}</h3>
                                         <p className="text-muted-foreground">
-                                            Explore and use prompts shared by the VisioMera community. Save your favorites to your library.
+                                            {localT('prompts.subtitle')}
                                         </p>
                                     </div>
                                 </div>
                             </div>
-
                             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                                {communityPrompts.map(prompt => (
+                                {communityPrompts.map((prompt, index) => (
                                     <AnimatedCard
                                         key={prompt.id}
                                         className="overflow-hidden cursor-pointer group border-primary/10"
@@ -1335,11 +1389,9 @@ export default function PromptLibrary() {
                                                     />
                                                 </Button>
                                             </div>
-
                                             <p className="text-sm text-muted-foreground mt-1 line-clamp-3">
                                                 {prompt.text}
                                             </p>
-
                                             {prompt.tags.length > 0 && (
                                                 <div className="flex flex-wrap gap-1 mt-2">
                                                     {prompt.tags.slice(0, 3).map(tag => (
@@ -1355,7 +1407,6 @@ export default function PromptLibrary() {
                                                 </div>
                                             )}
                                         </div>
-
                                         <div className="flex items-center justify-between p-3 bg-muted/30 border-t text-xs text-muted-foreground">
                                             <div className="flex items-center gap-2">
                                                 {prompt.author && (
@@ -1369,7 +1420,6 @@ export default function PromptLibrary() {
                                                     <span>{prompt.usageCount}</span>
                                                 </div>
                                             </div>
-
                                             <div>
                                                 {renderStarRating(prompt.rating)}
                                             </div>
@@ -1382,13 +1432,12 @@ export default function PromptLibrary() {
                 </div>
             </div>
 
-            {/* Prompt View/Edit Dialog */}
             {selectedPrompt && (
                 <Dialog open={promptDialogOpen} onOpenChange={setPromptDialogOpen}>
                     <DialogContent className="sm:max-w-[600px]">
                         <DialogHeader>
                             <DialogTitle className="flex items-center justify-between">
-                                <span>{editMode ? "Edit Prompt" : selectedPrompt.title}</span>
+                                <span>{editMode ? localT('prompts.edit_prompt') : selectedPrompt.title}</span>
                                 {!editMode && (
                                     <Button
                                         variant="ghost"
@@ -1401,21 +1450,18 @@ export default function PromptLibrary() {
                                 )}
                             </DialogTitle>
                         </DialogHeader>
-
                         {editMode ? (
-                            // Edit form
                             <div className="grid gap-4 py-4">
                                 <div className="grid gap-2">
-                                    <Label htmlFor="edit-title">Title</Label>
+                                    <Label htmlFor="edit-title">{localT('prompts.form.title')}</Label>
                                     <Input
                                         id="edit-title"
                                         value={formState.title}
                                         onChange={(e) => setFormState(prev => ({ ...prev, title: e.target.value }))}
                                     />
                                 </div>
-
                                 <div className="grid gap-2">
-                                    <Label htmlFor="edit-prompt-text">Prompt Text</Label>
+                                    <Label htmlFor="edit-prompt-text">{localT('prompts.form.text')}</Label>
                                     <Textarea
                                         id="edit-prompt-text"
                                         className="min-h-[120px]"
@@ -1423,25 +1469,23 @@ export default function PromptLibrary() {
                                         onChange={(e) => setFormState(prev => ({ ...prev, text: e.target.value }))}
                                     />
                                 </div>
-
                                 <div className="grid gap-2">
-                                    <Label htmlFor="edit-negative-prompt">Negative Prompt</Label>
+                                    <Label htmlFor="edit-negative-prompt">{localT('prompts.form.negative')}</Label>
                                     <Textarea
                                         id="edit-negative-prompt"
                                         value={formState.negative}
                                         onChange={(e) => setFormState(prev => ({ ...prev, negative: e.target.value }))}
                                     />
                                 </div>
-
                                 <div className="grid grid-cols-2 gap-4">
                                     <div className="grid gap-2">
-                                        <Label htmlFor="edit-category">Category</Label>
+                                        <Label htmlFor="edit-category">{localT('prompts.category')}</Label>
                                         <Select
                                             value={formState.category}
                                             onValueChange={(value) => setFormState(prev => ({ ...prev, category: value }))}
                                         >
                                             <SelectTrigger id="edit-category">
-                                                <SelectValue placeholder="Select category" />
+                                                <SelectValue placeholder={localT('prompts.category')} />
                                             </SelectTrigger>
                                             <SelectContent>
                                                 {categories.filter(c => c.id !== "all").map(category => (
@@ -1452,25 +1496,23 @@ export default function PromptLibrary() {
                                             </SelectContent>
                                         </Select>
                                     </div>
-
                                     <div className="grid gap-2">
-                                        <Label htmlFor="edit-add-tag">Tags</Label>
+                                        <Label htmlFor="edit-add-tag">{localT('prompts.form.tags')}</Label>
                                         <div className="flex gap-2">
                                             <Input
                                                 id="edit-add-tag"
                                                 ref={tagInputRef}
-                                                placeholder="Add tag"
+                                                placeholder={localT('prompts.form.add_tag')}
                                                 value={tagInput}
                                                 onChange={(e) => setTagInput(e.target.value)}
                                                 onKeyDown={(e) => e.key === 'Enter' && handleAddTag()}
                                             />
                                             <Button type="button" size="sm" onClick={handleAddTag}>
-                                                Add
+                                                {localT('prompts.form.add')}
                                             </Button>
                                         </div>
                                     </div>
                                 </div>
-
                                 {formState.tags.length > 0 && (
                                     <div className="flex flex-wrap gap-1 mt-1">
                                         {formState.tags.map(tag => (
@@ -1489,46 +1531,41 @@ export default function PromptLibrary() {
                                         ))}
                                     </div>
                                 )}
-
                                 <div className="grid gap-2">
-                                    <Label htmlFor="edit-notes">Notes</Label>
+                                    <Label htmlFor="edit-notes">{localT('prompts.form.notes')}</Label>
                                     <Textarea
                                         id="edit-notes"
                                         value={formState.notes}
                                         onChange={(e) => setFormState(prev => ({ ...prev, notes: e.target.value }))}
                                     />
                                 </div>
-
                                 <div className="flex items-center space-x-2 pt-2">
                                     <Switch
                                         id="edit-public-prompt"
                                         checked={formState.isPublic}
                                         onCheckedChange={(checked) => setFormState(prev => ({ ...prev, isPublic: checked }))}
                                     />
-                                    <Label htmlFor="edit-public-prompt">Share with community</Label>
+                                    <Label htmlFor="edit-public-prompt">{localT('prompts.form.public')}</Label>
                                 </div>
-
                                 <DialogFooter className="mt-4">
-                                    <Button variant="outline" onClick={() => setEditMode(false)}>Cancel</Button>
-                                    <Button onClick={handleSavePrompt}>Save Changes</Button>
+                                    <Button variant="outline" onClick={() => setEditMode(false)}>{localT('prompts.cancel')}</Button>
+                                    <Button onClick={handleSavePrompt}>{localT('prompts.save_changes')}</Button>
                                 </DialogFooter>
                             </div>
                         ) : (
-                            // View mode
                             <div className="py-4">
-                                {/* Prompt text */}
+
                                 <div className="space-y-4">
                                     <div className="rounded-md border bg-muted/20 p-4">
                                         <ScrollArea className="h-[150px]">
                                             <div className="space-y-4">
                                                 <div>
-                                                    <Label className="text-xs text-muted-foreground mb-1 block">Prompt</Label>
+                                                    <Label className="text-xs text-muted-foreground mb-1 block">{localT('prompts.details.prompt')}</Label>
                                                     <p className="text-sm">{selectedPrompt.text}</p>
                                                 </div>
-
                                                 {selectedPrompt.negative && (
                                                     <div>
-                                                        <Label className="text-xs text-muted-foreground mb-1 block">Negative Prompt</Label>
+                                                        <Label className="text-xs text-muted-foreground mb-1 block">{localT('prompts.details.negative')}</Label>
                                                         <p className="text-sm">{selectedPrompt.negative}</p>
                                                     </div>
                                                 )}
@@ -1536,24 +1573,21 @@ export default function PromptLibrary() {
                                         </ScrollArea>
                                     </div>
 
-                                    {/* Metadata */}
                                     <div className="grid grid-cols-2 gap-4">
                                         <div>
-                                            <Label className="text-xs text-muted-foreground mb-1 block">Category</Label>
+                                            <Label className="text-xs text-muted-foreground mb-1 block">{localT('prompts.details.category')}</Label>
                                             <Badge variant="outline">
                                                 {categories.find(c => c.id === selectedPrompt.category)?.name || selectedPrompt.category}
                                             </Badge>
                                         </div>
-
                                         <div>
-                                            <Label className="text-xs text-muted-foreground mb-1 block">Created</Label>
+                                            <Label className="text-xs text-muted-foreground mb-1 block">{localT('prompts.details.created')}</Label>
                                             <p className="text-sm">{formatDate(selectedPrompt.createdAt)}</p>
                                         </div>
                                     </div>
 
-                                    {/* Tags */}
                                     <div>
-                                        <Label className="text-xs text-muted-foreground mb-1 block">Tags</Label>
+                                        <Label className="text-xs text-muted-foreground mb-1 block">{localT('prompts.details.tags')}</Label>
                                         <div className="flex flex-wrap gap-1">
                                             {selectedPrompt.tags.map(tag => (
                                                 <Badge key={tag} variant="secondary" className="text-xs">
@@ -1563,18 +1597,16 @@ export default function PromptLibrary() {
                                         </div>
                                     </div>
 
-                                    {/* Notes if available */}
                                     {selectedPrompt.notes && (
                                         <div>
-                                            <Label className="text-xs text-muted-foreground mb-1 block">Notes</Label>
+                                            <Label className="text-xs text-muted-foreground mb-1 block">{localT('prompts.form.notes')}</Label>
                                             <p className="text-sm bg-muted/20 p-2 rounded">{selectedPrompt.notes}</p>
                                         </div>
                                     )}
 
-                                    {/* Parameters if available */}
                                     {selectedPrompt.parameters && (
                                         <div>
-                                            <Label className="text-xs text-muted-foreground mb-1 block">Parameters</Label>
+                                            <Label className="text-xs text-muted-foreground mb-1 block">{localT('prompts.details.parameters')}</Label>
                                             <div className="grid grid-cols-2 gap-2 text-sm">
                                                 {Object.entries(selectedPrompt.parameters).map(([key, value]) => (
                                                     <div key={key} className="flex justify-between">
@@ -1586,7 +1618,6 @@ export default function PromptLibrary() {
                                         </div>
                                     )}
                                 </div>
-
                                 <div className="flex justify-between items-center mt-6">
                                     <div className="flex items-center gap-3">
                                         <Button
@@ -1595,9 +1626,8 @@ export default function PromptLibrary() {
                                             onClick={() => handleCopyPrompt(selectedPrompt.text)}
                                         >
                                             <Copy className="mr-2 h-4 w-4" />
-                                            Copy Prompt
+                                            {localT('prompts.copy_prompt')}
                                         </Button>
-
                                         <Button
                                             variant="outline"
                                             size="sm"
@@ -1612,25 +1642,22 @@ export default function PromptLibrary() {
                                                     selectedPrompt.favorite ? "fill-yellow-500 text-yellow-500" : ""
                                                 )}
                                             />
-                                            {selectedPrompt.favorite ? "Favorited" : "Favorite"}
+                                            {selectedPrompt.favorite ? localT('prompts.unfavorite') : localT('prompts.favorite')}
                                         </Button>
                                     </div>
-
                                     <Button
                                         variant="default"
                                         onClick={() => {
-                                            // Simulate using the prompt for generation
                                             setPrompts(prev =>
                                                 prev.map(p => p.id === selectedPrompt.id ?
                                                     { ...p, usageCount: p.usageCount + 1 } : p
                                                 )
                                             );
                                             setPromptDialogOpen(false);
-                                            // Here you would actually set up a generation with this prompt
                                         }}
                                     >
                                         <Sparkles className="mr-2 h-4 w-4" />
-                                        Use Prompt
+                                        {localT('prompts.use_prompt')}
                                     </Button>
                                 </div>
                             </div>

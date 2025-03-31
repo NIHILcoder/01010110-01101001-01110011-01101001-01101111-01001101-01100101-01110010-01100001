@@ -1,1418 +1,938 @@
-"use client"
-
-import React, { useState } from "react"
-import { ParticlesBackground } from "@/components/particles-background"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+"use client";
+import { useState, useEffect } from "react";
 import {
-    Bell,
-    Brush,
-    Copy,
-    CreditCard,
-    Download,
-    Globe,
-    Key,
-    Lock,
-    LogOut,
-    Plus,
-    Save,
-    Settings as SettingsIcon,
-    Shield,
+    Trophy,
+    Clock,
+    Heart,
+    MessageSquare,
+    Share2,
+    Filter,
+    Flame,
+    Calendar,
+    Award,
+    Users,
+    BookOpen,
+    Search,
+    SlidersHorizontal,
+    Grid,
+    Rows,
+    ChevronDown,
     Sparkles,
-    User,
-    Webhook,
-    Layout,
-    X
-} from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Separator } from "@/components/ui/separator"
-import { Checkbox } from "@/components/ui/checkbox"
-import { Input } from "@/components/ui/input"
-import { Switch } from "@/components/ui/switch"
-import { Label } from "@/components/ui/label"
-import { Badge } from "@/components/ui/badge"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
-import { ScrollArea } from "@/components/ui/scroll-area"
-import { Textarea } from "@/components/ui/textarea"
-import { Progress } from "@/components/ui/progress"
+    Star,
+    Plus,
+    Camera,
+    Tag,
+    Lightbulb,
+    ThumbsUp,
+    Eye,
+    Play
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { EnhancedParticlesBackground } from "@/components/enhanced-particles-background";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+    DropdownMenuSeparator,
+    DropdownMenuLabel
+} from "@/components/ui/dropdown-menu";
+import { Separator } from "@/components/ui/separator";
 import {
     Tooltip,
     TooltipContent,
     TooltipProvider,
     TooltipTrigger
-} from "@/components/ui/tooltip"
-import { useLanguage, useLocalTranslation } from "@/components/language-context"
+} from "@/components/ui/tooltip";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
+import { Slider } from "@/components/ui/slider";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { ImagePreviewDialog } from "@/components/image-preview-dialog";
+import {
+    AnimatedCard,
+    SparkleButton,
+    AnimatedBadge,
+    FloatingElement,
+    StaggeredContainer
+} from "@/components/animated-components";
+import { cn } from "@/lib/utils";
+import { useLanguage, useLocalTranslation } from "@/components/language-context";
 
-export default function SettingsPage() {
-    const [editMode, setEditMode] = useState(false)
-    const [profileData, setProfileData] = useState({
-        name: "User Name",
-        email: "user@example.com",
-        bio: "AI art enthusiast and digital creator passionate about exploring the intersection of technology and creativity."
-    })
+export default function EnhancedCommunityGallery() {
+    const [viewMode, setViewMode] = useState<"grid" | "rows">("grid");
+    const [filterOpen, setFilterOpen] = useState(false);
+    const [activeCategory, setActiveCategory] = useState("all");
+    const [searchQuery, setSearchQuery] = useState("");
+    const [sortBy, setSortBy] = useState("trending");
+    const [selectedImageIndex, setSelectedImageIndex] = useState<number | null>(null);
+    const [previewOpen, setPreviewOpen] = useState(false);
+    const [animateItems, setAnimateItems] = useState(false);
+    const [page, setPage] = useState(1);
+    const [loading, setLoading] = useState(false);
 
-    const { t, language } = useLanguage();
-
-    // Helper function to localize features
-    const localizeFeature = (featureId: string): string => {
-        const featureTranslations: Record<string, string> = {
-            "credits": "1000 кредитов генерации в месяц",
-            "models": "Доступ ко всем моделям",
-            "resolution": "Максимальное разрешение: 2048×2048",
-            "queue": "Приоритетная очередь генерации",
-            "parameters": "Расширенные параметры",
-            "license": "Коммерческая лицензия",
-            "api_access": "Доступ к API",
-            "controlnet": "Поддержка ControlNet"
-        };
-
-        return featureTranslations[featureId] || featureId;
-    };
-
-    // Helper function to localize subscription plan features
-    const localizeSubscriptionFeature = (feature: string): string => {
-        const subscriptionTranslations: Record<string, string> = {
-            "100 generation credits per month": "100 кредитов генерации в месяц",
-            "1000 generation credits per month": "1000 кредитов генерации в месяц",
-            "5000 generation credits per month": "5000 кредитов генерации в месяц",
-            "Access to basic models": "Доступ к базовым моделям",
-            "Access to all models": "Доступ ко всем моделям",
-            "Maximum resolution: 512×512": "Максимальное разрешение: 512×512",
-            "Maximum resolution: 2048×2048": "Максимальное разрешение: 2048×2048",
-            "Maximum resolution: 4096×4096": "Максимальное разрешение: 4096×4096",
-            "Standard generation queue": "Стандартная очередь генерации",
-            "Priority generation queue": "Приоритетная очередь генерации",
-            "Highest priority queue": "Наивысший приоритет в очереди",
-            "Basic parameters": "Базовые параметры",
-            "Advanced parameters": "Расширенные параметры",
-            "All parameters": "Все параметры",
-            "Personal use only": "Только для личного использования",
-            "Commercial license": "Коммерческая лицензия",
-            "Extended commercial license": "Расширенная коммерческая лицензия",
-            "API access": "Доступ к API",
-            "Full API access": "Полный доступ к API",
-            "ControlNet support": "Поддержка ControlNet",
-            "Dedicated support": "Выделенная поддержка",
-            "Team collaboration features": "Функции для совместной работы команды",
-            "Custom model fine-tuning": "Индивидуальная настройка моделей"
-        };
-
-        return subscriptionTranslations[feature] || feature;
-    };
-
+    // Language translations
+    const { language } = useLanguage();
     const pageTranslations = {
         en: {
-            'settings.title': 'Settings',
-            'settings.description': 'Manage your account preferences and application settings',
-            'settings.tab.account': 'Account',
-            'settings.tab.appearance': 'Appearance',
-            'settings.tab.notifications': 'Notifications',
-            'settings.tab.subscription': 'Subscription',
-            'settings.tab.privacy': 'Privacy',
-            'settings.tab.api': 'API',
-            'settings.profile.title': 'Profile Information',
-            'settings.profile.description': 'Manage your account details and public profile',
-            'settings.profile.display_name': 'Display Name',
-            'settings.profile.username': 'Username',
-            'settings.profile.email': 'Email',
-            'settings.profile.bio': 'Bio',
-            'settings.profile.edit': 'Edit Profile',
-            'settings.profile.cancel': 'Cancel',
-            'settings.profile.save': 'Save Changes',
-            'settings.profile.change_avatar': 'Change Avatar',
-            'settings.security.title': 'Account Security',
-            'settings.security.description': 'Manage your password and security settings',
-            'settings.security.current_password': 'Current Password',
-            'settings.security.new_password': 'New Password',
-            'settings.security.confirm_password': 'Confirm New Password',
-            'settings.security.2fa': 'Two-Factor Authentication',
-            'settings.security.2fa_app': 'Authenticator App',
-            'settings.security.recommended': 'Recommended',
-            'settings.security.2fa_description': 'Use an authenticator app to get two-factor authentication codes',
-            'settings.security.enable': 'Enable',
-            'settings.security.update': 'Update Security Settings',
-            'settings.danger.title': 'Danger Zone',
-            'settings.danger.description': 'Irreversible account actions',
-            'settings.danger.delete_account': 'Delete Account',
-            'settings.danger.delete_warning': 'Once you delete your account, there is no going back. This action cannot be undone.',
-
-            // Appearance Tab
-            'settings.appearance.title': 'Theme Preferences',
-            'settings.appearance.description': 'Customize how VisioMera looks and feels',
-            'settings.appearance.color_theme': 'Color Theme',
-            'settings.appearance.light': 'Light',
-            'settings.appearance.dark': 'Dark',
-            'settings.appearance.system': 'System',
-            'settings.appearance.ui_density': 'UI Density',
-            'settings.appearance.compact': 'Compact',
-            'settings.appearance.comfortable': 'Comfortable',
-            'settings.appearance.spacious': 'Spacious',
-            'settings.appearance.effects': 'Effects & Animations',
-            'settings.appearance.particles': 'Background particles',
-            'settings.appearance.transitions': 'UI transitions',
-            'settings.appearance.reduced_motion': 'Reduced motion',
-            'settings.appearance.haptic': 'Haptic feedback',
-            'settings.appearance.save': 'Save Preferences',
-            'settings.appearance.customization': 'Interface Customization',
-            'settings.appearance.customization_description': 'Configure your workspace layout',
-            'settings.appearance.default_view': 'Default View',
-            'settings.appearance.standard': 'Standard Mode',
-            'settings.appearance.standard_description': 'Simplified interface with essential controls',
-            'settings.appearance.advanced': 'Advanced Mode',
-            'settings.appearance.advanced_description': 'Full control with all parameters and options',
-            'settings.appearance.gallery': 'Gallery View Preferences',
-            'settings.appearance.gallery_grid': 'Default to grid view',
-            'settings.appearance.gallery_info': 'Show image info on hover',
-            'settings.appearance.gallery_autosave': 'Auto-save generations',
-            'settings.appearance.gallery_prompt': 'Show prompts with images',
-
-            // Notifications Tab
-            'settings.notifications.title': 'Notification Preferences',
-            'settings.notifications.description': 'Configure how and when you receive notifications',
-            'settings.notifications.email': 'Email Notifications',
-            'settings.notifications.email_account': 'Account updates and security alerts',
-            'settings.notifications.email_comments': 'Comments on your creations',
-            'settings.notifications.email_likes': 'Likes and reactions',
-            'settings.notifications.email_features': 'New features and announcements',
-            'settings.notifications.email_tips': 'Tips and tutorials',
-            'settings.notifications.in_app': 'In-App Notifications',
-            'settings.notifications.in_app_comments': 'Comments on your creations',
-            'settings.notifications.in_app_likes': 'Likes and reactions',
-            'settings.notifications.in_app_follows': 'New followers',
-            'settings.notifications.in_app_mentions': 'Mentions and tags',
-            'settings.notifications.in_app_competitions': 'Competition updates',
-            'settings.notifications.in_app_generation': 'Generation completions',
-            'settings.notifications.schedule': 'Notification Schedule',
-            'settings.notifications.quiet_from': 'Quiet hours start',
-            'settings.notifications.quiet_to': 'Quiet hours end',
-            'settings.notifications.weekend_pause': 'Pause all notifications on weekends',
-            'settings.notifications.save': 'Save Notification Settings',
-
-            // Subscription Tab
-            'settings.subscription.title': 'Current Plan',
-            'settings.subscription.description': 'Manage your subscription and billing',
-            'settings.subscription.pro_plan': 'Pro Plan',
-            'settings.subscription.price': 'per month',
-            'settings.subscription.next_billing': 'Your next billing date is April 15, 2025',
-            'settings.subscription.manage': 'Manage Subscription',
-            'settings.subscription.credits': 'Generation Credits',
-            'settings.subscription.monthly_limit': 'Monthly Limit',
-            'settings.subscription.credits_used': 'Credits Used',
-            'settings.subscription.credits_remaining': 'Credits Remaining',
-            'settings.subscription.buy_additional': 'Buy Additional Credits',
-            'settings.subscription.buy_credits_tooltip': 'Purchase more credits when you reach your limit',
-            'settings.subscription.features': 'Plan Features',
-            'settings.subscription.history': 'View Billing History',
-            'settings.subscription.upgrade': 'Upgrade Plan',
-            'settings.subscription.available_plans': 'Available Plans',
-            'settings.subscription.compare_plans': 'Compare plans and find the right fit for your needs',
-            'settings.subscription.free': 'Free',
-            'settings.subscription.business': 'Business',
-            'settings.subscription.most_popular': 'Most Popular',
-            'settings.subscription.current_plan': 'Current Plan',
-            'settings.subscription.upgrade_to': 'Upgrade to',
-
-            // Privacy Tab
-            'settings.privacy.title': 'Privacy Settings',
-            'settings.privacy.description': 'Control how your data is used and shared',
-            'settings.privacy.profile': 'Profile Privacy',
-            'settings.privacy.public_profile': 'Make profile public',
-            'settings.privacy.public_profile_description': 'Allow anyone to view your profile and creations',
-            'settings.privacy.searchable': 'Searchable profile',
-            'settings.privacy.searchable_description': 'Allow your profile to appear in search results',
-            'settings.privacy.share_activity': 'Share activity',
-            'settings.privacy.share_activity_description': 'Show your activity (likes, comments) to followers',
-            'settings.privacy.content': 'Content Sharing',
-            'settings.privacy.auto_public': 'Automatically make my creations public',
-            'settings.privacy.auto_public_description': 'New generations will be visible to the community',
-            'settings.privacy.show_prompts': 'Share my prompts with the community',
-            'settings.privacy.show_prompts_description': 'Allow others to view the prompts used for your public creations',
-            'settings.privacy.allow_remix': 'Allow others to remix my work',
-            'settings.privacy.allow_remix_description': 'Let community members use your images as reference for their creations',
-            'settings.privacy.data': 'Data Privacy',
-            'settings.privacy.anon_analytics': 'Allow anonymous analytics',
-            'settings.privacy.anon_analytics_description': 'Help us improve by sharing anonymous usage data',
-            'settings.privacy.model_training': 'Allow model training contribution',
-            'settings.privacy.model_training_description': 'Your creations may be used to improve AI models',
-            'settings.privacy.personalization': 'Personalized experience',
-            'settings.privacy.personalization_description': 'Use your activity to customize your experience',
-            'settings.privacy.save': 'Save Privacy Settings',
-            'settings.privacy.data_management': 'Data Management',
-            'settings.privacy.data_export': 'Data Export',
-            'settings.privacy.data_export_description': 'Download a copy of your data, including your profile information, creations, and account activity',
-            'settings.privacy.request_export': 'Request Data Export',
-            'settings.privacy.data_removal': 'Data Removal',
-            'settings.privacy.data_removal_description': 'If you\'d like us to delete specific content or data types instead of your entire account, you can request targeted data removal',
-            'settings.privacy.request_removal': 'Request Data Removal',
-
-            // API Tab
-            'settings.api.title': 'API Access',
-            'settings.api.description': 'Manage your API keys and usage for programmatic access',
-            'settings.api.keys': 'Your API Keys',
-            'settings.api.production_key': 'Production Key',
-            'settings.api.development_key': 'Development Key',
-            'settings.api.created': 'Created',
-            'settings.api.active': 'Active',
-            'settings.api.generate': 'Generate New API Key',
-            'settings.api.usage': 'API Usage',
-            'settings.api.documentation': 'View Documentation',
-            'settings.api.monthly_limit': 'Monthly Limit',
-            'settings.api.used_month': 'Used This Month',
-            'settings.api.usage_cycle': 'Your API usage resets on the 1st of each month. Current billing cycle:',
-            'settings.api.domains': 'Allowed Domains',
-            'settings.api.domains_description': 'Restrict your API keys to specific domains for enhanced security',
-            'settings.api.add_domain': 'Add',
-            'settings.api.webhooks': 'Webhooks',
-            'settings.api.webhooks_description': 'Configure webhook endpoints to receive real-time events',
-            'settings.api.endpoints': 'Webhook Endpoints',
-            'settings.api.add_endpoint': 'Add Endpoint',
-            'settings.api.endpoint_active': 'Active',
-            'settings.api.generation_completed': 'Generation Completed',
-            'settings.api.events_description': 'Receives events when image generations complete',
-            'settings.api.edit': 'Edit',
-            'settings.api.test': 'Test',
-            'settings.api.delete': 'Delete',
-            'settings.api.enabled': 'API Access Enabled',
-            'settings.api.save': 'Save API Settings',
-
-            // Sign Out
-            'settings.sign_out': 'Sign Out'
+            'community.title': 'Community Hub',
+            'community.subtitle': 'Explore creations from the VisioMera community',
+            'community.upload': 'Upload Creation',
+            'community.upload_mobile': 'Upload Your Creation',
+            'community.category': 'Category',
+            'community.search': 'Search artworks...',
+            'community.featured_competitions': 'Featured Competitions',
+            'community.view_all': 'View All',
+            'community.prize': 'Prize:',
+            'community.entries': 'entries',
+            'community.days_left': 'days left',
+            'community.hours_left': 'hours left',
+            'community.enter_competition': 'Enter Competition',
+            'community.gallery': 'Community Gallery',
+            'community.sort_by': 'Sort by',
+            'community.trending': 'Trending',
+            'community.newest': 'Newest',
+            'community.collaborations': 'Collaborations',
+            'community.tutorials': 'Tutorials',
+            'community.members': 'members',
+            'community.active_project': 'Active Project',
+            'community.view_project': 'View Project',
+            'community.duration': 'min',
+            'community.level': 'Level',
+            'community.views': 'views',
+            'community.watch_tutorial': 'Watch Tutorial',
+            'community.load_more': 'Load More',
+            'community.loading': 'Loading...',
+            'community.no_results': 'No results found',
+            'community.try_adjusting': 'Try adjusting your search or filter to find what you\'re looking for.',
+            'community.reset_filters': 'Reset Filters',
+            'community.trending_tags': 'Trending Tags',
+            'community.tips_title': 'AI Art Creation Tips',
+            'community.tips_text': 'Looking to improve your generations? Try using detailed descriptions, specify lighting conditions, and include style references in your prompts.',
+            'community.view_guides': 'View Guides',
+            'community.filter_options': 'Filter Options',
+            'community.model_type': 'Model Type',
+            'community.select_model': 'Select model',
+            'community.time_range': 'Time Range',
+            'community.select_time': 'Select time range',
+            'community.featured_only': 'Featured Only',
+            'community.by': 'By',
+            'community.just_now': 'Just now',
+            'community.hour_ago': 'hour ago',
+            'community.hours_ago': 'hours ago',
+            'community.day_ago': 'day ago',
+            'community.days_ago': 'days ago'
         },
         ru: {
-            'settings.title': 'Настройки',
-            'settings.description': 'Управление предпочтениями аккаунта и настройками приложения',
-            'settings.tab.account': 'Аккаунт',
-            'settings.tab.appearance': 'Внешний вид',
-            'settings.tab.notifications': 'Уведомления',
-            'settings.tab.subscription': 'Подписка',
-            'settings.tab.privacy': 'Приватность',
-            'settings.tab.api': 'API',
-            'settings.profile.title': 'Информация профиля',
-            'settings.profile.description': 'Управление данными вашего аккаунта и публичного профиля',
-            'settings.profile.display_name': 'Отображаемое имя',
-            'settings.profile.username': 'Имя пользователя',
-            'settings.profile.email': 'Email',
-            'settings.profile.bio': 'О себе',
-            'settings.profile.edit': 'Редактировать профиль',
-            'settings.profile.cancel': 'Отмена',
-            'settings.profile.save': 'Сохранить изменения',
-            'settings.profile.change_avatar': 'Изменить аватар',
-            'settings.security.title': 'Безопасность аккаунта',
-            'settings.security.description': 'Управление паролем и настройками безопасности',
-            'settings.security.current_password': 'Текущий пароль',
-            'settings.security.new_password': 'Новый пароль',
-            'settings.security.confirm_password': 'Подтвердите новый пароль',
-            'settings.security.2fa': 'Двухфакторная аутентификация',
-            'settings.security.2fa_app': 'Приложение-аутентификатор',
-            'settings.security.recommended': 'Рекомендуется',
-            'settings.security.2fa_description': 'Используйте приложение-аутентификатор для получения кодов двухфакторной аутентификации',
-            'settings.security.enable': 'Включить',
-            'settings.security.update': 'Обновить настройки безопасности',
-            'settings.danger.title': 'Опасная зона',
-            'settings.danger.description': 'Необратимые действия с аккаунтом',
-            'settings.danger.delete_account': 'Удалить аккаунт',
-            'settings.danger.delete_warning': 'После удаления аккаунта пути назад нет. Это действие нельзя отменить.',
-
-            // Appearance Tab
-            'settings.appearance.title': 'Настройки темы',
-            'settings.appearance.description': 'Настройте внешний вид и поведение VisioMera',
-            'settings.appearance.color_theme': 'Цветовая тема',
-            'settings.appearance.light': 'Светлая',
-            'settings.appearance.dark': 'Темная',
-            'settings.appearance.system': 'Системная',
-            'settings.appearance.ui_density': 'Плотность интерфейса',
-            'settings.appearance.compact': 'Компактная',
-            'settings.appearance.comfortable': 'Комфортная',
-            'settings.appearance.spacious': 'Просторная',
-            'settings.appearance.effects': 'Эффекты и анимации',
-            'settings.appearance.particles': 'Фоновые частицы',
-            'settings.appearance.transitions': 'Переходы интерфейса',
-            'settings.appearance.reduced_motion': 'Уменьшенное движение',
-            'settings.appearance.haptic': 'Тактильная обратная связь',
-            'settings.appearance.save': 'Сохранить настройки',
-            'settings.appearance.customization': 'Настройка интерфейса',
-            'settings.appearance.customization_description': 'Настройте макет рабочего пространства',
-            'settings.appearance.default_view': 'Вид по умолчанию',
-            'settings.appearance.standard': 'Стандартный режим',
-            'settings.appearance.standard_description': 'Упрощенный интерфейс с основными элементами управления',
-            'settings.appearance.advanced': 'Расширенный режим',
-            'settings.appearance.advanced_description': 'Полный контроль со всеми параметрами и опциями',
-            'settings.appearance.gallery': 'Настройки просмотра галереи',
-            'settings.appearance.gallery_grid': 'Сетка по умолчанию',
-            'settings.appearance.gallery_info': 'Показывать информацию при наведении',
-            'settings.appearance.gallery_autosave': 'Автосохранение генераций',
-            'settings.appearance.gallery_prompt': 'Показывать промпты с изображениями',
-
-            // Notifications Tab
-            'settings.notifications.title': 'Настройки уведомлений',
-            'settings.notifications.description': 'Настройте как и когда вы получаете уведомления',
-            'settings.notifications.email': 'Email уведомления',
-            'settings.notifications.email_account': 'Обновления аккаунта и оповещения безопасности',
-            'settings.notifications.email_comments': 'Комментарии к вашим работам',
-            'settings.notifications.email_likes': 'Лайки и реакции',
-            'settings.notifications.email_features': 'Новые функции и объявления',
-            'settings.notifications.email_tips': 'Советы и руководства',
-            'settings.notifications.in_app': 'Уведомления в приложении',
-            'settings.notifications.in_app_comments': 'Комментарии к вашим работам',
-            'settings.notifications.in_app_likes': 'Лайки и реакции',
-            'settings.notifications.in_app_follows': 'Новые подписчики',
-            'settings.notifications.in_app_mentions': 'Упоминания и теги',
-            'settings.notifications.in_app_competitions': 'Обновления конкурсов',
-            'settings.notifications.in_app_generation': 'Завершение генераций',
-            'settings.notifications.schedule': 'Расписание уведомлений',
-            'settings.notifications.quiet_from': 'Начало тихого времени',
-            'settings.notifications.quiet_to': 'Конец тихого времени',
-            'settings.notifications.weekend_pause': 'Приостановить все уведомления в выходные',
-            'settings.notifications.save': 'Сохранить настройки уведомлений',
-
-            // Subscription Tab
-            'settings.subscription.title': 'Текущий план',
-            'settings.subscription.description': 'Управление подпиской и оплатой',
-            'settings.subscription.pro_plan': 'Про План',
-            'settings.subscription.price': 'в месяц',
-            'settings.subscription.next_billing': 'Ваша следующая дата оплаты: 15 апреля 2025 г.',
-            'settings.subscription.manage': 'Управление подпиской',
-            'settings.subscription.credits': 'Кредиты генерации',
-            'settings.subscription.monthly_limit': 'Месячный лимит',
-            'settings.subscription.credits_used': 'Использовано кредитов',
-            'settings.subscription.credits_remaining': 'Осталось кредитов',
-            'settings.subscription.buy_additional': 'Купить дополнительные кредиты',
-            'settings.subscription.buy_credits_tooltip': 'Купите больше кредитов, когда достигнете лимита',
-            'settings.subscription.features': 'Возможности плана',
-            'settings.subscription.history': 'Просмотреть историю платежей',
-            'settings.subscription.upgrade': 'Улучшить план',
-            'settings.subscription.available_plans': 'Доступные планы',
-            'settings.subscription.compare_plans': 'Сравните планы и найдите подходящий для ваших нужд',
-            'settings.subscription.free': 'Бесплатный',
-            'settings.subscription.business': 'Бизнес',
-            'settings.subscription.most_popular': 'Самый популярный',
-            'settings.subscription.current_plan': 'Текущий план',
-            'settings.subscription.upgrade_to': 'Перейти на',
-
-            // Privacy Tab
-            'settings.privacy.title': 'Настройки приватности',
-            'settings.privacy.description': 'Управляйте использованием и доступом к вашим данным',
-            'settings.privacy.profile': 'Приватность профиля',
-            'settings.privacy.public_profile': 'Сделать профиль публичным',
-            'settings.privacy.public_profile_description': 'Разрешить всем просматривать ваш профиль и работы',
-            'settings.privacy.searchable': 'Профиль в поиске',
-            'settings.privacy.searchable_description': 'Разрешить вашему профилю появляться в результатах поиска',
-            'settings.privacy.share_activity': 'Делиться активностью',
-            'settings.privacy.share_activity_description': 'Показывать вашу активность (лайки, комментарии) подписчикам',
-            'settings.privacy.content': 'Общий доступ к контенту',
-            'settings.privacy.auto_public': 'Автоматически делать мои работы публичными',
-            'settings.privacy.auto_public_description': 'Новые генерации будут видны сообществу',
-            'settings.privacy.show_prompts': 'Делиться моими промптами с сообществом',
-            'settings.privacy.show_prompts_description': 'Разрешить другим видеть промпты, использованные для ваших публичных работ',
-            'settings.privacy.allow_remix': 'Разрешить другим переделывать мои работы',
-            'settings.privacy.allow_remix_description': 'Позволить участникам сообщества использовать ваши изображения в качестве референса для своих работ',
-            'settings.privacy.data': 'Приватность данных',
-            'settings.privacy.anon_analytics': 'Разрешить анонимную аналитику',
-            'settings.privacy.anon_analytics_description': 'Помогите нам улучшить сервис, поделившись анонимными данными об использовании',
-            'settings.privacy.model_training': 'Разрешить вклад в обучение моделей',
-            'settings.privacy.model_training_description': 'Ваши работы могут быть использованы для улучшения ИИ-моделей',
-            'settings.privacy.personalization': 'Персонализированный опыт',
-            'settings.privacy.personalization_description': 'Использовать вашу активность для настройки вашего опыта',
-            'settings.privacy.save': 'Сохранить настройки приватности',
-            'settings.privacy.data_management': 'Управление данными',
-            'settings.privacy.data_export': 'Экспорт данных',
-            'settings.privacy.data_export_description': 'Скачайте копию ваших данных, включая информацию профиля, работы и активность аккаунта',
-            'settings.privacy.request_export': 'Запросить экспорт данных',
-            'settings.privacy.data_removal': 'Удаление данных',
-            'settings.privacy.data_removal_description': 'Если вы хотите, чтобы мы удалили определенный контент или типы данных вместо всего аккаунта, вы можете запросить целевое удаление данных',
-            'settings.privacy.request_removal': 'Запросить удаление данных',
-
-            // API Tab
-            'settings.api.title': 'Доступ к API',
-            'settings.api.description': 'Управляйте вашими API-ключами и использованием для программного доступа',
-            'settings.api.keys': 'Ваши API-ключи',
-            'settings.api.production_key': 'Рабочий ключ',
-            'settings.api.development_key': 'Ключ разработки',
-            'settings.api.created': 'Создан',
-            'settings.api.active': 'Активен',
-            'settings.api.generate': 'Сгенерировать новый API-ключ',
-            'settings.api.usage': 'Использование API',
-            'settings.api.documentation': 'Просмотреть документацию',
-            'settings.api.monthly_limit': 'Месячный лимит',
-            'settings.api.used_month': 'Использовано в этом месяце',
-            'settings.api.usage_cycle': 'Ваше использование API сбрасывается 1-го числа каждого месяца. Текущий цикл оплаты:',
-            'settings.api.domains': 'Разрешенные домены',
-            'settings.api.domains_description': 'Ограничьте использование ваших API-ключей определенными доменами для повышения безопасности',
-            'settings.api.add_domain': 'Добавить',
-            'settings.api.webhooks': 'Вебхуки',
-            'settings.api.webhooks_description': 'Настройте конечные точки вебхуков для получения событий в реальном времени',
-            'settings.api.endpoints': 'Конечные точки вебхуков',
-            'settings.api.add_endpoint': 'Добавить конечную точку',
-            'settings.api.endpoint_active': 'Активна',
-            'settings.api.generation_completed': 'Генерация завершена',
-            'settings.api.events_description': 'Получает события при завершении генерации изображений',
-            'settings.api.edit': 'Редактировать',
-            'settings.api.test': 'Тест',
-            'settings.api.delete': 'Удалить',
-            'settings.api.enabled': 'Доступ к API включен',
-            'settings.api.save': 'Сохранить настройки API',
-
-            // Sign Out
-            'settings.sign_out': 'Выйти'
+            'community.title': 'Сообщество',
+            'community.subtitle': 'Исследуйте работы сообщества VisioMera',
+            'community.upload': 'Загрузить работу',
+            'community.upload_mobile': 'Загрузить вашу работу',
+            'community.category': 'Категория',
+            'community.search': 'Поиск работ...',
+            'community.featured_competitions': 'Популярные конкурсы',
+            'community.view_all': 'Показать все',
+            'community.prize': 'Приз:',
+            'community.entries': 'работ',
+            'community.days_left': 'дней осталось',
+            'community.hours_left': 'часов осталось',
+            'community.enter_competition': 'Участвовать в конкурсе',
+            'community.gallery': 'Галерея сообщества',
+            'community.sort_by': 'Сортировать по',
+            'community.trending': 'Популярное',
+            'community.newest': 'Новое',
+            'community.collaborations': 'Совместные проекты',
+            'community.tutorials': 'Уроки',
+            'community.members': 'участников',
+            'community.active_project': 'Активный проект',
+            'community.view_project': 'Посмотреть проект',
+            'community.duration': 'мин',
+            'community.level': 'Уровень',
+            'community.views': 'просмотров',
+            'community.watch_tutorial': 'Смотреть урок',
+            'community.load_more': 'Загрузить ещё',
+            'community.loading': 'Загрузка...',
+            'community.no_results': 'Результаты не найдены',
+            'community.try_adjusting': 'Попробуйте изменить поисковый запрос или фильтры для поиска нужного контента.',
+            'community.reset_filters': 'Сбросить фильтры',
+            'community.trending_tags': 'Популярные теги',
+            'community.tips_title': 'Советы по созданию ИИ-арта',
+            'community.tips_text': 'Хотите улучшить свои генерации? Попробуйте использовать детальные описания, указывайте условия освещения и включайте стилистические ориентиры в ваши промпты.',
+            'community.view_guides': 'Смотреть руководства',
+            'community.filter_options': 'Параметры фильтра',
+            'community.model_type': 'Тип модели',
+            'community.select_model': 'Выберите модель',
+            'community.time_range': 'Временной диапазон',
+            'community.select_time': 'Выберите период',
+            'community.featured_only': 'Только избранное',
+            'community.by': 'Автор',
+            'community.just_now': 'Только что',
+            'community.hour_ago': 'час назад',
+            'community.hours_ago': 'часов назад',
+            'community.day_ago': 'день назад',
+            'community.days_ago': 'дней назад'
         }
     };
 
     const { localT } = useLocalTranslation(pageTranslations);
 
+    const categories = [
+        { id: "all", label: "All" },
+        { id: "portraits", label: "Portraits" },
+        { id: "landscapes", label: "Landscapes" },
+        { id: "fantasy", label: "Fantasy" },
+        { id: "scifi", label: "Sci-Fi" },
+        { id: "abstract", label: "Abstract" },
+        { id: "photorealistic", label: "Photorealistic" },
+        { id: "anime", label: "Anime" },
+        { id: "digital", label: "Digital Art" }
+    ];
+
+    const filters = {
+        modelType: [
+            { id: "all", label: "All Models" },
+            { id: "flux", label: "Flux" },
+            { id: "sd", label: "Stable Diffusion" },
+            { id: "dalle", label: "DALL-E" },
+            { id: "midjourney", label: "Midjourney" }
+        ],
+        timeRange: [
+            { id: "all", label: "All Time" },
+            { id: "today", label: "Today" },
+            { id: "week", label: "This Week" },
+            { id: "month", label: "This Month" }
+        ]
+    };
+
+    const samplePrompts = [
+        "A beautiful sunset over mountains with a calm lake reflection",
+        "Portrait of a young woman with blue eyes and flowing hair, photorealistic",
+        "Fantasy landscape with floating islands and waterfalls, magical atmosphere",
+        "Futuristic cityscape at night with neon lights and flying vehicles",
+        "Abstract geometric patterns with vibrant colors, digital art style",
+        "A serene Japanese garden with cherry blossoms and a small pond",
+        "Medieval castle on a hill surrounded by autumn forest, cinematic lighting",
+        "Underwater scene with colorful coral reef and tropical fish",
+        "Cyberpunk character with neon implants in a rainy street scene",
+        "Elegant still life with fruits and flowers in Renaissance style"
+    ];
+
+    const generateGalleryData = (count: number) => {
+        return Array.from({ length: count }).map((_, i) => ({
+            id: `art-${i}`,
+            title: `Artwork ${i + 1}`,
+            description: samplePrompts[i % samplePrompts.length],
+            image: `/placeholder.svg?height=600&width=600&text=Artwork+${i + 1}`,
+            author: {
+                name: `Creator ${i % 10 + 1}`,
+                avatar: `/placeholder.svg?height=40&width=40&text=C${i % 10 + 1}`
+            },
+            stats: {
+                likes: Math.floor(Math.random() * 500),
+                comments: Math.floor(Math.random() * 50),
+                views: Math.floor(Math.random() * 2000) + 100
+            },
+            tags: [
+                categories[Math.floor(Math.random() * categories.length)].id,
+                categories[Math.floor(Math.random() * categories.length)].id
+            ].filter((v, i, a) => a.indexOf(v) === i),
+            timestamp: new Date(Date.now() - Math.floor(Math.random() * 7 * 24 * 60 * 60 * 1000)).toISOString(),
+            featured: Math.random() > 0.8,
+            prompt: samplePrompts[i % samplePrompts.length]
+        }));
+    };
+
+    const [galleryItems, setGalleryItems] = useState(generateGalleryData(24));
+
+    const competitions = [
+        {
+            title: "Futuristic Utopias",
+            image: "/placeholder.svg?height=300&width=500&text=Futuristic+Utopias",
+            deadline: "3 days left",
+            entries: 128,
+            prize: "$500",
+            description: "Envision a future where technology and nature coexist harmoniously. Create stunning images of utopian cities with sustainable architecture and thriving ecosystems."
+        },
+        {
+            title: "Mythical Creatures",
+            image: "/placeholder.svg?height=300&width=500&text=Mythical+Creatures",
+            deadline: "1 week left",
+            entries: 87,
+            prize: "$300",
+            description: "Bring legendary creatures to life with your imagination. Dragons, phoenixes, unicorns, or invent your own mythical beings with detailed characteristics."
+        },
+        {
+            title: "Abstract Emotions",
+            image: "/placeholder.svg?height=300&width=500&text=Abstract+Emotions",
+            deadline: "2 days left",
+            entries: 156,
+            prize: "$400",
+            description: "Express complex emotions through abstract art. Create images that capture feelings like joy, melancholy, hope, or anxiety using colors, shapes, and compositions."
+        }
+    ];
+
+    const collaborations = [
+        {
+            title: "Evolving Cityscapes",
+            image: "/placeholder.svg?height=400&width=500&text=Evolving+Cityscapes",
+            members: 8,
+            description: "A collective project exploring how cities might evolve over the next century, combining architectural vision with environmental adaptation."
+        },
+        {
+            title: "Folklore Reimagined",
+            image: "/placeholder.svg?height=400&width=500&text=Folklore+Reimagined",
+            members: 12,
+            description: "Artists from different cultures collaborate to give traditional folklore tales a modern visual interpretation."
+        },
+        {
+            title: "Mind's Eye",
+            image: "/placeholder.svg?height=400&width=500&text=Mind's+Eye",
+            members: 6,
+            description: "An exploration of consciousness and perception through surrealist imagery and dreamscapes."
+        }
+    ];
+
+    const tutorials = [
+        {
+            title: "Mastering Prompt Engineering",
+            image: "/placeholder.svg?height=300&width=500&text=Prompt+Engineering",
+            duration: "25 min",
+            level: "Intermediate",
+            author: "Prompt Expert",
+            views: 1567
+        },
+        {
+            title: "Advanced LoRA Techniques",
+            image: "/placeholder.svg?height=300&width=500&text=LoRA+Techniques",
+            duration: "40 min",
+            level: "Advanced",
+            author: "AI Artist Pro",
+            views: 982
+        },
+        {
+            title: "Color Theory for AI Art",
+            image: "/placeholder.svg?height=300&width=500&text=Color+Theory",
+            duration: "30 min",
+            level: "All Levels",
+            author: "Creative Guide",
+            views: 2431
+        }
+    ];
+
+    useEffect(() => {
+        setAnimateItems(true);
+    }, []);
+
+    useEffect(() => {
+        if (page > 1) {
+            setLoading(true);
+            setTimeout(() => {
+                setGalleryItems(prev => [...prev, ...generateGalleryData(12)]);
+                setLoading(false);
+            }, 1000);
+        }
+    }, [page]);
+
+    const getFilteredItems = () => {
+        let filtered = [...galleryItems];
+        if (activeCategory !== "all") {
+            filtered = filtered.filter(item => item.tags.includes(activeCategory));
+        }
+        if (searchQuery) {
+            const query = searchQuery.toLowerCase();
+            filtered = filtered.filter(
+                item =>
+                    item.title.toLowerCase().includes(query) ||
+                    item.description.toLowerCase().includes(query) ||
+                    item.author.name.toLowerCase().includes(query)
+            );
+        }
+        if (sortBy === "trending") {
+            filtered.sort((a, b) => b.stats.likes - a.stats.likes);
+        } else if (sortBy === "newest") {
+            filtered.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+        } else if (sortBy === "top") {
+            filtered.sort((a, b) => (b.stats.likes * 2 + b.stats.comments) - (a.stats.likes * 2 + a.stats.comments));
+        }
+        return filtered;
+    };
+
+    const filteredItems = getFilteredItems();
+
+    const formatTimestamp = (timestamp: string) => {
+        const date = new Date(timestamp);
+        const now = new Date();
+        const diffMs = now.getTime() - date.getTime();
+        const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+        const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+
+        if (diffDays > 0) {
+            return `${diffDays} ${diffDays === 1 ? localT('community.day_ago') : localT('community.days_ago')}`;
+        } else if (diffHours > 0) {
+            return `${diffHours} ${diffHours === 1 ? localT('community.hour_ago') : localT('community.hours_ago')}`;
+        } else {
+            return localT('community.just_now');
+        }
+    };
+
+    const handleViewItem = (index: number) => {
+        setSelectedImageIndex(index);
+        setPreviewOpen(true);
+    };
+
+    const handleLoadMore = () => {
+        setPage(prev => prev + 1);
+    };
+
     return (
         <div className="container relative mx-auto py-8">
-            <ParticlesBackground />
-
+            <EnhancedParticlesBackground variant="waves" />
             <div className="mb-8 space-y-4">
-                <h1 className="text-3xl font-bold">{localT('settings.title')}</h1>
-                <p className="text-muted-foreground">{localT('settings.description')}</p>
+                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                    <div>
+                        <h1 className="text-3xl font-bold">{localT('community.title')}</h1>
+                        <p className="text-muted-foreground">{localT('community.subtitle')}</p>
+                    </div>
+                    <div className="flex flex-wrap items-center gap-2">
+                        <Select value={activeCategory} onValueChange={setActiveCategory}>
+                            <SelectTrigger className="w-[150px]">
+                                <SelectValue placeholder={localT('community.category')} />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {categories.map(category => (
+                                    <SelectItem key={category.id} value={category.id}>
+                                        {category.label}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                        <div className="relative">
+                            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                            <Input
+                                placeholder={localT('community.search')}
+                                className="pl-8 w-[200px]"
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                            />
+                        </div>
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <Button variant="outline" size="icon">
+                                    <SlidersHorizontal className="h-4 w-4" />
+                                </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end" className="w-56">
+                                <DropdownMenuLabel>{localT('community.filter_options')}</DropdownMenuLabel>
+                                <DropdownMenuSeparator />
+                                <div className="px-2 py-1.5">
+                                    <p className="mb-1 text-xs font-medium">{localT('community.model_type')}</p>
+                                    <Select defaultValue="all">
+                                        <SelectTrigger className="h-8 text-xs">
+                                            <SelectValue placeholder={localT('community.select_model')} />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            {filters.modelType.map(model => (
+                                                <SelectItem key={model.id} value={model.id}>
+                                                    {model.label}
+                                                </SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                                <div className="px-2 py-1.5">
+                                    <p className="mb-1 text-xs font-medium">{localT('community.time_range')}</p>
+                                    <Select defaultValue="all">
+                                        <SelectTrigger className="h-8 text-xs">
+                                            <SelectValue placeholder={localT('community.select_time')} />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            {filters.timeRange.map(time => (
+                                                <SelectItem key={time.id} value={time.id}>
+                                                    {time.label}
+                                                </SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                                <div className="px-2 py-1.5">
+                                    <div className="flex items-center justify-between">
+                                        <Label htmlFor="featured-only" className="text-xs">{localT('community.featured_only')}</Label>
+                                        <Switch id="featured-only" />
+                                    </div>
+                                </div>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
+                        <div className="flex border rounded-md overflow-hidden">
+                            <Button
+                                variant={viewMode === "grid" ? "secondary" : "ghost"}
+                                size="icon"
+                                className="h-9 w-9 rounded-none"
+                                onClick={() => setViewMode("grid")}
+                            >
+                                <Grid className="h-4 w-4" />
+                            </Button>
+                            <Button
+                                variant={viewMode === "rows" ? "secondary" : "ghost"}
+                                size="icon"
+                                className="h-9 w-9 rounded-none"
+                                onClick={() => setViewMode("rows")}
+                            >
+                                <Rows className="h-4 w-4" />
+                            </Button>
+                        </div>
+                        <SparkleButton className="hidden md:flex">
+                            {localT('community.upload')}
+                        </SparkleButton>
+                    </div>
+                </div>
+                <div className="md:hidden">
+                    <SparkleButton className="w-full">
+                        {localT('community.upload_mobile')}
+                    </SparkleButton>
+                </div>
             </div>
-
-            <Tabs defaultValue="account" className="space-y-8">
-                <TabsList className="grid w-full grid-cols-2 md:grid-cols-6 gap-2">
-                    <TabsTrigger value="account" className="flex gap-2 items-center">
-                        <User className="h-4 w-4" />
-                        <span className="hidden md:inline">{localT('settings.tab.account')}</span>
-                    </TabsTrigger>
-                    <TabsTrigger value="appearance" className="flex gap-2 items-center">
-                        <Brush className="h-4 w-4" />
-                        <span className="hidden md:inline">{localT('settings.tab.appearance')}</span>
-                    </TabsTrigger>
-                    <TabsTrigger value="notifications" className="flex gap-2 items-center">
-                        <Bell className="h-4 w-4" />
-                        <span className="hidden md:inline">{localT('settings.tab.notifications')}</span>
-                    </TabsTrigger>
-                    <TabsTrigger value="subscription" className="flex gap-2 items-center">
-                        <CreditCard className="h-4 w-4" />
-                        <span className="hidden md:inline">{localT('settings.tab.subscription')}</span>
-                    </TabsTrigger>
-                    <TabsTrigger value="privacy" className="flex gap-2 items-center">
-                        <Shield className="h-4 w-4" />
-                        <span className="hidden md:inline">{localT('settings.tab.privacy')}</span>
-                    </TabsTrigger>
-                    <TabsTrigger value="api" className="flex gap-2 items-center">
-                        <Webhook className="h-4 w-4" />
-                        <span className="hidden md:inline">{localT('settings.tab.api')}</span>
-                    </TabsTrigger>
-                </TabsList>
-
-                <TabsContent value="account" className="space-y-6">
-                    <Card>
-                        <CardHeader>
-                            <CardTitle>{localT('settings.profile.title')}</CardTitle>
-                            <CardDescription>
-                                {localT('settings.profile.description')}
-                            </CardDescription>
-                        </CardHeader>
-                        <CardContent className="space-y-6">
-                            <div className="flex flex-col md:flex-row gap-6">
-                                <div className="flex flex-col items-center space-y-4">
-                                    <Avatar className="h-24 w-24">
-                                        <AvatarImage src="/placeholder.svg?height=96&width=96&text=UN" alt="User" />
-                                        <AvatarFallback>UN</AvatarFallback>
-                                    </Avatar>
-                                    <Button variant="outline" size="sm">{localT('settings.profile.change_avatar')}</Button>
-                                </div>
-
-                                <div className="flex-1 space-y-4">
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                        <div className="space-y-2">
-                                            <Label htmlFor="name">{localT('settings.profile.display_name')}</Label>
-                                            <Input
-                                                id="name"
-                                                value={profileData.name}
-                                                onChange={(e) => setProfileData({...profileData, name: e.target.value})}
-                                                disabled={!editMode}
-                                            />
-                                        </div>
-                                        <div className="space-y-2">
-                                            <Label htmlFor="username">{localT('settings.profile.username')}</Label>
-                                            <Input id="username" value="@username" disabled />
-                                        </div>
-                                    </div>
-
-                                    <div className="space-y-2">
-                                        <Label htmlFor="email">{localT('settings.profile.email')}</Label>
-                                        <Input
-                                            id="email"
-                                            type="email"
-                                            value={profileData.email}
-                                            onChange={(e) => setProfileData({...profileData, email: e.target.value})}
-                                            disabled={!editMode}
-                                        />
-                                    </div>
-
-                                    <div className="space-y-2">
-                                        <Label htmlFor="bio">{localT('settings.profile.bio')}</Label>
-                                        <Textarea
-                                            id="bio"
-                                            value={profileData.bio}
-                                            onChange={(e) => setProfileData({...profileData, bio: e.target.value})}
-                                            disabled={!editMode}
-                                            className="min-h-[100px]"
-                                        />
+            <div className="mb-12">
+                <div className="mb-4 flex items-center justify-between">
+                    <h2 className="text-2xl font-bold">{localT('community.featured_competitions')}</h2>
+                    <Button variant="ghost" size="sm">
+                        {localT('community.view_all')}
+                        <ChevronDown className="ml-1 h-4 w-4" />
+                    </Button>
+                </div>
+                <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+                    {competitions.map((competition, index) => (
+                        <AnimatedCard
+                            key={index}
+                            className="group overflow-hidden border-muted/50 hover:border-primary/30"
+                        >
+                            <div className="relative aspect-video">
+                                <img
+                                    src={competition.image}
+                                    alt={competition.title}
+                                    className="h-full w-full object-cover transition-transform group-hover:scale-105"
+                                />
+                                <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent" />
+                                <div className="absolute bottom-0 left-0 p-4">
+                                    <h3 className="text-lg font-bold text-white">{competition.title}</h3>
+                                    <p className="text-sm text-white/80">{localT('community.prize')} {competition.prize}</p>
+                                    <div className="mt-2 flex flex-wrap items-center gap-2">
+                                        <AnimatedBadge
+                                            className="bg-black/50 text-white"
+                                            animation="pulse"
+                                        >
+                                            <Clock className="mr-1 h-3 w-3" />
+                                            {competition.deadline}
+                                        </AnimatedBadge>
+                                        <Badge variant="secondary" className="bg-black/50 text-white">
+                                            <Trophy className="mr-1 h-3 w-3" />
+                                            {competition.entries} {localT('community.entries')}
+                                        </Badge>
                                     </div>
                                 </div>
                             </div>
-                        </CardContent>
-                        <CardFooter className="flex justify-between">
-                            <Button variant="outline" onClick={() => setEditMode(!editMode)}>
-                                {editMode ? localT('settings.profile.cancel') : localT('settings.profile.edit')}
-                            </Button>
-                            {editMode && (
-                                <Button>
-                                    <Save className="mr-2 h-4 w-4" />
-                                    {localT('settings.profile.save')}
-                                </Button>
-                            )}
-                        </CardFooter>
-                    </Card>
-
-                    <Card>
-                        <CardHeader>
-                            <CardTitle>{localT('settings.security.title')}</CardTitle>
-                            <CardDescription>
-                                {localT('settings.security.description')}
-                            </CardDescription>
-                        </CardHeader>
-                        <CardContent className="space-y-4">
-                            <div className="space-y-2">
-                                <Label htmlFor="current-password">{localT('settings.security.current_password')}</Label>
-                                <Input id="current-password" type="password" placeholder="••••••••" />
-                            </div>
-
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div className="space-y-2">
-                                    <Label htmlFor="new-password">{localT('settings.security.new_password')}</Label>
-                                    <Input id="new-password" type="password" placeholder="••••••••" />
-                                </div>
-                                <div className="space-y-2">
-                                    <Label htmlFor="confirm-password">{localT('settings.security.confirm_password')}</Label>
-                                    <Input id="confirm-password" type="password" placeholder="••••••••" />
-                                </div>
-                            </div>
-
-                            <div className="pt-4">
-                                <h3 className="text-sm font-medium mb-3">{localT('settings.security.2fa')}</h3>
-                                <div className="flex items-center justify-between rounded-lg border p-4">
-                                    <div className="space-y-0.5">
-                                        <div className="flex items-center">
-                                            <h4 className="font-medium">{localT('settings.security.2fa_app')}</h4>
-                                            <Badge variant="outline" className="ml-2">{localT('settings.security.recommended')}</Badge>
-                                        </div>
-                                        <p className="text-sm text-muted-foreground">
-                                            {localT('settings.security.2fa_description')}
-                                        </p>
-                                    </div>
-                                    <Button variant="outline">{localT('settings.security.enable')}</Button>
-                                </div>
-                            </div>
-                        </CardContent>
-                        <CardFooter>
-                            <Button>
-                                <Lock className="mr-2 h-4 w-4" />
-                                {localT('settings.security.update')}
-                            </Button>
-                        </CardFooter>
-                    </Card>
-
-                    <Card className="border-destructive/50">
-                        <CardHeader>
-                            <CardTitle className="text-destructive">{localT('settings.danger.title')}</CardTitle>
-                            <CardDescription>
-                                {localT('settings.danger.description')}
-                            </CardDescription>
-                        </CardHeader>
-                        <CardContent className="space-y-4">
-                            <div className="rounded-lg border border-destructive/30 p-4">
-                                <h3 className="font-medium text-destructive mb-1">{localT('settings.danger.delete_account')}</h3>
-                                <p className="text-sm text-muted-foreground mb-4">
-                                    {localT('settings.danger.delete_warning')}
+                            <CardContent className="p-4">
+                                <p className="text-sm text-muted-foreground line-clamp-2">
+                                    {competition.description}
                                 </p>
-                                <Button variant="destructive">{localT('settings.danger.delete_account')}</Button>
-                            </div>
-                        </CardContent>
-                    </Card>
-                </TabsContent>
-
-                <TabsContent value="appearance" className="space-y-6">
-                    <Card>
-                        <CardHeader>
-                            <CardTitle>{localT('settings.appearance.title')}</CardTitle>
-                            <CardDescription>
-                                {localT('settings.appearance.description')}
-                            </CardDescription>
-                        </CardHeader>
-                        <CardContent className="space-y-6">
-                            <div className="space-y-4">
-                                <h3 className="text-sm font-medium">{localT('settings.appearance.color_theme')}</h3>
-                                <RadioGroup defaultValue="system" className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                    <div>
-                                        <RadioGroupItem value="light" id="light" className="peer sr-only" />
-                                        <Label
-                                            htmlFor="light"
-                                            className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary"
-                                        >
-                                            <Sparkles className="mb-3 h-6 w-6" />
-                                            <div className="font-medium">{localT('settings.appearance.light')}</div>
-                                        </Label>
-                                    </div>
-                                    <div>
-                                        <RadioGroupItem value="dark" id="dark" className="peer sr-only" />
-                                        <Label
-                                            htmlFor="dark"
-                                            className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary"
-                                        >
-                                            <Sparkles className="mb-3 h-6 w-6" />
-                                            <div className="font-medium">{localT('settings.appearance.dark')}</div>
-                                        </Label>
-                                    </div>
-                                    <div>
-                                        <RadioGroupItem value="system" id="system" className="peer sr-only" />
-                                        <Label
-                                            htmlFor="system"
-                                            className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary"
-                                        >
-                                            <Sparkles className="mb-3 h-6 w-6" />
-                                            <div className="font-medium">{localT('settings.appearance.system')}</div>
-                                        </Label>
-                                    </div>
-                                </RadioGroup>
-                            </div>
-
-                            <Separator />
-
-                            <div className="space-y-4">
-                                <h3 className="text-sm font-medium">{localT('settings.appearance.ui_density')}</h3>
-                                <RadioGroup defaultValue="comfortable" className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                    <div>
-                                        <RadioGroupItem value="compact" id="compact" className="peer sr-only" />
-                                        <Label
-                                            htmlFor="compact"
-                                            className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary"
-                                        >
-                                            <Layout className="mb-3 h-6 w-6" />
-                                            <div className="font-medium">{localT('settings.appearance.compact')}</div>
-                                        </Label>
-                                    </div>
-                                    <div>
-                                        <RadioGroupItem value="comfortable" id="comfortable" className="peer sr-only" />
-                                        <Label
-                                            htmlFor="comfortable"
-                                            className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary"
-                                        >
-                                            <Layout className="mb-3 h-6 w-6" />
-                                            <div className="font-medium">{localT('settings.appearance.comfortable')}</div>
-                                        </Label>
-                                    </div>
-                                    <div>
-                                        <RadioGroupItem value="spacious" id="spacious" className="peer sr-only" />
-                                        <Label
-                                            htmlFor="spacious"
-                                            className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary"
-                                        >
-                                            <Layout className="mb-3 h-6 w-6" />
-                                            <div className="font-medium">{localT('settings.appearance.spacious')}</div>
-                                        </Label>
-                                    </div>
-                                </RadioGroup>
-                            </div>
-
-                            <Separator />
-
-                            <div className="space-y-4">
-                                <h3 className="text-sm font-medium">{localT('settings.appearance.effects')}</h3>
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <div className="flex items-center space-x-2">
-                                        <Switch id="particles" defaultChecked />
-                                        <Label htmlFor="particles">{localT('settings.appearance.particles')}</Label>
-                                    </div>
-                                    <div className="flex items-center space-x-2">
-                                        <Switch id="transitions" defaultChecked />
-                                        <Label htmlFor="transitions">{localT('settings.appearance.transitions')}</Label>
-                                    </div>
-                                    <div className="flex items-center space-x-2">
-                                        <Switch id="reduced-motion" />
-                                        <Label htmlFor="reduced-motion">{localT('settings.appearance.reduced_motion')}</Label>
-                                    </div>
-                                    <div className="flex items-center space-x-2">
-                                        <Switch id="haptic" />
-                                        <Label htmlFor="haptic">{localT('settings.appearance.haptic')}</Label>
-                                    </div>
-                                </div>
-                            </div>
-                        </CardContent>
-                        <CardFooter>
-                            <Button>
-                                <Save className="mr-2 h-4 w-4" />
-                                {localT('settings.appearance.save')}
-                            </Button>
-                        </CardFooter>
-                    </Card>
-
-                    <Card>
-                        <CardHeader>
-                            <CardTitle>{localT('settings.appearance.customization')}</CardTitle>
-                            <CardDescription>
-                                {localT('settings.appearance.customization_description')}
-                            </CardDescription>
-                        </CardHeader>
-                        <CardContent className="space-y-6">
-                            <div className="space-y-4">
-                                <h3 className="text-sm font-medium">{localT('settings.appearance.default_view')}</h3>
-                                <RadioGroup defaultValue="standard" className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <div>
-                                        <RadioGroupItem value="standard" id="standard-view" className="peer sr-only" />
-                                        <Label
-                                            htmlFor="standard-view"
-                                            className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary"
-                                        >
-                                            <Sparkles className="mb-3 h-6 w-6" />
-                                            <div className="font-medium">{localT('settings.appearance.standard')}</div>
-                                            <p className="text-sm text-muted-foreground text-center mt-2">
-                                                {localT('settings.appearance.standard_description')}
-                                            </p>
-                                        </Label>
-                                    </div>
-                                    <div>
-                                        <RadioGroupItem value="advanced" id="advanced-view" className="peer sr-only" />
-                                        <Label
-                                            htmlFor="advanced-view"
-                                            className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary"
-                                        >
-                                            <SettingsIcon className="mb-3 h-6 w-6" />
-                                            <div className="font-medium">{localT('settings.appearance.advanced')}</div>
-                                            <p className="text-sm text-muted-foreground text-center mt-2">
-                                                {localT('settings.appearance.advanced_description')}
-                                            </p>
-                                        </Label>
-                                    </div>
-                                </RadioGroup>
-                            </div>
-
-                            <Separator />
-
-                            <div className="space-y-4">
-                                <h3 className="text-sm font-medium">{localT('settings.appearance.gallery')}</h3>
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <div className="flex items-center space-x-2">
-                                        <Switch id="auto-grid" defaultChecked />
-                                        <Label htmlFor="auto-grid">{localT('settings.appearance.gallery_grid')}</Label>
-                                    </div>
-                                    <div className="flex items-center space-x-2">
-                                        <Switch id="image-info" defaultChecked />
-                                        <Label htmlFor="image-info">{localT('settings.appearance.gallery_info')}</Label>
-                                    </div>
-                                    <div className="flex items-center space-x-2">
-                                        <Switch id="auto-save" />
-                                        <Label htmlFor="auto-save">{localT('settings.appearance.gallery_autosave')}</Label>
-                                    </div>
-                                    <div className="flex items-center space-x-2">
-                                        <Switch id="show-prompt" defaultChecked />
-                                        <Label htmlFor="show-prompt">{localT('settings.appearance.gallery_prompt')}</Label>
-                                    </div>
-                                </div>
-                            </div>
-                        </CardContent>
-                    </Card>
-                </TabsContent>
-
-                <TabsContent value="notifications" className="space-y-6">
-                    <Card>
-                        <CardHeader>
-                            <CardTitle>{localT('settings.notifications.title')}</CardTitle>
-                            <CardDescription>
-                                {localT('settings.notifications.description')}
-                            </CardDescription>
-                        </CardHeader>
-                        <CardContent className="space-y-6">
-                            <div className="space-y-4">
-                                <h3 className="text-sm font-medium">{localT('settings.notifications.email')}</h3>
-                                <div className="space-y-2">
-                                    {[
-                                        { id: "email-account", label: localT('settings.notifications.email_account') },
-                                        { id: "email-comments", label: localT('settings.notifications.email_comments') },
-                                        { id: "email-likes", label: localT('settings.notifications.email_likes') },
-                                        { id: "email-features", label: localT('settings.notifications.email_features') },
-                                        { id: "email-tips", label: localT('settings.notifications.email_tips') },
-                                    ].map((item) => (
-                                        <div key={item.id} className="flex items-center space-x-2">
-                                            <Checkbox id={item.id} defaultChecked={item.id === "email-account"} />
-                                            <Label htmlFor={item.id} className="text-sm">{item.label}</Label>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-
-                            <Separator />
-
-                            <div className="space-y-4">
-                                <h3 className="text-sm font-medium">{localT('settings.notifications.in_app')}</h3>
-                                <div className="space-y-2">
-                                    {[
-                                        { id: "in-app-comments", label: localT('settings.notifications.in_app_comments'), defaultChecked: true },
-                                        { id: "in-app-likes", label: localT('settings.notifications.in_app_likes'), defaultChecked: true },
-                                        { id: "in-app-follows", label: localT('settings.notifications.in_app_follows'), defaultChecked: true },
-                                        { id: "in-app-mentions", label: localT('settings.notifications.in_app_mentions'), defaultChecked: true },
-                                        { id: "in-app-competitions", label: localT('settings.notifications.in_app_competitions'), defaultChecked: true },
-                                        { id: "in-app-generation", label: localT('settings.notifications.in_app_generation'), defaultChecked: true },
-                                    ].map((item) => (
-                                        <div key={item.id} className="flex items-center space-x-2">
-                                            <Switch id={item.id} defaultChecked={item.defaultChecked} />
-                                            <Label htmlFor={item.id} className="text-sm">{item.label}</Label>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-
-                            <Separator />
-
-                            <div className="space-y-4">
-                                <h3 className="text-sm font-medium">{localT('settings.notifications.schedule')}</h3>
-                                <div className="space-y-2">
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                        <div className="space-y-2">
-                                            <Label htmlFor="quiet-from">{localT('settings.notifications.quiet_from')}</Label>
-                                            <Select defaultValue="22:00">
-                                                <SelectTrigger id="quiet-from">
-                                                    <SelectValue placeholder="Select time" />
-                                                </SelectTrigger>
-                                                <SelectContent>
-                                                    {Array.from({ length: 24 }, (_, i) => (
-                                                        <SelectItem key={i} value={`${i.toString().padStart(2, '0')}:00`}>
-                                                            {`${i.toString().padStart(2, '0')}:00`}
-                                                        </SelectItem>
-                                                    ))}
-                                                </SelectContent>
-                                            </Select>
-                                        </div>
-                                        <div className="space-y-2">
-                                            <Label htmlFor="quiet-to">{localT('settings.notifications.quiet_to')}</Label>
-                                            <Select defaultValue="07:00">
-                                                <SelectTrigger id="quiet-to">
-                                                    <SelectValue placeholder="Select time" />
-                                                </SelectTrigger>
-                                                <SelectContent>
-                                                    {Array.from({ length: 24 }, (_, i) => (
-                                                        <SelectItem key={i} value={`${i.toString().padStart(2, '0')}:00`}>
-                                                            {`${i.toString().padStart(2, '0')}:00`}
-                                                        </SelectItem>
-                                                    ))}
-                                                </SelectContent>
-                                            </Select>
-                                        </div>
-                                    </div>
-                                    <div className="flex items-center space-x-2 pt-2">
-                                        <Switch id="weekend-pause" />
-                                        <Label htmlFor="weekend-pause">{localT('settings.notifications.weekend_pause')}</Label>
-                                    </div>
-                                </div>
-                            </div>
-                        </CardContent>
-                        <CardFooter>
-                            <Button>
-                                <Save className="mr-2 h-4 w-4" />
-                                {localT('settings.notifications.save')}
-                            </Button>
-                        </CardFooter>
-                    </Card>
-                </TabsContent>
-
-                <TabsContent value="subscription" className="space-y-6">
-                    <Card>
-                        <CardHeader>
-                            <CardTitle>{localT('settings.subscription.title')}</CardTitle>
-                            <CardDescription>
-                                {localT('settings.subscription.description')}
-                            </CardDescription>
-                        </CardHeader>
-                        <CardContent className="space-y-6">
-                            <div className="rounded-lg border p-6 text-center space-y-4">
-                                <Badge variant="secondary" className="px-3 py-1 text-base">{localT('settings.subscription.pro_plan')}</Badge>
-                                <h2 className="text-3xl font-bold">$12.99 <span className="text-muted-foreground text-base font-normal">/{localT('settings.subscription.price')}</span></h2>
-                                <p className="text-muted-foreground">{localT('settings.subscription.next_billing')}</p>
-                                <Button variant="outline" className="mt-2">
-                                    {localT('settings.subscription.manage')}
+                            </CardContent>
+                            <CardFooter className="p-4 pt-0">
+                                <Button className="w-full group">
+                      <span className="relative">
+                        {localT('community.enter_competition')}
+                          <span className="absolute -bottom-1 left-0 h-[2px] w-0 bg-primary-foreground transition-all group-hover:w-full"></span>
+                      </span>
                                 </Button>
-                            </div>
-
-                            <div className="space-y-4">
-                                <h3 className="text-sm font-medium">{localT('settings.subscription.credits')}</h3>
-                                <div className="space-y-2">
-                                    <div className="flex items-center justify-between">
-                                        <span>{localT('settings.subscription.monthly_limit')}</span>
-                                        <span className="font-medium">{language === 'ru' ? '1000 кредитов' : '1000 credits'}</span>
-                                    </div>
-                                    <div className="flex items-center justify-between">
-                                        <span>{localT('settings.subscription.credits_used')}</span>
-                                        <span className="font-medium">{language === 'ru' ? '750 кредитов' : '750 credits'}</span>
-                                    </div>
-                                    <div className="flex items-center justify-between">
-                                        <span>{localT('settings.subscription.credits_remaining')}</span>
-                                        <span className="font-medium">{language === 'ru' ? '250 кредитов' : '250 credits'}</span>
-                                    </div>
-                                    <Progress value={75} className="h-2 mt-1" />
-                                    <div className="flex justify-end mt-2">
-                                        <TooltipProvider>
-                                            <Tooltip>
-                                                <TooltipTrigger asChild>
-                                                    <Button variant="outline" size="sm">
-                                                        <CreditCard className="mr-2 h-4 w-4" />
-                                                        {localT('settings.subscription.buy_additional')}
-                                                    </Button>
-                                                </TooltipTrigger>
-                                                <TooltipContent>
-                                                    <p>{localT('settings.subscription.buy_credits_tooltip')}</p>
-                                                </TooltipContent>
-                                            </Tooltip>
-                                        </TooltipProvider>
-                                    </div>
+                            </CardFooter>
+                        </AnimatedCard>
+                    ))}
+                </div>
+            </div>
+            <div className="mb-12">
+                <div className="mb-4 flex items-center justify-between">
+                    <h2 className="text-2xl font-bold">{localT('community.gallery')}</h2>
+                    <Select value={sortBy} onValueChange={setSortBy}>
+                        <SelectTrigger className="w-[150px]">
+                            <SelectValue placeholder={localT('community.sort_by')} />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="trending">
+                                <div className="flex items-center">
+                                    <Flame className="mr-2 h-4 w-4 text-orange-500" />
+                                    {localT('community.trending')}
                                 </div>
-                            </div>
-
-                            <Separator />
-
-                            <div className="space-y-4">
-                                <h3 className="text-sm font-medium">{localT('settings.subscription.features')}</h3>
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-y-2">
-                                    {[
-                                        { id: "credits", text: "1000 generation credits per month" },
-                                        { id: "models", text: "Access to all models" },
-                                        { id: "resolution", text: "Maximum resolution: 2048×2048" },
-                                        { id: "queue", text: "Priority generation queue" },
-                                        { id: "parameters", text: "Advanced parameters" },
-                                        { id: "license", text: "Commercial license" },
-                                        { id: "api_access", text: "API access" },
-                                        { id: "controlnet", text: "ControlNet support" },
-                                    ].map((feature, index) => (
-                                        <div key={index} className="flex items-center space-x-2">
-                                            <div className="flex h-5 w-5 items-center justify-center rounded-full bg-primary">
-                                                <svg
-                                                    xmlns="http://www.w3.org/2000/svg"
-                                                    viewBox="0 0 24 24"
-                                                    fill="none"
-                                                    stroke="currentColor"
-                                                    strokeWidth="2"
-                                                    strokeLinecap="round"
-                                                    strokeLinejoin="round"
-                                                    className="h-3 w-3 text-primary-foreground"
-                                                >
-                                                    <path d="M20 6L9 17l-5-5" />
-                                                </svg>
-                                            </div>
-                                            <span className="text-sm">{language === 'ru' ? localizeFeature(feature.id) : feature.text}</span>
-                                        </div>
-                                    ))}
+                            </SelectItem>
+                            <SelectItem value="newest">
+                                <div className="flex items-center">
+                                    <Calendar className="mr-2 h-4 w-4 text-blue-500" />
+                                    {localT('community.newest')}
                                 </div>
-                            </div>
-                        </CardContent>
-                        <CardFooter className="flex justify-between">
-                            <Button variant="outline">{localT('settings.subscription.history')}</Button>
-                            <Button variant="default">{localT('settings.subscription.upgrade')}</Button>
-                        </CardFooter>
-                    </Card>
-
-                    <Card>
-                        <CardHeader>
-                            <CardTitle>{localT('settings.subscription.available_plans')}</CardTitle>
-                            <CardDescription>
-                                {localT('settings.subscription.compare_plans')}
-                            </CardDescription>
-                        </CardHeader>
-                        <CardContent>
-                            <ScrollArea className="w-full whitespace-nowrap rounded-md border">
-                                <div className="flex w-max space-x-4 p-4">
-                                    {[
-                                        {
-                                            name: localT('settings.subscription.free'),
-                                            price: "$0",
-                                            popular: false,
-                                            features: [
-                                                "100 generation credits per month",
-                                                "Access to basic models",
-                                                "Maximum resolution: 512×512",
-                                                "Standard generation queue",
-                                                "Basic parameters",
-                                                "Personal use only",
-                                            ],
-                                        },
-                                        {
-                                            name: "Pro",
-                                            price: "$12.99",
-                                            popular: true,
-                                            features: [
-                                                "1000 generation credits per month",
-                                                "Access to all models",
-                                                "Maximum resolution: 2048×2048",
-                                                "Priority generation queue",
-                                                "Advanced parameters",
-                                                "Commercial license",
-                                                "API access",
-                                                "ControlNet support",
-                                            ],
-                                        },
-                                        {
-                                            name: localT('settings.subscription.business'),
-                                            price: "$49.99",
-                                            popular: false,
-                                            features: [
-                                                "5000 generation credits per month",
-                                                "Access to all models",
-                                                "Maximum resolution: 4096×4096",
-                                                "Highest priority queue",
-                                                "All parameters",
-                                                "Extended commercial license",
-                                                "Full API access",
-                                                "ControlNet support",
-                                                "Dedicated support",
-                                                "Team collaboration features",
-                                                "Custom model fine-tuning",
-                                            ],
-                                        },
-                                    ].map((plan) => (
-                                        <div
-                                            key={plan.name}
-                                            className="min-w-[280px] flex flex-col rounded-lg border bg-card text-card-foreground shadow-sm relative"
-                                        >
-                                            {plan.popular && (
-                                                <div className="absolute -top-3 left-0 right-0 mx-auto w-fit rounded-full bg-primary px-3 py-1 text-xs font-medium text-primary-foreground">
-                                                    {localT('settings.subscription.most_popular')}
+                            </SelectItem>
+                            <SelectItem value="top">
+                                <div className="flex items-center">
+                                    <Award className="mr-2 h-4 w-4 text-yellow-500" />
+                                    Top Rated
+                                </div>
+                            </SelectItem>
+                        </SelectContent>
+                    </Select>
+                </div>
+                <Tabs defaultValue="trending">
+                    <TabsList className="mb-6">
+                        <TabsTrigger value="trending">
+                            <Flame className="mr-2 h-4 w-4" />
+                            {localT('community.trending')}
+                        </TabsTrigger>
+                        <TabsTrigger value="newest">
+                            <Calendar className="mr-2 h-4 w-4" />
+                            {localT('community.newest')}
+                        </TabsTrigger>
+                        <TabsTrigger value="collaborations">
+                            <Users className="mr-2 h-4 w-4" />
+                            {localT('community.collaborations')}
+                        </TabsTrigger>
+                        <TabsTrigger value="tutorials">
+                            <BookOpen className="mr-2 h-4 w-4" />
+                            {localT('community.tutorials')}
+                        </TabsTrigger>
+                    </TabsList>
+                    <TabsContent value="trending" className="mt-0">
+                        {viewMode === "grid" ? (
+                            <StaggeredContainer
+                                className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4"
+                                staggerDelay={0.05}
+                            >
+                                {filteredItems.map((item, i) => (
+                                    <AnimatedCard
+                                        key={item.id}
+                                        className="overflow-hidden cursor-pointer group"
+                                        onClick={() => handleViewItem(i)}
+                                    >
+                                        <div className="aspect-square overflow-hidden">
+                                            <img
+                                                src={item.image}
+                                                alt={item.title}
+                                                className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
+                                            />
+                                            {item.featured && (
+                                                <div className="absolute top-2 right-2">
+                                                    <AnimatedBadge
+                                                        className="bg-primary text-primary-foreground"
+                                                        animation="pulse"
+                                                    >
+                                                        <Star className="mr-1 h-3 w-3" /> Featured
+                                                    </AnimatedBadge>
                                                 </div>
                                             )}
-                                            <div className="p-6 space-y-4">
-                                                <h3 className="text-xl font-bold">{plan.name}</h3>
-                                                <p className="text-3xl font-bold">
-                                                    {plan.price} <span className="text-muted-foreground text-base font-normal">/{localT('settings.subscription.price')}</span>
-                                                </p>
-                                                <div className="space-y-2">
-                                                    {plan.features.map((feature, index) => (
-                                                        <div key={index} className="flex items-center space-x-2">
-                                                            <div className="flex h-5 w-5 items-center justify-center rounded-full bg-primary/10">
-                                                                <svg
-                                                                    xmlns="http://www.w3.org/2000/svg"
-                                                                    viewBox="0 0 24 24"
-                                                                    fill="none"
-                                                                    stroke="currentColor"
-                                                                    strokeWidth="2"
-                                                                    strokeLinecap="round"
-                                                                    strokeLinejoin="round"
-                                                                    className="h-3 w-3 text-primary"
-                                                                >
-                                                                    <path d="M20 6L9 17l-5-5" />
-                                                                </svg>
-                                                            </div>
-                                                            <span className="text-sm">{language === 'ru' ? localizeSubscriptionFeature(feature) : feature}</span>
-                                                        </div>
-                                                    ))}
+                                        </div>
+                                        <CardContent className="p-3">
+                                            <div className="flex items-center justify-between">
+                                                <div className="flex items-center gap-2">
+                                                    <img
+                                                        src={item.author.avatar}
+                                                        alt={item.author.name}
+                                                        className="h-6 w-6 rounded-full border border-muted"
+                                                    />
+                                                    <span className="text-sm font-medium truncate max-w-[100px]">
+                                  {item.author.name}
+                                </span>
+                                                </div>
+                                                <div className="flex items-center gap-1 text-muted-foreground">
+                                                    <Heart className="h-4 w-4" />
+                                                    <span className="text-xs">
+                                  {item.stats.likes > 999
+                                      ? `${(item.stats.likes / 1000).toFixed(1)}K`
+                                      : item.stats.likes}
+                                </span>
                                                 </div>
                                             </div>
-                                            <div className="p-6 pt-0 mt-auto">
-                                                <Button
-                                                    variant={plan.popular ? "default" : "outline"}
-                                                    className="w-full"
-                                                >
-                                                    {plan.name === "Pro" ? localT('settings.subscription.current_plan') : `${localT('settings.subscription.upgrade_to')} ${plan.name}`}
-                                                </Button>
+                                        </CardContent>
+                                        <CardFooter className="flex justify-between p-3 pt-0">
+                                            <div className="flex gap-1 text-xs text-muted-foreground">
+                                                <Clock className="h-3.5 w-3.5" />
+                                                <span>{formatTimestamp(item.timestamp)}</span>
+                                            </div>
+                                            <div className="flex items-center gap-1">
+                                                <MessageSquare className="h-3.5 w-3.5 text-muted-foreground" />
+                                                <span className="text-xs text-muted-foreground">{item.stats.comments}</span>
+                                            </div>
+                                        </CardFooter>
+                                    </AnimatedCard>
+                                ))}
+                            </StaggeredContainer>
+                        ) : (
+                            <StaggeredContainer className="space-y-4" staggerDelay={0.08}>
+                                {filteredItems.map((item, i) => (
+                                    <AnimatedCard
+                                        key={item.id}
+                                        className="flex flex-col sm:flex-row overflow-hidden cursor-pointer hover:shadow-md group"
+                                        onClick={() => handleViewItem(i)}
+                                    >
+                                        <div className="aspect-square sm:w-60 overflow-hidden">
+                                            <img
+                                                src={item.image}
+                                                alt={item.title}
+                                                className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
+                                            />
+                                        </div>
+                                        <div className="flex flex-1 flex-col p-4">
+                                            <div className="flex items-start justify-between">
+                                                <div>
+                                                    <h3 className="font-medium line-clamp-1">{item.title}</h3>
+                                                    <p className="text-sm text-muted-foreground line-clamp-2 mt-1">
+                                                        {item.description}
+                                                    </p>
+                                                </div>
+                                                {item.featured && (
+                                                    <AnimatedBadge
+                                                        className="bg-primary text-primary-foreground"
+                                                        animation="pulse"
+                                                    >
+                                                        <Star className="mr-1 h-3 w-3" /> Featured
+                                                    </AnimatedBadge>
+                                                )}
+                                            </div>
+                                            <div className="mt-2 flex flex-wrap gap-1">
+                                                {item.tags.map(tag => {
+                                                    const category = categories.find(c => c.id === tag);
+                                                    return category ? (
+                                                        <Badge key={tag} variant="outline" className="text-xs">
+                                                            {category.label}
+                                                        </Badge>
+                                                    ) : null;
+                                                })}
+                                            </div>
+                                            <div className="flex items-center justify-between mt-auto pt-3">
+                                                <div className="flex items-center gap-2">
+                                                    <img
+                                                        src={item.author.avatar}
+                                                        alt={item.author.name}
+                                                        className="h-6 w-6 rounded-full border border-muted"
+                                                    />
+                                                    <span className="text-sm">{item.author.name}</span>
+                                                    <span className="text-xs text-muted-foreground">
+                                  {formatTimestamp(item.timestamp)}
+                                </span>
+                                                </div>
+                                                <div className="flex items-center gap-3 text-muted-foreground">
+                                                    <div className="flex items-center gap-1">
+                                                        <ThumbsUp className="h-4 w-4" />
+                                                        <span className="text-xs">{item.stats.likes}</span>
+                                                    </div>
+                                                    <div className="flex items-center gap-1">
+                                                        <MessageSquare className="h-4 w-4" />
+                                                        <span className="text-xs">{item.stats.comments}</span>
+                                                    </div>
+                                                    <div className="flex items-center gap-1">
+                                                        <Eye className="h-4 w-4" />
+                                                        <span className="text-xs">{item.stats.views}</span>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
-                                    ))}
-                                </div>
-                            </ScrollArea>
-                        </CardContent>
-                    </Card>
-                </TabsContent>
-
-                <TabsContent value="privacy" className="space-y-6">
-                    <Card>
-                        <CardHeader>
-                            <CardTitle>{localT('settings.privacy.title')}</CardTitle>
-                            <CardDescription>
-                                {localT('settings.privacy.description')}
-                            </CardDescription>
-                        </CardHeader>
-                        <CardContent className="space-y-6">
-                            <div className="space-y-4">
-                                <h3 className="text-sm font-medium">{localT('settings.privacy.profile')}</h3>
-                                <div className="space-y-2">
-                                    {[
-                                        { id: "public-profile", label: localT('settings.privacy.public_profile'), description: localT('settings.privacy.public_profile_description') },
-                                        { id: "searchable", label: localT('settings.privacy.searchable'), description: localT('settings.privacy.searchable_description') },
-                                        { id: "share-activity", label: localT('settings.privacy.share_activity'), description: localT('settings.privacy.share_activity_description') },
-                                    ].map((item) => (
-                                        <div key={item.id} className="flex items-start space-x-2">
-                                            <div className="pt-0.5">
-                                                <Switch id={item.id} defaultChecked />
-                                            </div>
-                                            <div>
-                                                <Label htmlFor={item.id}>{item.label}</Label>
-                                                <p className="text-sm text-muted-foreground">{item.description}</p>
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-
-                            <Separator />
-
-                            <div className="space-y-4">
-                                <h3 className="text-sm font-medium">{localT('settings.privacy.content')}</h3>
-                                <div className="space-y-2">
-                                    {[
-                                        { id: "auto-public", label: localT('settings.privacy.auto_public'), description: localT('settings.privacy.auto_public_description') },
-                                        { id: "show-prompts", label: localT('settings.privacy.show_prompts'), description: localT('settings.privacy.show_prompts_description') },
-                                        { id: "allow-remix", label: localT('settings.privacy.allow_remix'), description: localT('settings.privacy.allow_remix_description') },
-                                    ].map((item) => (
-                                        <div key={item.id} className="flex items-start space-x-2">
-                                            <div className="pt-0.5">
-                                                <Switch id={item.id} defaultChecked={item.id === "show-prompts"} />
-                                            </div>
-                                            <div>
-                                                <Label htmlFor={item.id}>{item.label}</Label>
-                                                <p className="text-sm text-muted-foreground">{item.description}</p>
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-
-                            <Separator />
-
-                            <div className="space-y-4">
-                                <h3 className="text-sm font-medium">{localT('settings.privacy.data')}</h3>
-                                <div className="space-y-2">
-                                    {[
-                                        { id: "anon-analytics", label: localT('settings.privacy.anon_analytics'), description: localT('settings.privacy.anon_analytics_description') },
-                                        { id: "model-training", label: localT('settings.privacy.model_training'), description: localT('settings.privacy.model_training_description') },
-                                        { id: "personalization", label: localT('settings.privacy.personalization'), description: localT('settings.privacy.personalization_description') },
-                                    ].map((item) => (
-                                        <div key={item.id} className="flex items-start space-x-2">
-                                            <div className="pt-0.5">
-                                                <Switch id={item.id} defaultChecked={item.id === "anon-analytics"} />
-                                            </div>
-                                            <div>
-                                                <Label htmlFor={item.id}>{item.label}</Label>
-                                                <p className="text-sm text-muted-foreground">{item.description}</p>
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-                        </CardContent>
-                        <CardFooter>
-                            <Button>
-                                <Save className="mr-2 h-4 w-4" />
-                                {localT('settings.privacy.save')}
-                            </Button>
-                        </CardFooter>
-                    </Card>
-
-                    <Card>
-                        <CardHeader>
-                            <CardTitle>{localT('settings.privacy.data_management')}</CardTitle>
-                            <CardDescription>
-                                {localT('settings.privacy.data_export')}
-                            </CardDescription>
-                        </CardHeader>
-                        <CardContent className="space-y-6">
-                            <div className="rounded-lg border p-4">
-                                <h3 className="font-medium mb-2">{localT('settings.privacy.data_export')}</h3>
-                                <p className="text-sm text-muted-foreground mb-4">
-                                    {localT('settings.privacy.data_export_description')}
-                                </p>
-                                <Button variant="outline">
-                                    <Download className="mr-2 h-4 w-4" />
-                                    {localT('settings.privacy.request_export')}
+                                    </AnimatedCard>
+                                ))}
+                            </StaggeredContainer>
+                        )}
+                        {filteredItems.length > 0 && (
+                            <div className="mt-8 flex justify-center">
+                                <Button
+                                    variant="outline"
+                                    onClick={handleLoadMore}
+                                    disabled={loading}
+                                    className="min-w-[200px]"
+                                >
+                                    {loading ? (
+                                        <>
+                                            <svg className="mr-2 h-4 w-4 animate-spin" viewBox="0 0 24 24">
+                                                <circle
+                                                    className="opacity-25"
+                                                    cx="12"
+                                                    cy="12"
+                                                    r="10"
+                                                    stroke="currentColor"
+                                                    strokeWidth="4"
+                                                    fill="none"
+                                                />
+                                                <path
+                                                    className="opacity-75"
+                                                    fill="currentColor"
+                                                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                                                />
+                                            </svg>
+                                            {localT('community.loading')}
+                                        </>
+                                    ) : (
+                                        <>{localT('community.load_more')}</>
+                                    )}
                                 </Button>
                             </div>
-
-                            <div className="rounded-lg border border-destructive/30 p-4">
-                                <h3 className="font-medium text-destructive mb-2">{localT('settings.privacy.data_removal')}</h3>
-                                <p className="text-sm text-muted-foreground mb-4">
-                                    {localT('settings.privacy.data_removal_description')}
+                        )}
+                        {filteredItems.length === 0 && (
+                            <div className="py-12 text-center">
+                                <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-muted">
+                                    <Search className="h-10 w-10 text-muted-foreground" />
+                                </div>
+                                <h3 className="mt-4 text-lg font-medium">{localT('community.no_results')}</h3>
+                                <p className="mt-2 text-sm text-muted-foreground">
+                                    {localT('community.try_adjusting')}
                                 </p>
-                                <Button variant="destructive">{localT('settings.privacy.request_removal')}</Button>
-                            </div>
-                        </CardContent>
-                    </Card>
-                </TabsContent>
-
-                <TabsContent value="api" className="space-y-6">
-                    <Card>
-                        <CardHeader>
-                            <CardTitle>{localT('settings.api.title')}</CardTitle>
-                            <CardDescription>
-                                {localT('settings.api.description')}
-                            </CardDescription>
-                        </CardHeader>
-                        <CardContent className="space-y-6">
-                            <div className="space-y-4">
-                                <h3 className="text-sm font-medium">{localT('settings.api.keys')}</h3>
-                                <div className="rounded-lg border p-4 space-y-4">
-                                    <div className="space-y-2">
-                                        <div className="flex items-center justify-between">
-                                            <div>
-                                                <h4 className="font-medium">{localT('settings.api.production_key')}</h4>
-                                                <p className="text-xs text-muted-foreground">{localT('settings.api.created')}: {language === 'ru' ? '15 марта 2025' : 'Mar 15, 2025'}</p>
-                                            </div>
-                                            <Badge variant="outline">{localT('settings.api.active')}</Badge>
-                                        </div>
-                                        <div className="flex items-center space-x-2">
-                                            <Input
-                                                type="password"
-                                                value="••••••••••••••••••••••••••••••"
-                                                readOnly
-                                                className="font-mono"
-                                            />
-                                            <Button variant="outline" size="icon">
-                                                <Copy className="h-4 w-4" />
-                                            </Button>
-                                        </div>
-                                    </div>
-                                    <div className="space-y-2">
-                                        <div className="flex items-center justify-between">
-                                            <div>
-                                                <h4 className="font-medium">{localT('settings.api.development_key')}</h4>
-                                                <p className="text-xs text-muted-foreground">{localT('settings.api.created')}: {language === 'ru' ? '10 марта 2025' : 'Mar 10, 2025'}</p>
-                                            </div>
-                                            <Badge variant="outline">{localT('settings.api.active')}</Badge>
-                                        </div>
-                                        <div className="flex items-center space-x-2">
-                                            <Input
-                                                type="password"
-                                                value="••••••••••••••••••••••••••••••"
-                                                readOnly
-                                                className="font-mono"
-                                            />
-                                            <Button variant="outline" size="icon">
-                                                <Copy className="h-4 w-4" />
-                                            </Button>
-                                        </div>
-                                    </div>
-                                    <Button className="w-full">
-                                        <Key className="mr-2 h-4 w-4" />
-                                        {localT('settings.api.generate')}
-                                    </Button>
-                                </div>
-                            </div>
-
-                            <Separator />
-
-                            <div className="space-y-4">
-                                <div className="flex justify-between items-center">
-                                    <h3 className="text-sm font-medium">{localT('settings.api.usage')}</h3>
-                                    <Button variant="outline" size="sm">{localT('settings.api.documentation')}</Button>
-                                </div>
-                                <div className="space-y-4">
-                                    <div className="flex items-center justify-between">
-                                        <span>{localT('settings.api.monthly_limit')}</span>
-                                        <span className="font-medium">{language === 'ru' ? '10 000 запросов' : '10,000 requests'}</span>
-                                    </div>
-                                    <div className="flex items-center justify-between">
-                                        <span>{localT('settings.api.used_month')}</span>
-                                        <span className="font-medium">{language === 'ru' ? '3 254 запроса' : '3,254 requests'}</span>
-                                    </div>
-                                    <Progress value={32.54} className="h-2" />
-                                    <p className="text-xs text-muted-foreground">
-                                        {localT('settings.api.usage_cycle')} {language === 'ru' ? '1 марта - 31 марта 2025' : 'Mar 1 - Mar 31, 2025'}
-                                    </p>
-                                </div>
-                            </div>
-
-                            <Separator />
-
-                            <div className="space-y-4">
-                                <h3 className="text-sm font-medium">{localT('settings.api.domains')}</h3>
-                                <p className="text-sm text-muted-foreground">
-                                    {localT('settings.api.domains_description')}
-                                </p>
-                                <div className="space-y-2">
-                                    <div className="flex items-center space-x-2">
-                                        <Input placeholder="Enter domain (e.g., example.com)" />
-                                        <Button variant="outline">{localT('settings.api.add_domain')}</Button>
-                                    </div>
-                                    <div className="rounded-lg border p-4">
-                                        <div className="flex items-center justify-between">
-                                            <span className="font-mono text-sm">{language === 'ru' ? 'вашсайт.рф' : 'yourwebsite.com'}</span>
-                                            <Button variant="ghost" size="icon">
-                                                <X className="h-4 w-4" />
-                                            </Button>
-                                        </div>
-                                        <Separator className="my-2" />
-                                        <div className="flex items-center justify-between">
-                                            <span className="font-mono text-sm">{language === 'ru' ? 'приложение.вашсайт.рф' : 'app.yourwebsite.com'}</span>
-                                            <Button variant="ghost" size="icon">
-                                                <X className="h-4 w-4" />
-                                            </Button>
-                                        </div>
-                                        <Separator className="my-2" />
-                                        <div className="flex items-center justify-between">
-                                            <span className="font-mono text-sm">localhost</span>
-                                            <Button variant="ghost" size="icon">
-                                                <X className="h-4 w-4" />
-                                            </Button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </CardContent>
-                        <CardFooter className="flex justify-between">
-                            <div className="flex items-center space-x-2">
-                                <Switch id="api-enabled" defaultChecked />
-                                <Label htmlFor="api-enabled">{localT('settings.api.enabled')}</Label>
-                            </div>
-                            <Button>{localT('settings.api.save')}</Button>
-                        </CardFooter>
-                    </Card>
-
-                    <Card>
-                        <CardHeader>
-                            <CardTitle>{localT('settings.api.webhooks')}</CardTitle>
-                            <CardDescription>
-                                {localT('settings.api.webhooks_description')}
-                            </CardDescription>
-                        </CardHeader>
-                        <CardContent className="space-y-4">
-                            <div className="flex items-center justify-between">
-                                <h3 className="text-sm font-medium">{localT('settings.api.endpoints')}</h3>
-                                <Button variant="outline" size="sm">
-                                    <Plus className="mr-2 h-4 w-4" />
-                                    {localT('settings.api.add_endpoint')}
+                                <Button
+                                    variant="outline"
+                                    className="mt-4"
+                                    onClick={() => {
+                                        setSearchQuery("");
+                                        setActiveCategory("all");
+                                    }}
+                                >
+                                    {localT('community.reset_filters')}
                                 </Button>
                             </div>
-                            <div className="rounded-lg border">
-                                <div className="p-4 space-y-2">
-                                    <div className="flex items-center justify-between">
-                                        <h4 className="font-medium">{localT('settings.api.generation_completed')}</h4>
-                                        <Badge variant="outline">{localT('settings.api.endpoint_active')}</Badge>
+                        )}
+                    </TabsContent>
+                    <TabsContent value="newest" className="mt-0">
+                        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+                            <p className="py-12 text-center text-muted-foreground col-span-full">
+                                Check out the latest artwork from our talented community.
+                            </p>
+                        </div>
+                    </TabsContent>
+                    <TabsContent value="collaborations" className="mt-0">
+                        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+                            {collaborations.map((collab, index) => (
+                                <AnimatedCard key={index} className="overflow-hidden">
+                                    <div className="aspect-video">
+                                        <img
+                                            src={collab.image}
+                                            alt={collab.title}
+                                            className="h-full w-full object-cover transition-transform group-hover:scale-105"
+                                        />
                                     </div>
-                                    <p className="font-mono text-sm text-muted-foreground">https://{language === 'ru' ? 'вашсайт.рф' : 'yourwebsite.com'}/api/webhooks/generations</p>
-                                    <div className="flex items-center space-x-2">
-                                        <Globe className="h-4 w-4 text-muted-foreground" />
-                                        <span className="text-xs text-muted-foreground">{localT('settings.api.events_description')}</span>
+                                    <CardContent className="p-4">
+                                        <h3 className="font-bold">{collab.title}</h3>
+                                        <p className="mt-1 text-sm text-muted-foreground line-clamp-2">
+                                            {collab.description}
+                                        </p>
+                                        <div className="mt-4 flex items-center justify-between">
+                                            <div className="flex -space-x-2">
+                                                {Array.from({ length: Math.min(5, collab.members) }).map((_, j) => (
+                                                    <img
+                                                        key={j}
+                                                        src={`/placeholder.svg?height=32&width=32&text=U${j}`}
+                                                        alt={`Collaborator ${j + 1}`}
+                                                        className="h-8 w-8 rounded-full border-2 border-background"
+                                                    />
+                                                ))}
+                                                {collab.members > 5 && (
+                                                    <div className="flex h-8 w-8 items-center justify-center rounded-full border-2 border-background bg-muted text-xs">
+                                                        +{collab.members - 5}
+                                                    </div>
+                                                )}
+                                            </div>
+                                            <Badge variant="outline">{localT('community.active_project')}</Badge>
+                                        </div>
+                                    </CardContent>
+                                    <CardFooter className="p-4 pt-0">
+                                        <Button className="w-full">{localT('community.view_project')}</Button>
+                                    </CardFooter>
+                                </AnimatedCard>
+                            ))}
+                        </div>
+                    </TabsContent>
+                    <TabsContent value="tutorials" className="mt-0">
+                        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+                            {tutorials.map((tutorial, index) => (
+                                <AnimatedCard key={index} className="overflow-hidden">
+                                    <div className="aspect-video">
+                                        <img
+                                            src={tutorial.image}
+                                            alt={tutorial.title}
+                                            className="h-full w-full object-cover"
+                                        />
+                                        <div className="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 transition-opacity group-hover:opacity-100">
+                                            <Button variant="secondary" size="icon" className="h-12 w-12 rounded-full">
+                                                <Play className="h-6 w-6" />
+                                            </Button>
+                                        </div>
                                     </div>
-                                </div>
-                                <Separator />
-                                <div className="p-4">
-                                    <div className="flex gap-2">
-                                        <Button variant="outline" size="sm">{localT('settings.api.edit')}</Button>
-                                        <Button variant="outline" size="sm">{localT('settings.api.test')}</Button>
-                                        <Button variant="destructive" size="sm">{localT('settings.api.delete')}</Button>
-                                    </div>
-                                </div>
-                            </div>
-                        </CardContent>
-                    </Card>
-                </TabsContent>
-            </Tabs>
-
-            <div className="fixed bottom-4 right-4 z-10">
-                <Button variant="secondary" size="sm" className="text-xs flex items-center gap-1 bg-background/80 backdrop-blur-sm">
-                    <LogOut className="mr-1 h-4 w-4" />
-                    {localT('settings.sign_out')}
-                </Button>
+                                    <CardContent className="p-4">
+                                        <h3 className="font-bold line-clamp-1">{tutorial.title}</h3>
+                                        <p className="text-sm text-muted-foreground">
+                                            {localT('community.by')} {tutorial.author} • {tutorial.views.toLocaleString()} {localT('community.views')}
+                                        </p>
+                                        <div className="mt-2 flex items-center gap-2">
+                                            <Badge variant="secondary">
+                                                <Clock className="mr-1 h-3 w-3" />
+                                                {tutorial.duration}
+                                            </Badge>
+                                            <Badge variant="secondary">
+                                                <BookOpen className="mr-1 h-3 w-3" />
+                                                {tutorial.level}
+                                            </Badge>
+                                        </div>
+                                    </CardContent>
+                                    <CardFooter className="p-4 pt-0">
+                                        <Button className="w-full">{localT('community.watch_tutorial')}</Button>
+                                    </CardFooter>
+                                </AnimatedCard>
+                            ))}
+                        </div>
+                    </TabsContent>
+                </Tabs>
             </div>
+            <div className="mb-12">
+                <h2 className="text-2xl font-bold mb-4">{localT('community.trending_tags')}</h2>
+                <div className="flex flex-wrap gap-2">
+                    {categories.slice(1).map((category) => (
+                        <Button
+                            key={category.id}
+                            variant="outline"
+                            className="group flex items-center gap-2"
+                            onClick={() => setActiveCategory(category.id)}
+                        >
+                            <Tag className="h-4 w-4 text-muted-foreground group-hover:text-foreground" />
+                            {category.label}
+                            <Badge variant="secondary" className="ml-1">
+                                {Math.floor(Math.random() * 500) + 50}
+                            </Badge>
+                        </Button>
+                    ))}
+                </div>
+            </div>
+            <div className="mb-4 rounded-lg border bg-muted/20 p-6">
+                <div className="flex flex-col md:flex-row items-start md:items-center gap-4">
+                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
+                        <Lightbulb className="h-6 w-6 text-primary" />
+                    </div>
+                    <div className="flex-1">
+                        <h3 className="text-lg font-medium">{localT('community.tips_title')}</h3>
+                        <p className="text-muted-foreground">
+                            {localT('community.tips_text')}
+                        </p>
+                    </div>
+                    <Button className="mt-2 md:mt-0">
+                        {localT('community.view_guides')}
+                    </Button>
+                </div>
+            </div>
+            {selectedImageIndex !== null && (
+                <ImagePreviewDialog
+                    open={previewOpen}
+                    onOpenChangeAction={setPreviewOpen}
+                    image={filteredItems[selectedImageIndex]?.image || ""}
+                    prompt={filteredItems[selectedImageIndex]?.description || ""}
+                    timestamp={formatTimestamp(filteredItems[selectedImageIndex]?.timestamp || "")}
+                    tags={filteredItems[selectedImageIndex]?.tags.map(tag => {
+                        const category = categories.find(c => c.id === tag);
+                        return category?.label || tag;
+                    }) || []}
+                />
+            )}
         </div>
-    )
+    );
 }
