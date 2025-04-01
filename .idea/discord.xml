@@ -1,7 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="DiscordProjectSettings">
-    <option name="show" value="ASK" />
-    <option name="description" value="" />
+    <option name="show" value="PROJECT_FILES" />
+    <option name="nameOverrideEnabled" value="true" />
+    <option name="nameOverrideText" value="VisioMera" />
+    <option name="description" value="Ебал в рот Бэкенд" />
+    <option name="applicationTheme" value="2024-icons" />
+    <option name="iconsTheme" value="material" />
+    <option name="button1Title" value="Бэкенд хуйня" />
+    <option name="button1Url" value="" />
+    <option name="button2Title" value="Бэкенд хуйня" />
+    <option name="button2Url" value="" />
+    <option name="customApplicationId" value="Бэкенд хуйня" />
   </component>
 </project>

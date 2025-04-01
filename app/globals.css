@@ -115,7 +115,7 @@
 }
 
 @keyframes gradient {
-  0% { background-position: 0% center; }
+  0% { background-position: 0 center; }
   100% { background-position: 300% center; }
 }
 
@@ -127,8 +127,7 @@
   background-size: 300% auto;
 }
 
-/* Предотвращение "прыжка" контента при открытии модальных окон */
-/* Предотвращение "прыжка" контента при открытии модальных окон */
+  /* Предотвращение "прыжка" контента при открытии модальных окон */
 :root {
   --scrollbar-width: 0px; /* Задаем начальное значение */
 }
@@ -147,4 +146,181 @@ body.dialog-open {
 .modal-scrollable {
   overflow-y: auto;
   max-height: 90vh;
+}
+
+/* Добавьте эти анимации в конец файла app/globals.css */
+
+/* Анимации для генератора */
+@keyframes float {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+  100% { transform: translateY(0px); }
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes fadeSlideUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+.animate-pulse-slow {
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.animate-shimmer {
+  background: linear-gradient(
+          90deg,
+          rgba(var(--primary), 0.1) 0%,
+          rgba(var(--primary), 0.2) 25%,
+          rgba(var(--primary), 0.1) 50%,
+          rgba(var(--primary), 0.2) 75%,
+          rgba(var(--primary), 0.1) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 3s infinite linear;
+}
+
+.animate-fade-slide-up {
+  animation: fadeSlideUp 0.5s ease-out forwards;
+}
+
+/* Стилизация скроллбара для улучшения UI */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(var(--muted-foreground), 0.3);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(var(--muted-foreground), 0.5);
+}
+
+/* Улучшенные стили для генератора изображений */
+.generation-preview {
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.generation-preview::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(var(--primary), 0.3), transparent);
+  transform: translateX(-100%);
+  animation: shimmerLine 2s infinite;
+  opacity: 0;
+  z-index: 10;
+}
+
+.generation-preview.generating::before {
+  opacity: 1;
+}
+
+@keyframes shimmerLine {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+/* Эффекты наведения для элементов управления */
+button:not([disabled]) {
+  transition: all 0.2s ease;
+}
+
+button:hover:not([disabled]) .icon-spin {
+  animation: spin 1s linear infinite;
+}
+
+input:focus, textarea:focus, select:focus {
+  transition: all 0.2s ease;
+  box-shadow: 0 0 0 2px rgba(var(--primary), 0.1);
+}
+
+.tag-badge {
+  transition: all 0.2s ease;
+}
+
+.tag-badge:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+/* Анимированный градиент для кнопки генерации */
+.gradient-button {
+  background-size: 200% 100%;
+  background-image: linear-gradient(
+          90deg,
+          hsl(var(--primary)) 0%,
+          hsl(var(--primary)/0.8) 50%,
+          hsl(var(--primary)) 100%
+  );
+  animation: shimmer 2s infinite linear;
+  transition: all 0.3s ease;
+}
+
+.gradient-button:hover {
+  background-size: 100% 100%;
+  animation: none;
+}
+
+/* Блестящая анимация для подсказок */
+.sparkle {
+  position: relative;
+}
+
+.sparkle::before,
+.sparkle::after {
+  content: "";
+  position: absolute;
+  background: rgba(255, 255, 255, 0.4);
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  animation: sparkleAnim 2s infinite;
+}
+
+.sparkle::before {
+  top: -8px;
+  left: -8px;
+}
+
+.sparkle::after {
+  bottom: -5px;
+  right: -5px;
+  animation-delay: 1s;
+}
+
+@keyframes sparkleAnim {
+  0%, 100% { transform: scale(0); opacity: 0; }
+  50% { transform: scale(1); opacity: 1; }
 }
